@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  miner:
+    build:
+      context: ./miner
+      dockerfile: Dockerfile
+    #image: web1:latest
+    ports:
+      - "8080:80"
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    #image: web2:latest
+    ports:
+      - "8081:80"
