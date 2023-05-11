@@ -17,7 +17,19 @@ bot = telebot.TeleBot(TOKEN)
 
 #%%
 
-@bot.message_handler(commands=['start'])
+def restart(message):
+
+    new_message = "Do you want to restart or do you want to go back to the films list?"
+
+    markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+    markup.add( telebot.types.KeyboardButton('/restart') )
+    markup.add( telebot.types.KeyboardButton('/ZKM_Films_List') )
+
+    bot.send_message(message.chat.id, new_message, reply_markup = markup)
+
+#%%
+
+@bot.message_handler(commands=['start','restart'])
 def send_welcome(message):
 
     markup_start= telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
@@ -53,6 +65,8 @@ def handle_not_url_message(message):
         bot.reply_to(message, new_message)
         update_users_db(message_id = message.message_id , chat_id = message.chat.id, title = message.text, Session_Maker = Session_Maker)
         bot.send_message(chat_id = message.chat.id, text = "You will be informed when the tickets become available.")
+
+    restart(message)
 
     global films_list_state
     del films_list_state
