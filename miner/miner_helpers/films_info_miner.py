@@ -78,7 +78,7 @@ def get_films_status(films: List[dict]) -> List[dict]:
 
         # run the async methods for each link(URL) in the list
         tasks = [loop.create_task(run_checker(film)) for film in films]
-        loop.run_until_complete(asyncio.wait(tasks))
+        loop.run_until_complete(asyncio.gather(*tasks))
 
     except Exception as error:
         # log the error or exception
