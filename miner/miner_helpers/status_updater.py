@@ -21,8 +21,8 @@ def session_maker(connection_uri: str):
 
 def update_films_list(rows: List[dict], Session_Maker) -> None:
 
-    new_rows = []
-    update_rows = []
+    new_rows: list = []
+    update_rows: list = []
 
     try:
 
@@ -72,8 +72,8 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
 
 def update_films_status(films: List[dict], Session) -> None:
 
-    new_rows = []
-    update_rows = []
+    new_rows: list = []
+    update_rows: list = []
 
     try:
 
