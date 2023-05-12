@@ -21,98 +21,111 @@ def session_maker(connection_uri: str):
 
 def update_films_list(rows: List[dict], Session_Maker) -> None:
 
-    # Create a new session
-    session = Session_Maker()
+    new_rows: list = []
+    update_rows: list = []
 
-    # TODO: Change this logic with bulk_insert_mappings and bulk_update_mappings later.
+    try:
 
-    for row in rows:
-        title = row.get('title')
-        link = row.get('link')
-        img_link = row.get('img_link')
+        # Create a new session
+        with Session_Maker() as session:
 
-        try:
-            # Check if the row already exists
-            row_exists = session.query(Films).filter(Films.title == title).first() is not None
+            for row in rows:
+                title = row.get('title')
+                link = row.get('link')
+                img_link = row.get('img_link')
 
-            if row_exists:
-                # Update the existing row
-                session.query(Films).filter(Films.title == title).update({
-                    Films.link: link,
-                    Films.img_link: img_link
-                })
-            else:
-                # Insert a new row
-                new_row = Films(
-                    title=title,
-                    link=link,
-                    img_link=img_link
-                )
-                session.add(new_row)
+                # Check if the row already exists
+                row_exists = session.query(Films).filter(Films.title == title).first()
 
-        except Exception as error:
-            logging.error(f'ERROR : {error}', exc_info=True)
-            session.rollback()
+                if row_exists is not None:
 
-    # Commit the changes and close the session
-    session.commit()
-    session.close()
+                    # Update the existing row
+                    update_rows.append({
+                        'id': row_exists.id,
+                        'link': link,
+                        'img_link': img_link
+                        })
+
+                else:
+
+                    # Insert a new row
+                    new_rows.append({
+                        'title':title,
+                        'link':link,
+                        'img_link':img_link
+                    })
+
+            # Perform bulk insert and update
+            session.bulk_insert_mappings(Films, new_rows)
+            session.bulk_update_mappings(Films, update_rows)
+
+            # Commit the changes and close the session
+            session.commit()
+            session.close()
+
+    except Exception as error:
+        logging.error(f'ERROR : {error}', exc_info=True)
+        session.rollback()
+
 
 #%%
 
 def update_films_status(films: List[dict], Session) -> None:
 
-    # Create a new session
-    session = Session()
+    new_rows: list = []
+    update_rows: list = []
 
-    # TODO: Change this logic with bulk_insert_mappings and bulk_update_mappings later.
+    try:
 
-    for film in films:
-        title = film.get('title')
-        link = film.get('link')
-        img_link = film.get('img_link')
-        last_checked = film.get('last_checked')
-        availability = film.get('availability')
-        imax_3d_ov = film.get('imax_3d_ov')
-        imax_ov = film.get('imax_ov')
-        hd_ov = film.get('hd_ov')
+        with Session() as session:
 
-        try:
-            # Check if the row already exists
-            row_exists = session.query(Films).filter(Films.title == title).first() is not None
+            for film in films:
 
-            if row_exists:
+                title = film.get('title')
+                link = film.get('link')
+                img_link = film.get('img_link')
+                last_checked = film.get('last_checked')
+                availability = film.get('availability')
+                imax_3d_ov = film.get('imax_3d_ov')
+                imax_ov = film.get('imax_ov')
+                hd_ov = film.get('hd_ov')
 
-                # Capture Data Change in availability column
-                last_update = session.query(Films.availability).filter(Films.title == title).first()
+                # Check if the row already exists
+                row_exists = session.query(Films).filter(Films.title == title).first()
 
-                # Update the existing row
-                session.query(Films).filter(Films.title == title).update({
-                    Films.last_checked: last_checked,
-                    Films.availability: availability,
-                    Films.imax_3d_ov: imax_3d_ov,
-                    Films.imax_ov: imax_ov,
-                    Films.hd_ov: hd_ov,
-                    Films.last_update: last_update[0]
-                })
-            else:
-                # Insert a new row
-                new_row = Films(
-                    title=title,
-                    link = link,
-                    img_link = img_link,
-                    last_checked = last_checked,
-                    availability = availability,
-                    imax_3d_ov = imax_3d_ov,
-                    imax_ov = imax_ov,
-                    hd_ov = hd_ov
-                )
-                session.add(new_row)
+                if row_exists is not None:
 
-        except Exception as error:
-            logging.error(f'ERROR : {error}', exc_info=True)
-            session.rollback()
+                    # Update the existing row
+                    update_rows.append({
+                        'id': row_exists.id,
+                        'last_checked': last_checked,
+                        'availability': availability,
+                        'imax_3d_ov': imax_3d_ov,
+                        'imax_ov': imax_ov,
+                        'hd_ov': hd_ov,
+                        'last_update': row_exists.availability
+                    })
+                else:
+                    # Insert a new row
+                    new_rows.append({
+                        'title': title,
+                        'link':link,
+                        'img_link':img_link,
+                        'last_checked' : last_checked,
+                        'availability' : availability,
+                        'imax_3d_ov' : imax_3d_ov,
+                        'imax_ov' : imax_ov,
+                        'hd_ov' : hd_ov
+                        })
 
-    # Commit the changes and close the session
-    session.commit()
-    session.close()
+            # Perform bulk insert and update
+            session.bulk_insert_mappings(Films, new_rows)
+            session.bulk_update_mappings(Films, update_rows)
+
+            # Commit the changes and close the session
+            session.commit()
+            session.close()
+
+    except Exception as error:
+        logging.error(f'ERROR : {error}', exc_info=True)
+        session.rollback()

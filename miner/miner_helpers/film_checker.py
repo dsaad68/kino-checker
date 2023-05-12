@@ -1,6 +1,5 @@
 #%%
 
-import requests
 import aiohttp
 import logging
 
@@ -12,14 +11,17 @@ class Film_Checker:
 
     def __init__(self, url) -> None:
         self.url = url
-        self.session = requests.Session()
 
-    async def get_website(self):
+    async def get_website(self) -> BeautifulSoup:
+
         try:
+
             async with aiohttp.ClientSession() as session:
+
                 async with session.get(self.url) as response:
                     html_content = await response.text()
                     self.soup = BeautifulSoup(html_content, "html.parser")
+
         except Exception as e:
             logging.error(f'Error fetching website content: {e}')
 
