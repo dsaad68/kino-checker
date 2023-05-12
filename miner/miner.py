@@ -25,7 +25,7 @@ def sleep_with_progress(seconds):
 #%%
 if __name__ == "__main__":
 
-    TIME_INTERVAL = 300
+    TIME_INTERVAL = 120
 
     SQL_CONNECTION_URI = os.environ.get('KINO_POSTGRES_CONNECTION_URI')
     BOT_TOKEN = os.environ.get('Telegram_Dev_Bot')
