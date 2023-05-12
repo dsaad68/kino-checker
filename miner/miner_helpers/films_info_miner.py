@@ -5,6 +5,8 @@ import requests
 import asyncio
 import logging
 
+from asyncio import Semaphore
+
 from bs4 import BeautifulSoup
 from typing import List
 
@@ -49,39 +51,48 @@ def get_films_status(films: List[dict]) -> List[dict]:
     # create a list to store the results
     results = []
 
+    # using a Semaphore to limit the number of concurrent requests
+    # running too many requests concurrently can lead to performance issues
+    # or rate-limiting from the target server
+    sem = Semaphore(20)
+
     # create a coroutine to run the async methods
     async def run_checker(film:dict) -> None:
 
-        try:
+        async with sem:
 
-            film_checker = Film_Checker(film.get('link'))
-            await film_checker.get_website()
+            try:
 
-            film.update({
-                'availability' : film_checker.check_availability(),
-                'last_checked': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'imax_3d_ov' : film_checker.check_imax_3d_ov(),
-                'imax_ov': film_checker.check_imax_ov(),
-                'hd_ov': film_checker.check_hd_ov()
-                })
+                film_checker = Film_Checker(film.get('link'))
+                await film_checker.get_website()
 
-            results.append(film)
+                film.update({
+                    'availability' : film_checker.check_availability(),
+                    'last_checked': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'imax_3d_ov' : film_checker.check_imax_3d_ov(),
+                    'imax_ov': film_checker.check_imax_ov(),
+                    'hd_ov': film_checker.check_hd_ov()
+                    })
 
-        except Exception as e:
-            # log the error or exception
-            logging.error(f"Error occurred while processing film: {film.get('name')}\n{str(e)}")
+                results.append(film)
+
+            except Exception as e:
+                # log the error or exception
+                logging.error(f"Error occurred while processing film: {film.get('name')}\n{str(e)}")
 
     try:
+
         # create an event loop to run the async methods
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
         # run the async methods for each link(URL) in the list
         tasks = [loop.create_task(run_checker(film)) for film in films]
-        loop.run_until_complete(asyncio.wait(tasks))
+        loop.run_until_complete(asyncio.gather(*tasks))
 
     except Exception as error:
         # log the error or exception
         logging.error(error)
 
     return results
+# %%
