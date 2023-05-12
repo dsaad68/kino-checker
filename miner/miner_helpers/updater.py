@@ -10,7 +10,7 @@ from tables.tables_model import Films, Users
 
 #%%
 
-def message(user) -> str:
+def message(user: dict) -> str:
 
     positive = "✅🎥 You Can Buy Ticket Now!🎥✅\n"
     negative = "❌ Not Available Now!❌\n"
