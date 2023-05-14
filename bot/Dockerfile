@@ -1,5 +1,11 @@
 FROM python:3.11.3-slim-bullseye
 
+RUN echo "Europe/Berlin" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+
+RUN echo "Europe/Berlin" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+
 RUN apt update && apt upgrade -y && apt install gcc -y
 
 WORKDIR /app
