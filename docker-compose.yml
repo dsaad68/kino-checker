@@ -8,6 +8,7 @@ services:
     #image: web1:latest
     ports:
       - "8080:80"
+    restart: always
 
   bot:
     build:
@@ -16,3 +17,4 @@ services:
     #image: web2:latest
     ports:
       - "8081:80"
+    restart: always
