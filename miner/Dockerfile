@@ -1,8 +1,8 @@
 FROM python:3.11.3-slim-bullseye
 
 # Set the Timezone
-RUN echo "Europe/Berlin" > /etc/timezone
-RUN dpkg-reconfigure -f noninteractive tzdata
+ENV TZ="Europe/Berlin"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 RUN apt update && apt upgrade -y && apt install gcc -y
 
