@@ -1,5 +1,6 @@
 FROM python:3.11.3-slim-bullseye
 
+# Set the Timezone
 RUN echo "Europe/Berlin" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 
