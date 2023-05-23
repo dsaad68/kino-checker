@@ -18,9 +18,9 @@ def message(user: dict) -> str:
 
     return (f'{ positive if user.get("availability") else negative }'
             f'\nFilm is available: { "✅" if user.get("availability") else "❌"}\n'
-            f'IMAX 3D OV: {"✅" if user.get("check_imax_3d_ov") else "❌"}\n'
-            f'IMAX OV: {"✅" if user.get("check_imax_ov") else "❌"}\n'
-            f'HD OV: {"✅" if user.get("check_hd_ov") else "❌"}\n'
+            f'IMAX 3D OV: {"✅" if user.get("imax_3d_ov") else "❌"}\n'
+            f'IMAX OV: {"✅" if user.get("imax_ov") else "❌"}\n'
+            f'HD OV: {"✅" if user.get("hd_ov") else "❌"}\n'
             f'\nLast time check:\n'
             f'{user.get("last_checked")}\n'
             f'{buy_tick if user.get("availability") else ""}'
