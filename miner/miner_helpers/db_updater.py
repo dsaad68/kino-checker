@@ -56,9 +56,14 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
                         'img_link':img_link
                     })
 
+            logging.info(f'New rows: {len(new_rows)}')
+            logging.info(f'Update rows: {len(update_rows)}')
+
             # Perform bulk insert and update
-            session.bulk_insert_mappings(Films, new_rows)
-            session.bulk_update_mappings(Films, update_rows)
+            if new_rows:
+                session.bulk_insert_mappings(Films, new_rows)
+            if update_rows:
+                session.bulk_update_mappings(Films, update_rows)
 
             # Commit the changes and close the session
             session.commit()
