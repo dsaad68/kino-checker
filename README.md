@@ -14,10 +14,10 @@ CREATE TABLE kino.films (
   img_link TEXT,
   last_checked TIMESTAMP,
   availability BOOLEAN DEFAULT FALSE,
+  availability_date TIMESTAMP,
   imax_3d_ov BOOLEAN DEFAULT FALSE,
   imax_ov BOOLEAN DEFAULT FALSE,
   hd_ov BOOLEAN DEFAULT FALSE,
-  availability_date TIMESTAMP,
   last_update BOOLEAN DEFAULT FALSE,
   trackable BOOLEAN DEFAULT TRUE
  );
