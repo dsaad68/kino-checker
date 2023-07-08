@@ -5,7 +5,9 @@ services:
     build:
       context: ./miner
       dockerfile: Dockerfile
-    #image: web1:latest
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
     ports:
       - "8080:80"
     restart: always
@@ -14,7 +16,9 @@ services:
     build:
       context: ./bot
       dockerfile: Dockerfile
-    #image: web2:latest
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
     ports:
       - "8081:80"
     restart: always
