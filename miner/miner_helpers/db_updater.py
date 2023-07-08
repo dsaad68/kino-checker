@@ -38,7 +38,7 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
                 # Check if the row already exists
                 row_exists = session.query(Films).filter(Films.title == title).first()
 
-                if row_exists is not None:
+                if row_exists:
 
                     # Update the existing row
                     update_rows.append({
@@ -67,18 +67,20 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
 
             # Commit the changes and close the session
             session.commit()
-            session.close()
 
     except Exception as error:
         logging.error(f'ERROR : {error}', exc_info=True)
         session.rollback()
+
+    # Finally close the session
+    finally:
+        session.close()
 
 
 #%%
 
 def update_films_status(films: List[dict], Session) -> None:
 
-    new_rows: list = []
     update_rows: list = []
 
     try:
@@ -88,8 +90,6 @@ def update_films_status(films: List[dict], Session) -> None:
             for film in films:
 
                 title = film.get('title')
-                link = film.get('link')
-                img_link = film.get('img_link')
                 last_checked = film.get('last_checked')
                 availability = film.get('availability')
                 imax_3d_ov = film.get('imax_3d_ov')
@@ -99,7 +99,7 @@ def update_films_status(films: List[dict], Session) -> None:
                 # Check if the row already exists
                 row_exists = session.query(Films).filter(Films.title == title).first()
 
-                if availability == True and row_exists.last_update == False:
+                if availability and not row_exists.last_update:
                     # Update the existing row
                     update_rows.append({
                         'id': row_exists.id,
@@ -129,10 +129,13 @@ def update_films_status(films: List[dict], Session) -> None:
             # Perform bulk update
             session.bulk_update_mappings(Films, update_rows)
 
-            # Commit the changes and close the session
+            # Commit the changes
             session.commit()
-            session.close()
 
     except Exception as error:
         logging.error(f'ERROR : {error}', exc_info=True)
         session.rollback()
+
+    # Finally close the session
+    finally:
+        session.close()
