@@ -8,8 +8,8 @@ import asyncio
 from alive_progress import alive_bar
 
 from miner_helpers.films_info_miner import get_films_list, get_films_status
-from miner_helpers.status_updater import session_maker, update_films_list, update_films_status
-from miner_helpers.updater import get_films_db_status, send_status
+from miner_helpers.db_updater import session_maker, update_films_list, update_films_status
+from miner_helpers.tlg_updater import get_films_db_status, send_status
 
 from logger.custom_logger import Logger
 
@@ -45,13 +45,13 @@ if __name__ == "__main__":
 
         Session_Maker = session_maker(SQL_CONNECTION_URI)
 
-        logging.info("Getting the films' list!")
+        logging.info("Getting the films' list from the website!")
         Films = get_films_list(url)
 
         logging.info("Updating the films' list in DB!")
         update_films_list(Films, Session_Maker)
 
-        logging.info("Getting the films' status!")
+        logging.info("Getting the films' status from the website!")
         Films = get_films_status(Films)
 
         logging.info("Updating the films' status in DB!")
