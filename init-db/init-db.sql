@@ -1,12 +1,5 @@
-# Kino Tracker BOT
-
-## How to create the SQL Tables
-
-```sql
 CREATE SCHEMA IF NOT EXISTS kino;
-```
 
-```sql
 CREATE TABLE kino.films (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -21,9 +14,7 @@ CREATE TABLE kino.films (
   last_update BOOLEAN DEFAULT FALSE,
   trackable BOOLEAN DEFAULT TRUE
  );
-```
 
-```sql
 CREATE TABLE kino.users (
   id SERIAL PRIMARY KEY,
   chat_id VARCHAR(255) NOT NULL,
@@ -31,4 +22,3 @@ CREATE TABLE kino.users (
   title VARCHAR(255) NOT NULL,
   notified BOOLEAN DEFAULT FALSE
  );
-```

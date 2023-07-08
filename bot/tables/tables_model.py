@@ -15,10 +15,12 @@ class Films(Base):
     img_link = Column(Text)
     last_checked = Column(TIMESTAMP)
     availability = Column(Boolean, default=False)
+    availability_date = Column(TIMESTAMP)
     imax_3d_ov = Column(Boolean, default=False)
     imax_ov = Column(Boolean, default=False)
     hd_ov = Column(Boolean, default=False)
     last_update = Column(Boolean, default=False)
+    trackable = Column(Boolean, default=True)
 
 # Define a model for the kino.users table
 class Users(Base):
