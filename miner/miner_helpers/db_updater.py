@@ -1,5 +1,6 @@
 #%%
 import logging
+import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -93,8 +94,20 @@ def update_films_status(films: List[dict], Session) -> None:
                 # Check if the row already exists
                 row_exists = session.query(Films).filter(Films.title == title).first()
 
-                if row_exists is not None:
+                if availability == True and row_exists.last_update == False:
+                    # Update the existing row
+                    update_rows.append({
+                        'id': row_exists.id,
+                        'last_checked': last_checked,
+                        'availability': availability,
+                        'imax_3d_ov': imax_3d_ov,
+                        'imax_ov': imax_ov,
+                        'hd_ov': hd_ov,
+                        'last_update': row_exists.availability,
+                        'availability_date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    })
 
+                else:
                     # Update the existing row
                     update_rows.append({
                         'id': row_exists.id,
@@ -105,21 +118,10 @@ def update_films_status(films: List[dict], Session) -> None:
                         'hd_ov': hd_ov,
                         'last_update': row_exists.availability
                     })
-                else:
-                    # Insert a new row
-                    new_rows.append({
-                        'title': title,
-                        'link':link,
-                        'img_link':img_link,
-                        'last_checked' : last_checked,
-                        'availability' : availability,
-                        'imax_3d_ov' : imax_3d_ov,
-                        'imax_ov' : imax_ov,
-                        'hd_ov' : hd_ov
-                        })
 
-            # Perform bulk insert and update
-            session.bulk_insert_mappings(Films, new_rows)
+            logging.info(f'Update rows: {len(update_rows)}')
+
+            # Perform bulk update
             session.bulk_update_mappings(Films, update_rows)
 
             # Commit the changes and close the session
