@@ -27,8 +27,8 @@ if __name__ == "__main__":
 
     TIME_INTERVAL = 120
 
-    SQL_CONNECTION_URI = os.environ.get('KINO_POSTGRES_CONNECTION_URI')
-    BOT_TOKEN = os.environ.get('Telegram_Dev_Bot')
+    SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
+    BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
     logger = Logger(file_handler=True)
     logger.get_logger()

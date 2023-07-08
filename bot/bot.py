@@ -3,7 +3,6 @@
 import os
 import telebot
 import logging
-import time
 
 from bot_helpers.info_finder import session_maker, get_films_list_db, get_film_info_db, update_users_db
 from bot_helpers.answers import answer
@@ -12,7 +11,7 @@ from logger.custom_logger import Logger
 
 #%%
 
-TOKEN = os.environ.get('Telegram_Dev_Bot')
+TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
 
 #%%
@@ -78,7 +77,7 @@ if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
 
-    SQL_CONNECTION_URI = os.environ.get('KINO_POSTGRES_CONNECTION_URI')
+    SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
     Session_Maker = session_maker(SQL_CONNECTION_URI)
 
     logging.info("----- Bot starts to run! -----")
