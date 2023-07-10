@@ -8,8 +8,6 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
-    ports:
-      - "8080:80"
     restart: always
 
   bot:
@@ -19,8 +17,6 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
-    ports:
-      - "8081:80"
     restart: always
 
   cleaner:
@@ -29,6 +25,4 @@ services:
       dockerfile: Dockerfile
     environment:
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
-    ports:
-      - "8082:80"
     restart: always
