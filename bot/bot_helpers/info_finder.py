@@ -14,23 +14,27 @@ from sqlalchemy.orm import sessionmaker
 def session_maker(connection_uri: str) -> sessionmaker:
 
     # Define the database connection
-    engine = create_engine(connection_uri)
+    engine = create_engine(connection_uri, pool_size=2, max_overflow=2)
 
     # Define a session factory
     return sessionmaker(bind=engine)
 
-def get_films_list_db(Session_Maker: sessionmaker) -> List:
+def get_films_list_db(Session_Maker: sessionmaker) -> List[str]:
 
     try:
 
         with Session_Maker() as session:
 
-            films = session.query(Films.title).all()
+            films = session.query(Films.title).filter(Films.trackable == True).all()
             return [film[0] for film in films]
 
     except Exception as error:
         logging.error(f'ERROR: {error}', exc_info=True)
         return []
+
+    # Finally close the session
+    finally:
+        session.close()
 
 def get_film_info_db(title: str , Session_Maker: sessionmaker) -> dict:
 
@@ -38,19 +42,26 @@ def get_film_info_db(title: str , Session_Maker: sessionmaker) -> dict:
 
         with Session_Maker() as session:
 
-            film = session.query(Films).filter(Films.title == title).one()
+            film = session.query(Films).filter(Films.title == title).first()
 
-        return {'title': film.title,
-                'availability': film.availability,
-                'imax_3d_ov': film.imax_3d_ov,
-                'imax_ov': film.imax_ov,
-                'hd_ov': film.hd_ov,
-                'last_checked': film.last_checked,
-                'link': film.link}
+        if film:
+            return {'title': film.title,
+                    'availability': film.availability,
+                    'imax_3d_ov': film.imax_3d_ov,
+                    'imax_ov': film.imax_ov,
+                    'hd_ov': film.hd_ov,
+                    'last_checked': film.last_checked,
+                    'link': film.link}
+
+        logging.info(f'No film with title {title} found in the database')
+        return {}
 
     except Exception as error:
         logging.error(f'ERROR: {error}', exc_info=True)
         return {}
+
+    finally:
+        session.close()
 
 def update_users_db(chat_id, message_id, title, Session_Maker: sessionmaker) -> None:
     # sourcery skip: hoist-statement-from-if, use-named-expression
@@ -76,5 +87,6 @@ def update_users_db(chat_id, message_id, title, Session_Maker: sessionmaker) -> 
     except Exception as error:
         logging.error(f'ERROR: {error}', exc_info=True)
 
+    # Finally close the session
     finally:
         session.close()

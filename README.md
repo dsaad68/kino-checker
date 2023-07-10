@@ -1,28 +1,20 @@
-# Kino Tracker BOT
+# Kino Tracker Bot
 
-## How to create the SQL Tables
+Kino Tracker Bot is a Telegram bot that tracks the availability of movies in a selected cinemas and notifies users when a movie becomes available.
 
-```sql
-CREATE TABLE kino.films (
-  id SERIAL PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  link TEXT,
-  img_link TEXT,
-  last_checked TIMESTAMP,
-  availability BOOLEAN DEFAULT FALSE,
-  imax_3d_ov BOOLEAN DEFAULT FALSE,
-  imax_ov BOOLEAN DEFAULT FALSE,
-  hd_ov BOOLEAN DEFAULT FALSE,
-  last_update BOOLEAN DEFAULT FALSE
- );
-```
+Features
+* Tracks the availability of movies in selected cinemas
+* Notifies users when a movie becomes available
 
-```sql
-CREATE TABLE kino.users (
-  id SERIAL PRIMARY KEY,
-  chat_id VARCHAR(255) NOT NULL,
-  message_id VARCHAR(255) NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  notified BOOLEAN DEFAULT FALSE
- );
+*This bot requires a PostgreSQL database to store the user data. The database is not included in this repository.*
+
+## How to run the bot
+
+1. *Set the environment variables*\n
+Use the .env file to add environment variables for Docker Compose.
+2. *Initialize the database*\n
+Use `init-db\init-db.sql` to init the database.
+3. *To start a the bot, you can use the docker-compose up command in the terminal.*\n
+```shell
+docker compose up
 ```

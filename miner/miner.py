@@ -8,8 +8,8 @@ import asyncio
 from alive_progress import alive_bar
 
 from miner_helpers.films_info_miner import get_films_list, get_films_status
-from miner_helpers.status_updater import session_maker, update_films_list, update_films_status
-from miner_helpers.updater import get_films_db_status, send_status
+from miner_helpers.db_updater import session_maker, update_films_list, update_films_status
+from miner_helpers.tlg_updater import get_films_db_status, send_status
 
 from logger.custom_logger import Logger
 
@@ -25,17 +25,19 @@ def sleep_with_progress(seconds):
 #%%
 if __name__ == "__main__":
 
-    TIME_INTERVAL = 120
+    logger = Logger(file_handler=True)
+    logger.get_logger()
 
     SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
     BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
-    logger = Logger(file_handler=True)
-    logger.get_logger()
+    TIME_INTERVAL = 120
+
+    url = 'https://www.filmpalast.net/vorschau.html'
 
     logging.info("Main starts!")
 
-    url = 'https://www.filmpalast.net/vorschau.html'
+    Session_Maker = session_maker(SQL_CONNECTION_URI)
 
     while True:
 
@@ -43,15 +45,13 @@ if __name__ == "__main__":
 
         start_time = time.time()
 
-        Session_Maker = session_maker(SQL_CONNECTION_URI)
-
-        logging.info("Getting the films' list!")
+        logging.info("Getting the films' list from the website!")
         Films = get_films_list(url)
 
         logging.info("Updating the films' list in DB!")
         update_films_list(Films, Session_Maker)
 
-        logging.info("Getting the films' status!")
+        logging.info("Getting the films' status from the website!")
         Films = get_films_status(Films)
 
         logging.info("Updating the films' status in DB!")
