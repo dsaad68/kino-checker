@@ -1,6 +1,6 @@
 # Kino Tracker Bot
 
-Kino Tracker Bot is a Telegram bot that tracks the availability of movies in selected cinemas and notifies users when a movie becomes available.
+Kino Tracker Bot is a Telegram bot that tracks the availability of movies in a selected cinemas and notifies users when a movie becomes available.
 
 Features
 * Tracks the availability of movies in selected cinemas
