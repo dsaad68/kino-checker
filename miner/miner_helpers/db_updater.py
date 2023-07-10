@@ -13,7 +13,7 @@ from tables.tables_model import Films
 def session_maker(connection_uri: str):
 
     # Define the database connection
-    engine = create_engine(connection_uri)
+    engine = create_engine(connection_uri, pool_size=2, max_overflow=2)
 
     # Define a session factory
     return sessionmaker(bind=engine)

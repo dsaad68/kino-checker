@@ -78,6 +78,7 @@ if __name__ == "__main__":
     logger.get_logger()
 
     SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
+
     Session_Maker = session_maker(SQL_CONNECTION_URI)
 
     logging.info("----- Bot starts to run! -----")

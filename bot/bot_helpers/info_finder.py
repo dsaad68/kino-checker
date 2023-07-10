@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 def session_maker(connection_uri: str) -> sessionmaker:
 
     # Define the database connection
-    engine = create_engine(connection_uri)
+    engine = create_engine(connection_uri, pool_size=2, max_overflow=2)
 
     # Define a session factory
     return sessionmaker(bind=engine)

@@ -25,25 +25,25 @@ def sleep_with_progress(seconds):
 #%%
 if __name__ == "__main__":
 
-    TIME_INTERVAL = 120
+    logger = Logger(file_handler=True)
+    logger.get_logger()
 
     SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
     BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
-    logger = Logger(file_handler=True)
-    logger.get_logger()
+    TIME_INTERVAL = 120
+
+    url = 'https://www.filmpalast.net/vorschau.html'
 
     logging.info("Main starts!")
 
-    url = 'https://www.filmpalast.net/vorschau.html'
+    Session_Maker = session_maker(SQL_CONNECTION_URI)
 
     while True:
 
         logging.info("----- Mining session starts! -----")
 
         start_time = time.time()
-
-        Session_Maker = session_maker(SQL_CONNECTION_URI)
 
         logging.info("Getting the films' list from the website!")
         Films = get_films_list(url)
