@@ -8,8 +8,7 @@ from sqlalchemy.engine import create_engine
 
 
 class EnvVar(enum.Enum):
-    INT_DB_URL = enum.auto
-
+    INT_DB_URL = enum.auto()
 
 class IntegrationDb:
 
