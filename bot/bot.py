@@ -7,7 +7,7 @@ import logging
 from bot_helpers.info_finder import session_maker, get_films_list_db, get_film_info_db, update_users_db
 from bot_helpers.answers import answer
 
-from logger.custom_logger import Logger
+from my_logger import Logger
 
 #%%
 

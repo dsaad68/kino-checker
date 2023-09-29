@@ -1,0 +1,5 @@
+# Assume Python 3.11
+target-version = "py311"
+
+# Maximum line length
+line-length = 160

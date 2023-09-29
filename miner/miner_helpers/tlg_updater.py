@@ -32,9 +32,10 @@ def get_films_db_status(Session_Maker) -> List[dict]:
 
         with Session_Maker() as session:
 
-            subquery = session.query(Films.title).filter(Films.availability != Films.last_update , Films.availability == True)
+            subquery = session.query(Films.title).filter(Films.availability != Films.last_update , Films.availability == True) # noqa: E712
 
-            results = ( session.query(Users.chat_id, Users.message_id, Users.title, Films.availability, Films.imax_3d_ov, Films.imax_ov, Films.hd_ov, Films.last_checked, Films.link)
+            results = ( session.query(Users.chat_id, Users.message_id, Users.title, 
+                                       Films.availability, Films.imax_3d_ov, Films.imax_ov, Films.hd_ov, Films.last_checked, Films.link)
                        .join(Films, Films.title == Users.title)
                        .filter(Users.title.in_(subquery))
                        ).all()

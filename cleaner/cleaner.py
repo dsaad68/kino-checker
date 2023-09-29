@@ -9,7 +9,7 @@ from tables.tables_model import Films
 from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker
 
-from logger.custom_logger import Logger
+from my_logger import Logger
 
 #%%
 
@@ -42,7 +42,7 @@ def update_trackable_rows(Session_Maker, days:int = 120) -> None:
         with Session_Maker() as session:
 
             # Create an update statement
-            update_stmt = update(Films).where(Films.availability_date < threshold_date, Films.trackable == True).values(trackable=False)
+            update_stmt = update(Films).where(Films.availability_date < threshold_date, Films.trackable == True).values(trackable=False) # noqa: E712
 
             # Execute the update statement
             results = session.execute(update_stmt)

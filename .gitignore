@@ -1,6 +1,9 @@
+build
 .old
 __pycache__
 test*.*
 *.log
 *-bckp.*
 *_bckp.*
+.ruff_cache
+*.egg-info
