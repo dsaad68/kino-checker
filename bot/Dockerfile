@@ -8,11 +8,14 @@ RUN apt update && apt upgrade -y && apt install gcc -y
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the src directory contents into the container at /app/src
+# Copy the directory contents into the container at /app/
 COPY . .
+
+# Install requirements
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+# Install the custom logger
+RUN pip install --no-cache-dir ./my_logger
 
 # Expose the port the app runs on
 EXPOSE 80
