@@ -6,7 +6,7 @@ import asyncio
 from typing import List
 from telebot.async_telebot import AsyncTeleBot
 
-from tables.tables_model import Films, Users
+from .db_model import Films, Users
 
 #%%
 

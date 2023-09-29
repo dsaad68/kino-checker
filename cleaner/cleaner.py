@@ -4,7 +4,7 @@ import logging
 
 from datetime import datetime, timedelta
 
-from tables.tables_model import Films
+from cleaner_helpers.db_model import Films
 
 from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker

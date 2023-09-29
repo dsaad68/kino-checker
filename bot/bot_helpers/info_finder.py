@@ -3,11 +3,10 @@
 import logging
 
 from typing import List
-
-from tables.tables_model import Films, Users
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from .db_model import Films, Users
 
 #%%
 

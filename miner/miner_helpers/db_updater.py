@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from typing import List
 
-from tables.tables_model import Films
+from .db_model import Films
 #%%
 
 def session_maker(connection_uri: str):

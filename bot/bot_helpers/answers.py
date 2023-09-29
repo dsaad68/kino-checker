@@ -1,8 +1,5 @@
 #%%
 
-
-#%%
-
 def answer(film) -> str:
 
     positive = "✅🎥 You Can Buy Ticket Now!🎥✅\n"
