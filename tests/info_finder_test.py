@@ -41,15 +41,15 @@ def test_get_film_info_db():
         
         Session_Maker = session_maker(CONNECTION_STRING)
         
-        Result = get_film_info_db(title= 'Oppenheimer', Session_Maker= Session_Maker)
+        Result = get_film_info_db(title= 'Transformers - Aufstieg der Bestien', Session_Maker= Session_Maker)
         
-        assert Result == {'title': 'Oppenheimer',
+        assert Result == {'title': 'Transformers - Aufstieg der Bestien',
                         'availability': True,
-                        'imax_3d_ov': False,
-                        'imax_ov': True,
-                        'hd_ov': True,
-                        'last_checked': datetime.datetime(2023, 7, 20, 0, 4, 54),
-                        'link': 'https://www.filmpalast.net/film/oppenheimer.html'}
+                        'imax_3d_ov': True,
+                        'imax_ov': False,
+                        'hd_ov': False,
+                        'last_checked': datetime.datetime(2023, 6, 8, 0, 3, 14),
+                        'link': 'https://www.filmpalast.net/film/transformers-aufstieg-der-bestien.html'}
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")

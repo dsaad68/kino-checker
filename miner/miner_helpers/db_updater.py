@@ -21,7 +21,8 @@ def session_maker(connection_uri: str):
 #%%
 
 def update_films_list(rows: List[dict], Session_Maker) -> None:
-
+    # TODO: this function should be refactored 
+    
     new_rows: list = []
     update_rows: list = []
 
@@ -30,6 +31,7 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
         # Create a new session
         with Session_Maker() as session:
 
+            # sourcery skip: extract-method, use-named-expression
             for row in rows:
                 title = row.get('title')
                 link = row.get('link')
@@ -80,6 +82,7 @@ def update_films_list(rows: List[dict], Session_Maker) -> None:
 #%%
 
 def update_films_status(films: List[dict], Session) -> None:
+    # TODO: this function should be refactored
 
     update_rows: list = []
 
@@ -100,7 +103,7 @@ def update_films_status(films: List[dict], Session) -> None:
                 row_exists = session.query(Films).filter(Films.title == title).first()
 
                 if availability and not row_exists.last_update:
-                    # Update the existing row
+                    # Update the existing row with the availability
                     update_rows.append({
                         'id': row_exists.id,
                         'last_checked': last_checked,
@@ -113,7 +116,7 @@ def update_films_status(films: List[dict], Session) -> None:
                     })
 
                 else:
-                    # Update the existing row
+                    # Update the existing row without the availability
                     update_rows.append({
                         'id': row_exists.id,
                         'last_checked': last_checked,
