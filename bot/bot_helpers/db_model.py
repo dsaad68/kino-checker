@@ -1,6 +1,6 @@
 
 from sqlalchemy import Column, Integer, String, Boolean, Text, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 # Define a base class for declarative models
 Base = declarative_base()
