@@ -28,7 +28,7 @@ def test_get_films_list_db():
         
         Result = get_films_list_db(Session_Maker)
         
-        assert Result == ['Barbie', 'Oppenheimer', 'The Flash', 'Transformers - Aufstieg der Bestien']
+        assert Result == ['The Equalizer 3', 'Oppenheimer', 'The Flash', 'Transformers - Aufstieg der Bestien']
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")

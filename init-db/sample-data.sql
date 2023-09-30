@@ -1,7 +1,7 @@
 
 -- Sample data for films table
 INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
-(25, 'Barbie', 'https://www.filmpalast.net/film/barbie.html', 'https://www.filmpalast.net/fileadmin/_processed_/4/6/barbie.jpg', '2023-07-20 00:04:53', 't', 'f', 'f', 't', 't');
+(25, 'The Equalizer 3', 'https://www.filmpalast.net/film/the-equalizer-3.html', 'https://www.filmpalast.net/fileadmin/_processed_/4/6/the-equalizer-3.jpg', '2023-07-20 00:04:53', 't', 'f', 'f', 't', 'f');
 
 INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
 (26, 'Oppenheimer', 'https://www.filmpalast.net/film/oppenheimer.html', 'https://www.filmpalast.net/img/film/oppenheimer.jpg', Null, 't', 'f', 't', 't', 'f');
@@ -14,8 +14,4 @@ INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "
 
 -- Sample data for users table
 INSERT INTO "kino"."users" ("id", "chat_id", "message_id", "title", "notified") VALUES
-(5, '200788221', '1073', 'Barbie', 'f');
-INSERT INTO "kino"."users" ("id", "chat_id", "message_id", "title", "notified") VALUES
-(28, '200788221', '1147', 'Spider-Man: Across the Spider-Verse türkische Fassung', 'f');
-INSERT INTO "kino"."users" ("id", "chat_id", "message_id", "title", "notified") VALUES
-(4, '200788221', '388', 'Insidious: The Red Door', 'f');
+(5, '200788221', '1073', 'The Equalizer 3', 'f');
