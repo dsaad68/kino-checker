@@ -21,8 +21,8 @@ def session_maker(connection_uri: str):
 #%%
 
 def update_films_list(rows: List[dict], Session_Maker) -> None:
-    # TODO: this function should be refactored 
-    
+    # TODO: this function should be refactored
+
     new_rows: list = []
     update_rows: list = []
 
