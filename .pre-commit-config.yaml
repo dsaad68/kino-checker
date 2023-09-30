@@ -1,0 +1,6 @@
+repos:
+- repo: https://github.com/dsaad68/kino-checker
+  # Ruff version.
+  rev: v0.0.291
+  hooks:
+    - id: ruff
