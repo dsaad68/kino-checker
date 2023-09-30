@@ -66,8 +66,6 @@ def test_update_films_list():
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_update_films_status():
 
-    # FIXME: FIX THIS TEST
-
     schemas = ['kino']
     init_scripts = ["init-db/init-db.sql", "init-db/sample-data.sql"]
 
