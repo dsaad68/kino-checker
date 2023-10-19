@@ -1,9 +1,13 @@
 
+from sqlalchemy import MetaData
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, Text, TIMESTAMP
-from sqlalchemy.ext.declarative import declarative_base
+
+# Define the schema for the kino database
+metadata_obj = MetaData(schema="kino")
 
 # Define a base class for declarative models
-Base = declarative_base()
+Base = declarative_base(metadata=metadata_obj)
 
 # Define a model for the kino.films table
 class Films(Base):

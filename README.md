@@ -10,11 +10,19 @@ Features
 
 ## How to run the bot
 
-1. *Set the environment variables*\n
+1. Create symlinks to my_logger folder for each service in docker-compose.yml
+`mklink /D my_logger ..\my_logger``
+2. *Set the environment variables*\n
 Use the .env file to add environment variables for Docker Compose.
-2. *Initialize the database*\n
+3. *Initialize the database*\n
 Use `init-db\init-db.sql` to init the database.
-3. *To start a the bot, you can use the docker-compose up command in the terminal.*\n
+4. *To start a the bot, you can use the docker-compose up command in the terminal.*\n
 ```shell
 docker compose up
+```
+
+## How to install pre-commit
+
+```sh
+pre-commit install
 ```

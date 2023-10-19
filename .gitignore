@@ -1,6 +1,15 @@
+build
 .old
 __pycache__
 test*.*
 *.log
 *-bckp.*
 *_bckp.*
+.ruff_cache
+*.egg-info
+miner/my_logger
+bot/my_logger
+cleaner/my_logger
+tests/integeration_db/.env
+.vscode
+.pytest_cache

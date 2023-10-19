@@ -3,11 +3,10 @@
 import logging
 
 from typing import List
-
-from tables.tables_model import Films, Users
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from .db_model import Films, Users
 
 #%%
 
@@ -25,7 +24,7 @@ def get_films_list_db(Session_Maker: sessionmaker) -> List[str]:
 
         with Session_Maker() as session:
 
-            films = session.query(Films.title).filter(Films.trackable == True).all()
+            films = session.query(Films.title).filter(Films.trackable == True).all() # noqa: E712
             return [film[0] for film in films]
 
     except Exception as error:

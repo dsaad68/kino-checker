@@ -3,29 +3,42 @@ import logging
 
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
-
 class CustomLogFilter(logging.Filter):
-    """Extends the logging filter class to allow adding additional attributes to log records.
+    """A custom filter class that extends the logging filter to add additional attributes to log records.
+
+    This filter takes any number of keyword arguments and adds them as attributes to log records
+    processed by the filter.
 
     Parameters
     ----------
-    logging : _type_
-        _description_
+    **kwargs : dict
+        Additional key-value pairs to be added as attributes to log records.
+
+    Examples
+    --------
+    >>> custom_filter = CustomLogFilter(user="Alice", action="Login")
+    >>> logger.addFilter(custom_filter)
+    >>> logger.info("User action")
     """
 
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
     def filter(self, record):
-        """Adds additional attributes to the log record as specified in the `kwargs` dictionary and returns True
+        """Adds additional attributes to the log record and returns True.
+
+        The additional attributes are specified in the `kwargs` dictionary provided
+        during the initialization of the filter.
 
         Parameters
         ----------
-        record : LogRecord
+        record : logging.LogRecord
+            The log record to which the additional attributes will be added.
 
         Returns
         -------
-        Literal[True]
+        bool
+            Always returns True, allowing the log record to be processed by subsequent filters.
         """
         for key, value in self.kwargs.items():
             setattr(record, key, str(value))
@@ -35,17 +48,26 @@ class Logger:
     """Logger class provides a way to log information in different handlers, like stream and file.
     It also has the option to log in Azure App Insight by providing the connection string.
 
-    Args:
-        azure_connection_string (str, optional): Connection string to Azure Application Insights. Default is None.
-        stream_handler (bool, optional): Whether to add stream handler to the logger. Default is True.
-        file_handler (bool, optional): Whether to add file handler to the logger. Default is False.
-        log_lvl (logging level, optional): Log level of the handler. Default is logging.INFO.
-        **kwargs: Any other additional key-value pairs to be added as log message attributes.
+    Parameters
+    ----------
+    azure_connection_string : str, optional
+        Connection string to Azure Application Insights. Defaults to None.
+    stream_handler : bool, optional
+        If True, adds a stream handler to the logger. Defaults to True.
+    file_handler : bool, optional
+        If True, adds a file handler to the logger. Defaults to False.
+    azure_handler : bool, optional
+        If True, adds an Azure handler to the logger. Defaults to False.
+    log_lvl : int, optional
+        Log level of the handler. Defaults to logging.INFO.
+    **kwargs : dict
+        Additional key-value pairs to be added as log message attributes.
 
-        *** Azure App Insights Custom Dimensions
-        To add a custom dimensions to all the logRecords and sent it to Azure App Insights:
-        Logger should be initialized with arg with the named `custom_dimensions` and a dict[str,str] should be pass to it.
-        `logger = Logger(custom_dimensions={'job_id': 2020})`
+    Notes
+    -----
+    Azure App Insights Custom Dimensions
+    To add a custom dimensions to all the logRecords and sent it to Azure App Insights:
+    Logger should be initialized with arg with the named `custom_dimensions` and a dict[str,str] should be pass to it.
 
     Returns
     -------

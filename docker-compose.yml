@@ -3,8 +3,8 @@ version: '3'
 services:
   miner:
     build:
-      context: ./miner
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./miner/Dockerfile
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
@@ -12,8 +12,8 @@ services:
 
   bot:
     build:
-      context: ./bot
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./bot/Dockerfile
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
@@ -21,8 +21,8 @@ services:
 
   cleaner:
     build:
-      context: ./cleaner
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./cleaner/Dockerfile
     environment:
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
     restart: always

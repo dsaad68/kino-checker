@@ -10,7 +10,7 @@ from asyncio import Semaphore
 from bs4 import BeautifulSoup
 from typing import List
 
-from miner_helpers.film_checker import Film_Checker
+from .film_checker import Film_Checker
 
 #%%
 

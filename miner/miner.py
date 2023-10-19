@@ -11,7 +11,7 @@ from miner_helpers.films_info_miner import get_films_list, get_films_status
 from miner_helpers.db_updater import session_maker, update_films_list, update_films_status
 from miner_helpers.tlg_updater import get_films_db_status, send_status
 
-from logger.custom_logger import Logger
+from my_logger import Logger
 
 #%%
 
