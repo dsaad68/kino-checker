@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9 , '3.10', '3.11']
+        python-version: ['3.10', '3.11']
 
     steps:
     - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run tests with pytest
       run: |
-        docker run --name some-postgres -e POSTGRES_PASSWORD="another!!22TEST" -e POSTGRES_USER="admin" -e POSTGRES_DB="postgres" -p 5432:5432 postgres:16-bookworm
+        docker run --name some-postgres -e POSTGRES_PASSWORD="another!!22TEST" -e POSTGRES_USER="postgres" -e POSTGRES_DB="postgres" -p 5432:5432 postgres:alpine3.18
         pytest
     - name: Run ruff
       uses: chartboost/ruff-action@v1

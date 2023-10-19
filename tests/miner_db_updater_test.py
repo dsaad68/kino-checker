@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from miner.miner_helpers.db_updater import session_maker, update_films_list, update_films_status # noqa: E402
 from miner.miner_helpers.db_model import Films # noqa: E402
 
-CONTAINER_NAME = "postgres:16-bookworm"
+CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
