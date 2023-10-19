@@ -20,3 +20,9 @@ Use `init-db\init-db.sql` to init the database.
 ```shell
 docker compose up
 ```
+
+## How to install pre-commit
+
+```sh
+pre-commit install
+```
