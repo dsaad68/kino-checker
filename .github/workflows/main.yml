@@ -30,7 +30,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run tests with pytest
       run: |
-        docker run --name some-postgres -e POSTGRES_PASSWORD="another!!22TEST" -e POSTGRES_USER="admin" -e POSTGRES_DB="postgres" -port 5432:5432 postgres:16.0-alpine3.18
+        docker run --name some-postgres -e POSTGRES_PASSWORD="another!!22TEST" -e POSTGRES_USER="admin" -e POSTGRES_DB="postgres" -port 5432:5432 postgres:16-bookworm
         pytest
     - name: Run ruff
       uses: chartboost/ruff-action@v1
