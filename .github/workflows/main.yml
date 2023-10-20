@@ -1,4 +1,4 @@
-name: 'Python package'
+name: 'Python 3.10-3.11 Test and Lint'
 
 on:
   pull_request:
