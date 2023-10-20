@@ -1,3 +1,4 @@
+[![Python Test and Lint](https://github.com/dsaad68/kino-checker/actions/workflows/main.yml/badge.svg)](https://github.com/dsaad68/kino-checker/actions/workflows/main.yml)
 # Kino Tracker Bot
 
 Kino Tracker Bot is a Telegram bot that tracks the availability of movies in a selected cinemas and notifies users when a movie becomes available.
