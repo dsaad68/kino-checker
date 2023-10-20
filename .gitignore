@@ -10,6 +10,5 @@ test*.*
 miner/my_logger
 bot/my_logger
 cleaner/my_logger
-tests/integeration_db/.env
 .vscode
 .pytest_cache
