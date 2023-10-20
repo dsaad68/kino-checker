@@ -52,5 +52,7 @@ jobs:
     - name: Run tests with pytest
       run: |
         pytest -s .
+      env:
+        INT_DB_URL: "postgresql+psycopg2://postgres:another!!22TEST@localhost:5432/postgres"
     - name: Run ruff
       uses: chartboost/ruff-action@v1
