@@ -1,16 +1,42 @@
-name: Python package
+name: 'Python Test and Lint'
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9 , '3.10', '3.11']
+        python-version: ['3.10', '3.11']
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:alpine3.18
+        # Provide the password for postgres
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: another!!22TEST
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
@@ -25,6 +51,6 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Run tests with pytest
       run: |
-        pytest
+        pytest -s .
     - name: Run ruff
       uses: chartboost/ruff-action@v1

@@ -13,3 +13,5 @@ debugpy==1.6.7
 ruff
 pre-commit
 docker
+pytest
+python-dotenv

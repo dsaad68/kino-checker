@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from bot.bot_helpers.info_finder import session_maker, get_films_list_db, get_film_info_db, update_users_db # noqa: E402
 from bot.bot_helpers.db_model import Users # noqa: E402
 
-CONTAINER_NAME = "postgres:16-bookworm"
+CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
