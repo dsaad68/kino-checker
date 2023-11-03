@@ -8,8 +8,8 @@ import asyncio
 from alive_progress import alive_bar
 
 from miner_helpers.films_info_miner import get_films_list, get_films_status
-from miner_helpers.db_updater import session_maker, update_films_list, update_films_status
-from miner_helpers.tlg_updater import get_films_db_status, send_status
+from miner.miner_helpers.film_database_manager import FilmDatabaseManager
+from miner_helpers.tlg_updater import send_status
 
 from my_logger import Logger
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     logging.info("Main starts!")
 
-    Session_Maker = session_maker(SQL_CONNECTION_URI)
+    film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
 
     while True:
 
@@ -49,13 +49,13 @@ if __name__ == "__main__":
         Films = get_films_list(url)
 
         logging.info("Updating the films' list in DB!")
-        update_films_list(Films, Session_Maker)
+        film_db_manager.update_films_list(Films)
 
         logging.info("Getting the films' status from the website!")
         Films = get_films_status(Films)
 
         logging.info("Updating the films' status in DB!")
-        update_films_status(Films, Session_Maker)
+        film_db_manager.update_films_status(Films)
 
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
         start_time = time.time()
 
-        users_list = get_films_db_status(Session_Maker)
+        users_list = film_db_manager.get_films_db_status()
 
         asyncio.run(send_status(users_list, BOT_TOKEN))
 

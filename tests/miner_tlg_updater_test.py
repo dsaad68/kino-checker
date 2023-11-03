@@ -9,8 +9,7 @@ from integeration_db.docker_container import Docker
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from miner.miner_helpers.tlg_updater import get_films_db_status  # noqa: E402
-from miner.miner_helpers.db_updater import session_maker  # noqa: E402
+from miner.miner_helpers.film_database_manager import FilmDatabaseManager  # noqa: E402
 
 CONTAINER_NAME = "postgres:alpine3.18"
 
@@ -25,12 +24,9 @@ def test_get_films_db_status():
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
-        # Prepare
-
         # Execute
-
-        Session_Maker = session_maker(CONNECTION_STRING)
-        films_list = get_films_db_status(Session_Maker= Session_Maker)
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING)
+        films_list = film_db_manager.get_films_db_status()
 
         # Test
         equalizer_film = films_list[0]
