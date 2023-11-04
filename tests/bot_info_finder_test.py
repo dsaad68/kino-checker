@@ -8,7 +8,7 @@ from integeration_db.docker_container import Docker
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from bot.bot_helpers.info_finder import session_maker, get_films_list_db, get_film_info_db, update_users_db # noqa: E402
+from bot.bot_helpers.db_info_finder import DBInfoFinder  # noqa: E402
 from bot.bot_helpers.db_model import Users # noqa: E402
 
 CONTAINER_NAME = "postgres:alpine3.18"
@@ -24,9 +24,9 @@ def test_get_films_list_db():
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
-        Session_Maker = session_maker(CONNECTION_STRING)
+        db_info_finder = DBInfoFinder(CONNECTION_STRING)
 
-        Result = get_films_list_db(Session_Maker)
+        Result = db_info_finder.get_films_list_db()
 
         assert Result == ['The Equalizer 3', 'Oppenheimer', 'The Flash', 'Transformers - Aufstieg der Bestien']
 
@@ -39,9 +39,9 @@ def test_get_film_info_db():
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
-        Session_Maker = session_maker(CONNECTION_STRING)
+        db_info_finder = DBInfoFinder(CONNECTION_STRING)
 
-        Result = get_film_info_db(title= 'Transformers - Aufstieg der Bestien', Session_Maker= Session_Maker)
+        Result = db_info_finder.get_film_info_db(title= 'Transformers - Aufstieg der Bestien')
 
         assert Result == {'title': 'Transformers - Aufstieg der Bestien',
                         'availability': True,
@@ -60,10 +60,10 @@ def test_update_users_db():
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
-        Session_Maker = session_maker(CONNECTION_STRING)
-        update_users_db(chat_id=222, message_id=333, title='Oppenheimer', Session_Maker= Session_Maker)
+        db_info_finder = DBInfoFinder(CONNECTION_STRING)
+        db_info_finder.update_users_db(chat_id=222, message_id=333, title='Oppenheimer')
 
-        with Session_Maker() as session:
+        with db_info_finder.session_maker() as session:
             user = session.query(Users).first()
 
             assert user.chat_id == '222'

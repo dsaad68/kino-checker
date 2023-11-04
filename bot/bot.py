@@ -4,7 +4,7 @@ import os
 import telebot
 import logging
 
-from bot_helpers.info_finder import DBInfoFinder
+from bot_helpers.db_info_finder import DBInfoFinder
 from bot_helpers.answers import answer
 
 from my_logger import Logger
