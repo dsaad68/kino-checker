@@ -10,8 +10,6 @@ from .db_model import Films, Users
 
 #%%
 
-# TODO: Bundle these functions into a class
-
 class DBInfoFinder:
 
     def __init__(self, connection_uri: str):
