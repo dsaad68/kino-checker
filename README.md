@@ -1,3 +1,4 @@
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Python Test and Lint](https://github.com/dsaad68/kino-checker/actions/workflows/main.yml/badge.svg)](https://github.com/dsaad68/kino-checker/actions/workflows/main.yml)
 # Kino Tracker Bot
 

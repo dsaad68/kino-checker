@@ -12,3 +12,4 @@ bot/my_logger
 cleaner/my_logger
 .vscode
 .pytest_cache
+.venv
