@@ -1,4 +1,3 @@
-
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, Text, TIMESTAMP
@@ -8,6 +7,7 @@ metadata_obj = MetaData(schema="kino")
 
 # Define a base class for declarative models
 Base = declarative_base(metadata=metadata_obj)
+
 
 # Define a model for the kino.films table
 class Films(Base):
@@ -25,6 +25,7 @@ class Films(Base):
     hd_ov = Column(Boolean, default=False)
     last_update = Column(Boolean, default=False)
     trackable = Column(Boolean, default=True)
+
 
 # Define a model for the kino.users table
 class Users(Base):

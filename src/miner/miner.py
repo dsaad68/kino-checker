@@ -1,4 +1,4 @@
-#%%
+# %%
 
 import os
 import time
@@ -13,34 +13,34 @@ from miner_helpers.tlg_updater import send_status
 
 from my_logger import Logger
 
-#%%
+# %%
+
 
 def sleep_with_progress(seconds):
     with alive_bar(seconds) as bar:
-        bar.title('Sleepmeter')
+        bar.title("Sleepmeter")
         for _ in range(seconds):
             time.sleep(1)
             bar()
 
-#%%
-if __name__ == "__main__":
 
+# %%
+if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
 
-    SQL_CONNECTION_URI = os.environ.get('POSTGRES_CONNECTION_URI')
-    BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+    SQL_CONNECTION_URI = os.environ.get("POSTGRES_CONNECTION_URI")
+    BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 
     TIME_INTERVAL = 120
 
-    url = 'https://www.filmpalast.net/vorschau.html'
+    url = "https://www.filmpalast.net/vorschau.html"
 
     logging.info("Main starts!")
 
     film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
 
     while True:
-
         logging.info("----- Mining session starts! -----")
 
         start_time = time.time()

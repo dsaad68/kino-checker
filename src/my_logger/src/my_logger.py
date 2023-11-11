@@ -3,6 +3,7 @@ import logging
 
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
+
 class CustomLogFilter(logging.Filter):
     """A custom filter class that extends the logging filter to add additional attributes to log records.
 
@@ -44,6 +45,7 @@ class CustomLogFilter(logging.Filter):
             setattr(record, key, str(value))
         return True
 
+
 class Logger:
     """Logger class provides a way to log information in different handlers, like stream and file.
     It also has the option to log in Azure App Insight by providing the connection string.
@@ -75,7 +77,7 @@ class Logger:
         A logging.Logger object to log messages.
     """
 
-    DEFAULT_BASE_FORMAT  = "[%(asctime)s] - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
+    DEFAULT_BASE_FORMAT = "[%(asctime)s] - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     def __init__(self, azure_connection_string=None, stream_handler=True, file_handler=False, azure_handler=False, log_lvl=logging.INFO, **kwargs) -> None:
@@ -88,22 +90,19 @@ class Logger:
         self._azure_handler = azure_handler
 
     def _create_log_format(self):
-        """Creates log format by appending additional key from self.kwargs to the DEFAULT_BASE_FORMAT.
-        """
+        """Creates log format by appending additional key from self.kwargs to the DEFAULT_BASE_FORMAT."""
         extra_keys = "".join(f" [%({key})s] -" for key in self.kwargs)
         return self.DEFAULT_BASE_FORMAT[:33] + extra_keys + self.DEFAULT_BASE_FORMAT[33:]
 
-    def _add_lvl_formater(self,handler):
-        """Adds log level and formatter to the handler.
-        """
+    def _add_lvl_formater(self, handler):
+        """Adds log level and formatter to the handler."""
         handler.setLevel(self.log_lvl)
-        handler.setFormatter(logging.Formatter(self._log_format,datefmt=self.DEFAULT_TIME_FORMAT))
+        handler.setFormatter(logging.Formatter(self._log_format, datefmt=self.DEFAULT_TIME_FORMAT))
         return handler
 
     def _add_azure_handler(self):
-        """Checks if azure app insight handler should be added or not.
-        """
-        return (( self.azure_connection_string or os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") ) and (self._azure_handler))
+        """Checks if azure app insight handler should be added or not."""
+        return (self.azure_connection_string or os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")) and (self._azure_handler)
 
     def get_file_handler(self):
         """Gets file handler with log level and formatter added.
@@ -142,7 +141,7 @@ class Logger:
             azure_handler = AzureLogHandler()
             return self._add_lvl_formater(azure_handler)
 
-    def get_logger(self,name="") -> logging.Logger:
+    def get_logger(self, name="") -> logging.Logger:
         self.logger = logging.getLogger(name)
         self.logger.setLevel(self.log_lvl)
         if self._stream_handler:

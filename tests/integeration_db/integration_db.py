@@ -10,8 +10,8 @@ from sqlalchemy.engine import create_engine
 class EnvVar(enum.Enum):
     INT_DB_URL = enum.auto()
 
-class IntegrationDb:
 
+class IntegrationDb:
     def __init__(self, schemas: list[str], init_scripts: list[str]):
         if IntegrationDb.db_int_not_available():
             raise ValueError(f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")

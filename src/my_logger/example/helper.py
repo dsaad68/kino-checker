@@ -1,7 +1,7 @@
-#%%
+# %%
 
 import logging
 
-def do():
 
-    logging.info('HELLO')
+def do():
+    logging.info("HELLO")

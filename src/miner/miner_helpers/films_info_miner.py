@@ -1,4 +1,4 @@
-#%%
+# %%
 
 import datetime
 import requests
@@ -12,29 +12,27 @@ from typing import List
 
 from .film_checker import Film_Checker
 
-#%%
+# %%
 
-URL_PREFIX = 'https://www.filmpalast.net/'
+URL_PREFIX = "https://www.filmpalast.net/"
 
-#%%
+# %%
 
-def get_films_list(url:str) -> List[dict]:
 
+def get_films_list(url: str) -> List[dict]:
     try:
         # download the webpage
         response = requests.get(url)
 
         # parse the HTML using BeautifulSoup
-        soup = BeautifulSoup(response.content, 'html.parser')
+        soup = BeautifulSoup(response.content, "html.parser")
 
         # find all the elements you want to extract
-        items = soup.find_all('a', class_='item-link outline')
+        items = soup.find_all("a", class_="item-link outline")
 
-        return [ {'title': item.find('h6').text.strip(),
-                'link': URL_PREFIX + item['href'],
-                'img_link': URL_PREFIX + item.find('img')['data-src']
-                    }
-                for item in items]
+        return [
+            {"title": item.find("h6").text.strip(), "link": URL_PREFIX + item["href"], "img_link": URL_PREFIX + item.find("img")["data-src"]} for item in items
+        ]
 
     except requests.exceptions.RequestException as e:
         logging.error(f"Error while downloading webpage from {url}: \n {str(e)}")
@@ -44,10 +42,11 @@ def get_films_list(url:str) -> List[dict]:
         logging.error(f"Error while extracting film list from {url}: \n {str(e)}")
         return []
 
-#%%
+
+# %%
+
 
 def get_films_status(films: List[dict]) -> List[dict]:
-
     # create a list to store the results
     results = []
 
@@ -57,22 +56,21 @@ def get_films_status(films: List[dict]) -> List[dict]:
     sem = Semaphore(20)
 
     # create a coroutine to run the async methods
-    async def run_checker(film:dict) -> None:
-
+    async def run_checker(film: dict) -> None:
         async with sem:
-
             try:
-
-                film_checker = Film_Checker(film.get('link'))
+                film_checker = Film_Checker(film.get("link"))
                 await film_checker.get_website()
 
-                film.update({
-                    'availability' : film_checker.check_availability(),
-                    'last_checked': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    'imax_3d_ov' : film_checker.check_imax_3d_ov(),
-                    'imax_ov': film_checker.check_imax_ov(),
-                    'hd_ov': film_checker.check_hd_ov()
-                    })
+                film.update(
+                    {
+                        "availability": film_checker.check_availability(),
+                        "last_checked": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "imax_3d_ov": film_checker.check_imax_3d_ov(),
+                        "imax_ov": film_checker.check_imax_ov(),
+                        "hd_ov": film_checker.check_hd_ov(),
+                    }
+                )
 
                 results.append(film)
 
@@ -81,7 +79,6 @@ def get_films_status(films: List[dict]) -> List[dict]:
                 logging.error(f"Error occurred while processing film: {film.get('name')}\n{str(e)}")
 
     try:
-
         # create an event loop to run the async methods
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
@@ -95,4 +92,6 @@ def get_films_status(films: List[dict]) -> List[dict]:
         logging.error(error)
 
     return results
+
+
 # %%

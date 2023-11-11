@@ -2,11 +2,12 @@ import enum
 import logging
 import docker
 
+
 class STATUS(enum.Enum):
     RUNNING = "running"
 
-class Docker():
 
+class Docker:
     def __init__(self):
         self.client = self._get_client()
 
@@ -40,7 +41,6 @@ class Docker():
             return False
 
     def containers_with_image(self, image_name: str) -> list[str]:
-
         if not self.client:
             logging.warning("Docker client not initialized")
             return []
@@ -48,7 +48,7 @@ class Docker():
         try:
             # get all containers including the ones not running
             containers = self.client.containers.list(all=True)
-            return [ container.name for container in containers if container.attrs['Config']['Image'] == image_name ]
+            return [container.name for container in containers if container.attrs["Config"]["Image"] == image_name]
         except Exception as e:
             logging.error(f"Unexpected error: {e}")
             return []
@@ -59,12 +59,13 @@ class Docker():
             # For Windows, it will automatically use the named pipe by default.
             # For Linux, it uses the Unix socket by default.
             client = docker.from_env()
-            client.ping() # Validates if Docker daemon is responsive
+            client.ping()  # Validates if Docker daemon is responsive
             return client
         except Exception as e:
             logging.warning("Docker daemon is not responsive.")
             logging.error(f"Error: {e}")
             return None
+
 
 if __name__ == "__main__":
     dckr = Docker()
