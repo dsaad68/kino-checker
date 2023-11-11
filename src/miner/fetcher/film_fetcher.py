@@ -1,6 +1,5 @@
 import logging
 import requests
-from pprint import pprint
 from datetime import datetime
 
 CENTER_OID = "6F000000014BHGWDVI"
@@ -18,7 +17,6 @@ HEADERS = {
     "sec-fetch-site": "same-origin",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 }
-
 
 class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
@@ -58,7 +56,7 @@ class FilmInfoExtractor:
     def __init__(self, film_fetcher_response: list):
         self.film_fetcher_response = film_fetcher_response
 
-    def get_film_info_list(self) -> list:
+    def get_films_info_list(self) -> list:
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
@@ -77,24 +75,25 @@ class FilmInfoExtractor:
         return None
 
     # TODO: Check the time because of time zone
-    def get_performance_list(self) -> list:
+    def get_performances_list(self) -> list:
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
                 {
+                    "performance_id": performance.get("id"),
                     "film_id": film.get("id"),
                     "film_id_p": performance.get("filmId"),
-                    "performance_id": performance.get("id"),
-                    "cinema_id": performance.get("cinemaDate"),
                     "performance_datetime": performance.get("performanceDateTime"),
                     "performance_time": self._extract_time(performance.get("performanceDateTime")),
                     "performance_date": self._extract_date(performance.get("performanceDateTime")),
                     "release_type": performance.get("releaseTypeName"),
-                    "is_imx": self._is_imax(performance.get("releaseTypeName")),
+                    "is_imax": self._is_imax(performance.get("releaseTypeName")),
                     "is_ov": self._is_ov(performance.get("releaseTypeName")),
-                    "is_3d": performance.get("3d"),
+                    "is_3d": performance.get("is3D"),
                     "auditorium_name": performance.get("auditoriumName"),
-                    **self._empty_dict_checker(performance.get("access")),
+                    "auditorium_id": performance.get("auditoriumId"),
+                    # TODO: Add this later
+                    # **self._empty_dict_checker(performance.get("access")),
                 }
                 for film in film_list
                 for performance in film.get("performances")
@@ -108,7 +107,7 @@ class FilmInfoExtractor:
 
     @staticmethod
     def _is_ov(release_type: str) -> bool:
-        return "OV" in release_type if release_type is not None else False
+        return ("OV" in release_type or "englisch" in release_type) if release_type is not None else False
 
     @staticmethod
     def _extract_time(performanceDateTime: str) -> str:
@@ -128,11 +127,3 @@ class FilmInfoExtractor:
     def _empty_dict_checker(data: dict) -> dict:
         if data is not None:
             return data
-
-
-film_fetcher = FilmFetcher(center_oid=CENTER_OID, headers=HEADERS)
-response = film_fetcher.get_film_list("2022-01-01", "2022-01-31")
-
-pprint(FilmInfoExtractor(response).get_performance_list())
-
-pprint(FilmInfoExtractor(response).get_film_info_list())

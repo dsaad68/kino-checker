@@ -1,59 +1,42 @@
--- Create the kino schema
+-- Create the tracker schema
 CREATE SCHEMA IF NOT EXISTS tracker;
 
 -- Create the films table
--- CREATE TABLE kino.films (
---   id SERIAL PRIMARY KEY,
---   title VARCHAR(255) NOT NULL,
---   link TEXT,
---   img_link TEXT,
---   last_checked TIMESTAMP,
---   availability BOOLEAN DEFAULT FALSE,
---   availability_date TIMESTAMP,
---   imax_3d_ov BOOLEAN DEFAULT FALSE,
---   imax_ov BOOLEAN DEFAULT FALSE,
---   hd_ov BOOLEAN DEFAULT FALSE,
---   last_update BOOLEAN DEFAULT FALSE,
---   trackable BOOLEAN DEFAULT TRUE
---  );
-
-
--- TODO: Update the table
--- Create the users table
-CREATE TABLE tracker.users (
-  id SERIAL PRIMARY KEY,
-  chat_id VARCHAR(255) NOT NULL,
-  message_id VARCHAR(255) NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  notified BOOLEAN DEFAULT FALSE
- );
-
-
--- TODO: Update the film table
 CREATE TABLE tracker.films (
     film_id VARCHAR(255) PRIMARY KEY,
-    production_year INT,
+    title VARCHAR(255) NOT NULL,
     name VARCHAR(255),
-    title VARCHAR(255),
-    original_title VARCHAR(255),
-    length_in_minutes INT,
+    production_year INTEGER,
+    length_in_minutes INTEGER,
+    nationwide_start VARCHAR(255),
     image_url VARCHAR(255),
-    nationwide_start DATE,
-    age_rating INT
+    last_updated TIMESTAMP
 );
 
--- TODO: Update the performance table
-CREATE TABLE tracker.performance (
+CREATE TABLE tracker.performances (
     performance_id VARCHAR(255) PRIMARY KEY,
     film_id VARCHAR(255),
-    title VARCHAR(255),
-    performance_date_time DATETIME,
-    cinema_date DATE,
-    auditorium_name VARCHAR(255),
-    auditorium_number INT,
+    film_id_p VARCHAR(255),
+    performance_datetime TIMESTAMP,
+    performance_date DATE,
+    performance_time TIME,
+    release_type VARCHAR(255),
+    is_imax BOOLEAN,
+    is_ov BOOLEAN,
+    is_3d BOOLEAN,
     auditorium_id VARCHAR(255),
-    release_type_name VARCHAR(255),
-    is_3D BOOLEAN,
-    weekfilm_sort_order_prio INT,
-    FOREIGN KEY (film_id) REFERENCES film_information(film_id)
+    auditorium_name VARCHAR(255),
+    last_updated TIMESTAMP,
+    FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
+);
+
+-- Create the users table
+CREATE TABLE tracker.users (
+    id SERIAL PRIMARY KEY,
+    chat_id VARCHAR(255) NOT NULL,
+    message_id VARCHAR(255) NOT NULL,
+    film_id VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
+    notified BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
 );
