@@ -20,6 +20,7 @@ HEADERS = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 }
 
+
 class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
         self.center_oid = center_oid
@@ -75,7 +76,7 @@ class FilmInfoExtractor:
                     "nationwide_start": film.get("nationwideStart"),
                     "image_url": film.get("imageUrl"),
                 }
-                for film in film_list # type: ignore
+                for film in film_list  # type: ignore
             ]
         logging.warn("Film Fetcher Response is empty!")
         return None
@@ -101,7 +102,7 @@ class FilmInfoExtractor:
                     # TODO: Add this later
                     # **self._empty_dict_checker(performance.get("access")),
                 }
-                for film in film_list # type: ignore
+                for film in film_list  # type: ignore
                 for performance in film.get("performances")
             ]
         logging.warn("Film Fetcher Response is empty!")

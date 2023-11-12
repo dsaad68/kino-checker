@@ -8,6 +8,7 @@ metadata_obj = MetaData(schema="tracker")
 # Define a base class for declarative models
 Base = declarative_base(metadata=metadata_obj)
 
+
 # Define a model for the tracker.films table
 class Films(Base):
     __tablename__ = "films"
@@ -20,11 +21,12 @@ class Films(Base):
     image_url = Column(String(255))
     last_updated = Column(DateTime)
 
+
 # Define a model for the tracker.performances table
 class Performances(Base):
     __tablename__ = "performances"
     performance_id = Column(String(255), primary_key=True)
-    film_id = Column(String(255), ForeignKey('tracker.films.film_id'))
+    film_id = Column(String(255), ForeignKey("tracker.films.film_id"))
     film_id_p = Column(String(255))
     performance_datetime = Column(DateTime)
     performance_date = Column(Date)
@@ -37,16 +39,18 @@ class Performances(Base):
     auditorium_name = Column(String(255))
     last_updated = Column(DateTime)
 
+
 # Define a model for the tracker.users table
 class UpcomingFilms(Base):
     __tablename__ = "unpcoming_films"
     upcoming_film_id = Column(Integer, primary_key=True)
     title = Column(String(255), nullable=False)
     release_date = Column(Date)
-    film_id = Column(String(255), ForeignKey('tracker.films.film_id'), nullable=True)
+    film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=True)
     is_released = Column(Boolean, default=False)
     is_trackable = Column(Boolean, default=True)
     last_updated = Column(DateTime)
+
 
 # Define a model for the tracker.users table
 class Users(Base):
@@ -54,6 +58,6 @@ class Users(Base):
     user_id = Column(Integer, primary_key=True)
     chat_id = Column(String(255), nullable=False)
     message_id = Column(String(255), nullable=False)
-    film_id = Column(String(255), ForeignKey('tracker.films.film_id'), nullable=False)
+    film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=False)
     title = Column(String(255), nullable=False)
     notified = Column(Boolean, default=False)

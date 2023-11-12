@@ -25,12 +25,14 @@ def sleep_with_progress(seconds):
             time.sleep(1)
             bar()
 
+
 def get_or_raise(env_name: str) -> str:
     value = os.environ.get(env_name)
     if value is not None:
         return value
     else:
         raise ValueError(f"Missing environment variable {env_name}")
+
 
 # %%
 if __name__ == "__main__":
@@ -39,7 +41,7 @@ if __name__ == "__main__":
 
     # create a function that gets the environment variables or raise an error
 
-    SQL_CONNECTION_URI = get_or_raise(env_name ="POSTGRES_CONNECTION_URI")
+    SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_CONNECTION_URI")
     # BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 
     TIME_INTERVAL = 120
@@ -61,7 +63,7 @@ if __name__ == "__main__":
 
         logging.info("Extracting the films info and performance data from the API response!")
         film_info_extractor = FilmInfoExtractor(response)
-        films_list= film_info_extractor.get_films_info_list()
+        films_list = film_info_extractor.get_films_info_list()
         performance_list = film_info_extractor.get_performances_list()
 
         logging.info("Updating the films list in DB!")
