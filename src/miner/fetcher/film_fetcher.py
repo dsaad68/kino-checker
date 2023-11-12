@@ -1,6 +1,8 @@
 import logging
 import requests
-from datetime import datetime
+
+from typing import List, Optional
+from datetime import date, time, datetime
 
 CENTER_OID = "6F000000014BHGWDVI"
 HEADERS = {
@@ -24,7 +26,7 @@ class FilmFetcher:
         self.headers = headers
         self.session_id = self._get_session_id()
 
-    def _get_session_id(self) -> str:
+    def _get_session_id(self) -> Optional[str]:
         url = "https://cineorder.filmpalast.net/api/session"
 
         headers = self.headers | {"center-oid": self.center_oid}
@@ -37,7 +39,7 @@ class FilmFetcher:
             logging.error(f"An error occurred: {e}")
             return None
 
-    def get_film_list(self, date_from: str, date_to: str) -> list:
+    def get_film_list(self, date_from: str, date_to: str) -> Optional[List]:
         url = "https://cineorder.filmpalast.net/api/films"
 
         payload = {"cinemadate.from": date_from, "cinemadate.to": date_to}
@@ -53,10 +55,14 @@ class FilmFetcher:
 
 
 class FilmInfoExtractor:
-    def __init__(self, film_fetcher_response: list):
-        self.film_fetcher_response = film_fetcher_response
+    def __init__(self, film_fetcher_response: Optional[list]):
+        if film_fetcher_response is not None:
+            self.film_fetcher_response = film_fetcher_response
+        else:
+            logging.warning("API Response is empty!")
+            self.film_fetcher_response = None
 
-    def get_films_info_list(self) -> list:
+    def get_films_info_list(self) -> Optional[List]:
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
@@ -69,13 +75,13 @@ class FilmInfoExtractor:
                     "nationwide_start": film.get("nationwideStart"),
                     "image_url": film.get("imageUrl"),
                 }
-                for film in film_list
+                for film in film_list # type: ignore
             ]
         logging.warn("Film Fetcher Response is empty!")
         return None
 
     # TODO: Check the time because of time zone
-    def get_performances_list(self) -> list:
+    def get_performances_list(self) -> Optional[List]:
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
@@ -95,7 +101,7 @@ class FilmInfoExtractor:
                     # TODO: Add this later
                     # **self._empty_dict_checker(performance.get("access")),
                 }
-                for film in film_list
+                for film in film_list # type: ignore
                 for performance in film.get("performances")
             ]
         logging.warn("Film Fetcher Response is empty!")
@@ -110,20 +116,20 @@ class FilmInfoExtractor:
         return ("OV" in release_type or "englisch" in release_type) if release_type is not None else False
 
     @staticmethod
-    def _extract_time(performanceDateTime: str) -> str:
+    def _extract_time(performanceDateTime: str) -> Optional[time]:
         if performanceDateTime is None:
             return None
         dt = datetime.fromisoformat(performanceDateTime)
         return dt.time()
 
     @staticmethod
-    def _extract_date(performanceDateTime: str) -> str:
+    def _extract_date(performanceDateTime: str) -> Optional[date]:
         if performanceDateTime is None:
             return None
         dt = datetime.fromisoformat(performanceDateTime)
         return dt.date()
 
     @staticmethod
-    def _empty_dict_checker(data: dict) -> dict:
+    def _empty_dict_checker(data: dict) -> Optional[dict]:
         if data is not None:
             return data

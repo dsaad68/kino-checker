@@ -9,6 +9,7 @@ from alive_progress import alive_bar
 
 # from miner_helpers.tlg_updater import send_status
 # TODO: fix this later
+from fetcher.scrapper import Scraper
 from fetcher.film_database_manager import FilmDatabaseManager
 from fetcher.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
 
@@ -24,13 +25,21 @@ def sleep_with_progress(seconds):
             time.sleep(1)
             bar()
 
+def get_or_raise(env_name: str) -> str:
+    value = os.environ.get(env_name)
+    if value is not None:
+        return value
+    else:
+        raise ValueError(f"Missing environment variable {env_name}")
 
 # %%
 if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
 
-    SQL_CONNECTION_URI = os.environ.get("POSTGRES_CONNECTION_URI")
+    # create a function that gets the environment variables or raise an error
+
+    SQL_CONNECTION_URI = get_or_raise(env_name ="POSTGRES_CONNECTION_URI")
     # BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 
     TIME_INTERVAL = 120
@@ -51,20 +60,21 @@ if __name__ == "__main__":
         response = film_fetcher.get_film_list("2022-01-01", "2022-01-31")
 
         logging.info("Extracting the films info and performance data from the API response!")
-        films_list= FilmInfoExtractor(response).get_films_info_list()
-        performance_list = FilmInfoExtractor(response).get_performances_list()
+        film_info_extractor = FilmInfoExtractor(response)
+        films_list= film_info_extractor.get_films_info_list()
+        performance_list = film_info_extractor.get_performances_list()
 
         logging.info("Updating the films list in DB!")
-        film_db_manager.update_films_list(films_list)
+        film_db_manager.update_films_table(films_list)
 
         logging.info("Updating the performances list in DB!")
-        film_db_manager.update_performances_list(performance_list)
+        film_db_manager.update_performances_table(performance_list)
 
-        # logging.info("Getting the films' status from the website!")
-        # Films = get_films_status(Films)
+        logging.info("Updating the upcoming films list in DB!")
+        upcoming_films_list = Scraper.set_base_url().run()
 
-        # logging.info("Updating the films' status in DB!")
-        # film_db_manager.update_films_status(Films)
+        logging.info("Updating the upcoming films list in DB!")
+        film_db_manager.update_upcoming_films_table(upcoming_films_list)
 
         end_time = time.time()
         elapsed_time = end_time - start_time

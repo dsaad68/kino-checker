@@ -30,9 +30,21 @@ CREATE TABLE tracker.performances (
     FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
 );
 
+-- Create the upcoming films table
+CREATE TABLE tracker.unpcoming_films (
+    upcoming_film_id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    release_date DATE,
+    film_id VARCHAR(255),
+    last_updated TIMESTAMP,
+    is_released BOOLEAN DEFAULT FALSE,
+    is_trackable BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
+);
+
 -- Create the users table
 CREATE TABLE tracker.users (
-    id SERIAL PRIMARY KEY,
+    user_id SERIAL PRIMARY KEY,
     chat_id VARCHAR(255) NOT NULL,
     message_id VARCHAR(255) NOT NULL,
     film_id VARCHAR(255),

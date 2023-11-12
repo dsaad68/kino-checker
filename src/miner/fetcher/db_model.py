@@ -38,9 +38,20 @@ class Performances(Base):
     last_updated = Column(DateTime)
 
 # Define a model for the tracker.users table
+class UpcomingFilms(Base):
+    __tablename__ = "unpcoming_films"
+    upcoming_film_id = Column(Integer, primary_key=True)
+    title = Column(String(255), nullable=False)
+    release_date = Column(Date)
+    film_id = Column(String(255), ForeignKey('tracker.films.film_id'), nullable=True)
+    is_released = Column(Boolean, default=False)
+    is_trackable = Column(Boolean, default=True)
+    last_updated = Column(DateTime)
+
+# Define a model for the tracker.users table
 class Users(Base):
     __tablename__ = "users"
-    id = Column(String(255), primary_key=True)
+    user_id = Column(Integer, primary_key=True)
     chat_id = Column(String(255), nullable=False)
     message_id = Column(String(255), nullable=False)
     film_id = Column(String(255), ForeignKey('tracker.films.film_id'), nullable=False)
