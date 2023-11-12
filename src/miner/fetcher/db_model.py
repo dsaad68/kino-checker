@@ -42,9 +42,9 @@ class Performances(Base):
 
 # Define a model for the tracker.users table
 class UpcomingFilms(Base):
-    __tablename__ = "unpcoming_films"
+    __tablename__ = "upcoming_films"
     upcoming_film_id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
+    title = Column(String(255), nullable=False, unique=True)
     release_date = Column(Date)
     film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=True)
     is_released = Column(Boolean, default=False)

@@ -31,9 +31,10 @@ CREATE TABLE tracker.performances (
 );
 
 -- Create the upcoming films table
-CREATE TABLE tracker.unpcoming_films (
+CREATE TABLE tracker.upcoming_films (
     upcoming_film_id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
+    -- Add a unique constraint to the title column
+    title VARCHAR(255) NOT NULL UNIQUE,
     release_date DATE,
     film_id VARCHAR(255),
     last_updated TIMESTAMP,

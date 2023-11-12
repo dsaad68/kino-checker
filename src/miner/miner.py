@@ -85,9 +85,12 @@ if __name__ == "__main__":
 
         # Updating Users if there is a chanage in availability
 
-        # logging.info("----- Updating session starts! -----")
+        logging.info("----- Updating session starts! -----")
 
-        # start_time = time.time()
+        start_time = time.time()
+
+        logging.info("Updating the released films in the upcoming films table in DB!")
+        film_db_manager.update_released_films_in_upcoming_films_table()
 
         # users_list = film_db_manager.get_films_db_status()
 
