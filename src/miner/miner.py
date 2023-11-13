@@ -92,6 +92,9 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_released_films_in_upcoming_films_table()
 
+        logging.info("Updating the released films in the upcoming films table in DB!")
+        film_db_manager.update_users_table()
+
         # users_list = film_db_manager.get_films_db_status()
 
         # asyncio.run(send_status(users_list, BOT_TOKEN))
