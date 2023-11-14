@@ -10,7 +10,7 @@ from alive_progress import alive_bar
 # from miner_helpers.tlg_updater import send_status
 # TODO: fix this later
 from fetcher.scrapper import Scraper
-from fetcher.film_database_manager import FilmDatabaseManager
+from fetcher.film_db_manager import FilmDatabaseManager
 from fetcher.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
 
 from my_logger import Logger
