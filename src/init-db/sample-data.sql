@@ -1,17 +1,27 @@
 
 -- Sample data for films table
-INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
-(25, 'The Equalizer 3', 'https://www.filmpalast.net/film/the-equalizer-3.html', 'https://www.filmpalast.net/fileadmin/_processed_/4/6/the-equalizer-3.jpg', '2023-07-20 00:04:53', 't', 'f', 'f', 't', 'f');
+INSERT INTO "tracker"."films" ("film_id", "title", "name", "production_year", "length_in_minutes", "nationwide_start", "image_url", "last_updated") VALUES
+('2EE63000012BHGWDVI', 'Wish', 'Wish', 2022, 95, '2023-11-30', 'https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDEwMjI3OTZfL3JDQ3JHNHN3a3hnRlpmbHVwNTZzeDZ5bWs1aS5qcGdffA', '2023-11-13 19:14:38.574222'),
+('58E63000012BHGWDVI', 'Creator', 'Creator', 2022, 134, '2023-09-28', 'https://contentservice.cineorder.shop/contents/img?q=683jXDv0IV9SmgAABHGWNjb', '2023-11-13 19:14:38.574222'),
+('A6D63000012BHGWDVI', 'Wonka', 'Wonka', 2021, 120, '2023-12-07', 'https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDc4NzY5OV8vZXQxT2ZSdmZ3V21Ua1lpandxYUR3S0ZnWTFsLmpwZ19kZXw', '2023-11-13 19:14:38.574222'),
+('DCC63000012BHGWDVI', 'The Marvels', 'The Marvels', 2020, 105, '2023-11-09', 'https://contentservice.cineorder.shop/contents/img?q=683jXDP2IV9SmgAABHGWJjb', '2023-11-13 19:14:38.574222'),
+('FCE63000012BHGWDVI', 'Saw X', 'Saw X', 2022, 119, '2023-11-30', 'https://contentservice.cineorder.shop/contents/img?q=683jXDH0IV9SmgAABHGWJjb', '2023-11-13 19:14:38.574222');
 
-INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
-(26, 'Oppenheimer', 'https://www.filmpalast.net/film/oppenheimer.html', 'https://www.filmpalast.net/img/film/oppenheimer.jpg', Null, 't', 'f', 't', 't', 'f');
+-- Sample data for upcoming_films table
+INSERT INTO "tracker"."upcoming_films" ("upcoming_film_id", "title", "release_date", "film_id", "last_updated", "is_released", "is_trackable") VALUES
+(3, 'Napoleon', '2023-11-23', NULL, NULL, 'f', 't'),
+(4, 'SAW X', '2023-11-30', NULL, NULL, 'f', 't'),
+(5, 'Wish', '2023-11-30', '2EE63000012BHGWDVI', NULL, 'f', 't'),
+(14, 'Raus aus dem Teich', '2023-12-21', '25D63000012BHGWDVI', NULL, 't', 't');
 
-INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
-(15, 'The Flash', 'https://www.filmpalast.net/film/the-flash.html', 'https://www.filmpalast.net/fileadmin/_processed_/1/6/the_flash.jpg', Null, 'f', 'f', 'f', 'f', 'f');
-
-INSERT INTO "kino"."films" ("id", "title", "link", "img_link", "last_checked", "availability", "imax_3d_ov", "imax_ov", "hd_ov", "last_update") VALUES
-(11, 'Transformers - Aufstieg der Bestien', 'https://www.filmpalast.net/film/transformers-aufstieg-der-bestien.html', 'https://www.filmpalast.net/fileadmin/_processed_/8/6/transformers_aufstieg_der_bestien.jpg', '2023-06-08 00:03:14', 't', 't', 'f', 'f', 't');
+-- Sample data for performances table
+INSERT INTO "tracker"."performances" ("performance_id", "film_id", "film_id_p", "performance_datetime", "performance_date", "performance_time", "release_type", "is_imax", "is_ov", "is_3d", "auditorium_id", "auditorium_name", "last_updated") VALUES
+('71D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', '2023-12-06 17:15:00', '2023-12-06', '17:15:00', 'englisch/OV', 'f', 't', 'f', '10000000015UHQLKCP', 'Kino 1', '2023-11-13 19:14:38.658222'),
+('61D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', '2023-12-06 20:00:00', '2023-12-06', '20:00:00', 'IMAX/Digital', 't', 'f', 'f', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222')
+('C9C45000023UHQLKCP', 'DCC63000012BHGWDVI', 'DCC63000012BHGWDVI', '2023-11-13 20:00:00', '2023-11-13', '20:00:00', 'englisch/IMAX/OV/3D', 't', 't', 't', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222'),
+('B5C45000023UHQLKCP', 'DCC63000012BHGWDVI', 'DCC63000012BHGWDVI', '2023-11-14 17:00:00', '2023-11-14', '17:00:00', 'englisch/IMAX/OV/3D', 't', 't', 't', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222');
 
 -- Sample data for users table
-INSERT INTO "kino"."users" ("id", "chat_id", "message_id", "title", "notified") VALUES
-(5, '200788221', '1073', 'The Equalizer 3', 'f');
+INSERT INTO "tracker"."users" ("user_id", "chat_id", "message_id", "film_id", "title", "notified") VALUES
+(5, '222211111', '1010', 'Wish', '' ,'f'),
+(5, '222211111', '1010', 'Napoleon', '' ,'f');

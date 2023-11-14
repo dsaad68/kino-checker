@@ -4,7 +4,7 @@ import datetime
 
 from typing import List, Union, Dict, Optional
 
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy import Update, create_engine, update, and_
 from sqlalchemy.dialects.postgresql import insert, Insert
@@ -130,14 +130,14 @@ class FilmDatabaseManager:
         """
         # sourcery skip: inline-immediately-returned-variable
 
-        # Scalar subquery to get film_id
-        film_id_subquery = select(Films.film_id).where(UpcomingFilms.title == Films.title).correlate(UpcomingFilms).scalar_subquery()
+        # Define the subquery with case-insensitive comparison
+        film_id_subquery = select(Films.film_id).where(func.lower(UpcomingFilms.title) == func.lower(Films.title)).correlate(UpcomingFilms).scalar_subquery()
 
-        # Update statement
+        # Update statement with case-insensitive comparison
         update_stmt = (
             update(UpcomingFilms)
             .values(film_id=film_id_subquery, is_released=True)
-            .where(and_(UpcomingFilms.is_trackable == True, UpcomingFilms.title == Films.title))  # noqa: E712
+            .where(and_(UpcomingFilms.is_trackable == True, func.lower(UpcomingFilms.title) == func.lower(Films.title)))   # noqa: E712
         )
         return update_stmt
 
@@ -158,15 +158,19 @@ class FilmDatabaseManager:
         ```
         """
         # Scalar subquery
-        subquery = ( select(Films.film_id)
-                        .join(UpcomingFilms, Films.title == UpcomingFilms.title)
-                        .where(and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == False)) # noqa: E712
-                        .scalar_subquery())
+        # Subquery with case-insensitive comparison
+        subquery = (
+            select(Films.film_id)
+            .join(UpcomingFilms, func.lower(Films.title) == func.lower(UpcomingFilms.title))
+            .where(and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == False))  # noqa: E712
+            .scalar_subquery()
+        )
 
+        # Update statement with case-insensitive comparison
         return (
             update(Users)
             .values(film_id=subquery)
-            .where(Users.title == UpcomingFilms.title)
+            .where(func.lower(Users.title) == func.lower(UpcomingFilms.title))
         )
 
     def _excute_stmt(self, stmt: Union[Insert, Update]) -> None:
