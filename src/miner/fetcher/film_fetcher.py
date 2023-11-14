@@ -56,6 +56,7 @@ class FilmFetcher:
 
 
 class FilmInfoExtractor:
+    """This class extracts the films and performances from the film_fetcher_response."""
     def __init__(self, film_fetcher_response: Optional[list]):
         if film_fetcher_response is not None:
             self.film_fetcher_response = film_fetcher_response
@@ -63,7 +64,10 @@ class FilmInfoExtractor:
             logging.warning("API Response is empty!")
             self.film_fetcher_response = None
 
-    def get_films_info_list(self) -> Optional[List]:
+    # CHECK: if last_updated works
+    # CHECK: if it works with film object instead of dict
+    def get_films_info_list(self) -> Optional[List[dict]]:
+        """Extracts the films from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
@@ -75,14 +79,18 @@ class FilmInfoExtractor:
                     "length_in_minutes": film.get("lengthInMinutes"),
                     "nationwide_start": film.get("nationwideStart"),
                     "image_url": film.get("imageUrl"),
+                    "last_updated": datetime.now()
                 }
                 for film in film_list  # type: ignore
             ]
         logging.warn("Film Fetcher Response is empty!")
         return None
 
-    # TODO: Check the time because of time zone
-    def get_performances_list(self) -> Optional[List]:
+    # CHECK: the time because of time zone
+    # CHECK: if last_updated works
+    # CHECK: if it works with performance object instead of dict
+    def get_performances_list(self) -> Optional[List[dict]]:
+        """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:
             return [
@@ -99,6 +107,7 @@ class FilmInfoExtractor:
                     "is_3d": performance.get("is3D"),
                     "auditorium_name": performance.get("auditoriumName"),
                     "auditorium_id": performance.get("auditoriumId"),
+                    "last_updated": datetime.now(),
                     # TODO: Add this later
                     # **self._empty_dict_checker(performance.get("access")),
                 }
@@ -110,14 +119,17 @@ class FilmInfoExtractor:
 
     @staticmethod
     def _is_imax(release_type: str) -> bool:
+        """This function checks if a film is available in IMAX in a cinema"""
         return "IMAX" in release_type if release_type is not None else False
 
     @staticmethod
     def _is_ov(release_type: str) -> bool:
+        """This function checks if a film is available in OV in a cinema"""
         return ("OV" in release_type or "englisch" in release_type) if release_type is not None else False
 
     @staticmethod
     def _extract_time(performanceDateTime: str) -> Optional[time]:
+        """This function extracts the time from the performanceDateTime"""
         if performanceDateTime is None:
             return None
         dt = datetime.fromisoformat(performanceDateTime)
@@ -125,6 +137,7 @@ class FilmInfoExtractor:
 
     @staticmethod
     def _extract_date(performanceDateTime: str) -> Optional[date]:
+        """This function extracts the date from the performanceDateTime"""
         if performanceDateTime is None:
             return None
         dt = datetime.fromisoformat(performanceDateTime)
@@ -132,5 +145,6 @@ class FilmInfoExtractor:
 
     @staticmethod
     def _empty_dict_checker(data: dict) -> Optional[dict]:
+        """This function checks if a dictionary is empty and returns None if it is"""
         if data is not None:
             return data

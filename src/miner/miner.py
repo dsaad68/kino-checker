@@ -92,17 +92,20 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_released_films_in_upcoming_films_table()
 
+        # TODO: fix this logging statement
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_users_table()
 
+        # [ ]: Querying which users need to be updated
         # users_list = film_db_manager.get_films_db_status()
 
+        # [ ]: Sending message to users
         # asyncio.run(send_status(users_list, BOT_TOKEN))
 
-        # end_time = time.time()
-        # elapsed_time = end_time - start_time
+        end_time = time.time()
+        elapsed_time = end_time - start_time
 
-        # logging.info(f"----- Updating session ended in {elapsed_time:.4f} seconds! -----")
+        logging.info(f"----- Updating session ended in {elapsed_time:.4f} seconds! -----")
 
         # Sleep for 10 Min
         logging.info(f"==+== Sleeping for {TIME_INTERVAL/60} Min! ==+==")

@@ -1,20 +1,21 @@
 # %%
 import logging
-import datetime
 
-from typing import List, Union, Dict, Optional
+from typing import List, Union, Dict, Optional, Type, Callable
 
 from sqlalchemy.sql import select, func
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy import Update, create_engine, update, and_
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.dialects.postgresql import insert, Insert
+from sqlalchemy import Update, create_engine, update, and_
 
 from .db_model import Films, Performances, UpcomingFilms, Users
 
 # %%
 
-
 class FilmDatabaseManager:
+    """This class manages the films and performances tables in the database"""
+
     def __init__(self, connection_uri: str):
         self.connection_uri = connection_uri
         self.session_maker = self._session_maker()
@@ -43,6 +44,7 @@ class FilmDatabaseManager:
         else:
             logging.warning("Performances list is None")
 
+    # [ ]: Needs test
     def update_upcoming_films_table(self, upcoming_films_list: Optional[List[dict]]) -> None:
         """Updates the upcoming films table."""
 
@@ -54,10 +56,10 @@ class FilmDatabaseManager:
             logging.info("[*] Updated Upcoming Films table!")
             # Execute the upsert statement
             self._excute_stmt(upsert_stmt)
-
         else:
             logging.warning("Performances list is None")
 
+    # [ ]: Needs test
     def update_released_films_in_upcoming_films_table(self) -> None:
         """update the released films in the upcoming films table."""
 
@@ -68,6 +70,7 @@ class FilmDatabaseManager:
         # Execute the upsert statement
         self._excute_stmt(update_stmt)
 
+    # [ ]: Needs test
     # TODO: Check it works
     def update_users_table(self) -> None:
 
@@ -106,8 +109,10 @@ class FilmDatabaseManager:
             for key in exclude_cols:
                 update_dict.pop(key, None)
 
-        # set the last_update column to the current time
-        update_dict["last_updated"] = datetime.datetime.now()
+        # [X]: Move last_updated to the film_fetcher
+        # CHECK: if this is working
+        # # set the last_update column to the current time
+        # update_dict["last_updated"] = datetime.datetime.now()
 
         # Return the Upsert statement
         return insert_stmt.on_conflict_do_update(index_elements=[getattr(table, id_col_name)], set_=update_dict)
@@ -187,7 +192,40 @@ class FilmDatabaseManager:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
 
-    @staticmethod
-    def _get_existing_row(title: str, session: Session) -> Union[Films, None]:
+    # LEARN: Type
+    def _execute_query(self, model: Type, filter_condition: Callable) -> Union[Type, None]:
+        """Execute a query with a given model and filter condition."""
+
+        # sourcery skip: extract-duplicate-method
+        try:
+            with self.session_maker() as session:
+                return session.query(model).filter(filter_condition).first()
+        except SQLAlchemyError as error:
+            logging.error(f"Database Error: {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+        except Exception as error:
+            logging.error(f"ERROR : {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+
+    # LEARN: Filter by lambda function
+    def _get_film_by_title(self, title: str) -> Union[Films, None]:
         """Get an existing row in the films table given its title."""
-        return session.query(Films).filter(Films.title == title).first()
+        return self._execute_query(Films, lambda film: func.lower(film.title) == title.lower())
+
+    def _get_film_by_film_id(self, film_id: str) -> Union[Films, None]:
+        """Get an existing row in the films table given its film id."""
+        return self._execute_query(Films, lambda film: film.film_id == film_id)
+
+    def _get_performance_by_performance_id(self, performance_id: str) -> Union[Performances, None]:
+        """Get an existing row in the performances table given its performance id."""
+        return self._execute_query(Performances, lambda performance: performance.performance_id == performance_id)
+
+    def _get_performance_by_film_id(self, film_id: str) -> Union[Performances, None]:
+        """Get an existing row in the performances table given its film id."""
+        return self._execute_query(Performances, lambda performance: performance.film_id == film_id)
+
+    def _get_upcoming_film_by_title(self, title: str) -> Union[UpcomingFilms, None]:
+        """Get an existing row in the upcoming films table given its title."""
+        return self._execute_query(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
