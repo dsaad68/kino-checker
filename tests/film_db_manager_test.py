@@ -217,7 +217,7 @@ def test_update_upcoming_table():
         film_wonka = film_db_manager._get_upcoming_film_by_title("WONKA")
 
         assert film_wonka is not None
-        assert film_wonka.upcoming_film_id == 4 # type: ignore
+        assert film_wonka.upcoming_film_id == 5  # type: ignore
         assert film_wonka.title == "WONKA" # type: ignore
         assert film_wonka.release_date == "2023-12-07" # type: ignore
         assert film_wonka.film_id is None # type: ignore

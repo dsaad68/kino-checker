@@ -9,10 +9,10 @@ INSERT INTO "tracker"."films" ("film_id", "title", "name", "production_year", "l
 
 -- Sample data for upcoming_films table
 INSERT INTO "tracker"."upcoming_films" ("upcoming_film_id", "title", "release_date", "film_id", "last_updated", "is_released", "is_trackable") VALUES
-(3, 'Napoleon', '2023-11-23', NULL, NULL, 'f', 't'),
-(4, 'SAW X', '2023-11-30', NULL, NULL, 'f', 't'),
-(5, 'Wish', '2023-11-30', '2EE63000012BHGWDVI', NULL, 'f', 't'),
-(14, 'Raus aus dem Teich', '2023-12-21', '25D63000012BHGWDVI', NULL, 't', 't');
+(1, 'Napoleon', '2023-11-23', NULL, NULL, 'f', 't'),
+(2, 'SAW X', '2023-11-30', NULL, NULL, 'f', 't'),
+(3, 'Wish', '2023-11-30', '2EE63000012BHGWDVI', NULL, 'f', 't'),
+(4, 'Raus aus dem Teich', '2023-12-21', '25D63000012BHGWDVI', NULL, 't', 't');
 
 -- Sample data for performances table
 INSERT INTO "tracker"."performances" ("performance_id", "film_id", "film_id_p", "performance_datetime", "performance_date", "performance_time", "release_type", "is_imax", "is_ov", "is_3d", "auditorium_id", "auditorium_name", "last_updated") VALUES
