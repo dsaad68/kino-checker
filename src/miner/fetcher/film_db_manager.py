@@ -44,7 +44,7 @@ class FilmDatabaseManager:
         else:
             logging.warning("Performances list is None")
 
-    # [ ]: Needs test
+    # TODO: Needs test
     def update_upcoming_films_table(self, upcoming_films_list: Optional[List[dict]]) -> None:
         """Updates the upcoming films table."""
 
@@ -59,7 +59,7 @@ class FilmDatabaseManager:
         else:
             logging.warning("Performances list is None")
 
-    # [ ]: Needs test
+    # TODO: Needs test
     def update_released_films_in_upcoming_films_table(self) -> None:
         """update the released films in the upcoming films table."""
 
@@ -70,7 +70,7 @@ class FilmDatabaseManager:
         # Execute the upsert statement
         self._excute_stmt(update_stmt)
 
-    # [ ]: Needs test
+    # TODO: Needs test
     # TODO: Check it works
     def update_users_table(self) -> None:
 

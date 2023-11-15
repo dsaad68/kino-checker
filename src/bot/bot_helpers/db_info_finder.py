@@ -50,7 +50,7 @@ class DBInfoFinder:
 
         try:
             with self.session_maker() as session:
-                # check if a row with the same chat_id and title already exists
+                # checks if a row with the same chat_id and title already exists
                 existing_row = session.query(Users).filter(Users.chat_id == str(chat_id), Users.title == title).first()
                 if existing_row:
                     # update the existing row

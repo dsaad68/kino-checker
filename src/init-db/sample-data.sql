@@ -23,5 +23,5 @@ INSERT INTO "tracker"."performances" ("performance_id", "film_id", "film_id_p", 
 
 -- Sample data for users table
 INSERT INTO "tracker"."users" ("user_id", "chat_id", "message_id", "film_id", "title", "notified") VALUES
-(5, '222211111', '1010', 'Wish', '' ,'f'),
-(5, '222211111', '1010', 'Napoleon', '' ,'f');
+(1, '222211111', '1010', 'Wish', '' ,'f'),
+(2, '222211111', '1010', 'Napoleon', '' ,'f');
