@@ -8,7 +8,7 @@ from integeration_db.docker_container import Docker
 from integeration_db.integration_db import IntegrationDb, EnvVar
 
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
 from miner.fetcher.film_db_manager import FilmDatabaseManager # noqa: E402
 
 CONTAINER_NAME = "postgres:alpine3.18"
@@ -20,7 +20,7 @@ dckr = Docker()
 def test_update_films_table():
 
     schemas = ["tracker"]
-    init_scripts = ["init-db/init-db.sql", "init-db/sample-data.sql"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -107,7 +107,7 @@ def test_update_films_table():
 def test_update_performances_table():
 
     schemas = ["tracker"]
-    init_scripts = ["init-db/init-db.sql", "init-db/sample-data.sql"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -147,8 +147,8 @@ def test_update_performances_table():
 
         dont_exist = {
             "performance_id": "9EC45000023UHQLKCP",
-            "film_id": "4ED63000012BHGWDVI",
-            "film_id_p": "4ED63000012BHGWDVI",
+            "film_id": "DCC63000012BHGWDVI",
+            "film_id_p": "DCC63000012BHGWDVI",
             "performance_datetime": "2023-11-22 16:45:00",
             "performance_date": "2023-11-22",
             "performance_time": "16:45:00",
@@ -225,8 +225,8 @@ def test_update_performances_table():
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_update_upcoming_table():
 
-    schemas = ["kino"]
-    init_scripts = ["init-db/init-db.sql", "init-db/sample-data.sql"]
+    schemas = ["tracker"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 

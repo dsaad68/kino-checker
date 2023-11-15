@@ -16,7 +16,7 @@ class IntegrationDb:
         if IntegrationDb.db_int_not_available():
             raise ValueError(f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
         self.schemas = schemas
-        self.ini_scripts = init_scripts
+        self.init_scripts = init_scripts
 
     def __enter__(self):
         url = os.environ.get(EnvVar.INT_DB_URL.name)
@@ -47,7 +47,7 @@ class IntegrationDb:
             logging.info(f"--- Schema with name {schema} was created! ---")
 
     def _execute_init_scripts(self, connection):
-        for init_script in self.ini_scripts:
+        for init_script in self.init_scripts:
             with open(init_script) as file:
                 script_sql = file.read()
                 connection.execute(text(script_sql))
