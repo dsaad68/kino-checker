@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey, Sequence
 
 # Define the schema for the tracker database
 metadata_obj = MetaData(schema="tracker")
@@ -40,17 +40,21 @@ class Performances(Base):
     last_updated = Column(DateTime)
 
 
-# Define a model for the tracker.users table
+# Define a model for the tracker.upcoming_films table
 class UpcomingFilms(Base):
     __tablename__ = "upcoming_films"
-    upcoming_film_id = Column(Integer, primary_key=True)
+
+    # Define the sequence for upcoming_film_id
+    upcoming_film_id_seq = Sequence('upcoming_film_id_seq', metadata=Base.metadata, increment=1, start=1, cycle=False, schema='tracker')
+
+    # Define the columns
+    upcoming_film_id = Column(Integer, upcoming_film_id_seq, server_default=upcoming_film_id_seq.next_value(), primary_key=True)
     title = Column(String(255), nullable=False, unique=True)
     release_date = Column(Date)
-    film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=True)
+    film_id = Column(String(255), ForeignKey("tracker.films.film_id"))
+    last_updated = Column(DateTime)
     is_released = Column(Boolean, default=False)
     is_trackable = Column(Boolean, default=True)
-    last_updated = Column(DateTime)
-
 
 # Define a model for the tracker.users table
 class Users(Base):

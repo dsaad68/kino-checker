@@ -15,6 +15,10 @@ CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
+dt_str_2_datetime = lambda datetime_string: datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S") # noqa: E731
+date_str_2_date = lambda date_string: datetime.strptime(date_string, "%Y-%m-%d").date() # noqa: E731
+time_str_2_time = lambda time_string: datetime.strptime(time_string, "%H:%M:%S").time() # noqa: E731
+
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_update_films_table():
@@ -33,7 +37,7 @@ def test_update_films_table():
             "length_in_minutes": 95,
             "nationwide_start": "2023-11-30",
             "image_url": "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDEwMjI3OTZfL3JDQ3JHNHN3a3hnRlpmbHVwNTZzeDZ5bWs1aS5qcGdffA",
-            "last_updated": "2023-11-13 19:14:38.574222"
+            "last_updated": datetime.now()
         }
 
         upsert_case = {
@@ -60,16 +64,19 @@ def test_update_films_table():
 
         # Execute
         start = datetime.now() - timedelta(seconds=1)  # adding buffer
-        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
 
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
         film_db_manager.update_films_table(films_list=[exists, dont_exist, upsert_case])
+
         end = datetime.now() + timedelta(seconds=1)  # adding buffer
 
         # Verify
+
+        # don't exist
         oppenheimer_film = film_db_manager._get_film_by_title("Oppenheimer")
 
         assert oppenheimer_film is not None
-        assert oppenheimer_film.film_id == "2EE63000012BHGWDVI" # type: ignore
+        assert oppenheimer_film.film_id == "38E63000012BHGWDVI" # type: ignore
         assert oppenheimer_film.title == "Oppenheimer" # type: ignore
         assert oppenheimer_film.name == "Oppenheimer"  # type: ignore
         assert oppenheimer_film.production_year == 2022 # type: ignore
@@ -78,6 +85,7 @@ def test_update_films_table():
         assert oppenheimer_film.image_url == "https://contentservice.cineorder.shop/contents/img?q=683jXD30IV9SmgAABHGWNjb" # type: ignore
         assert start <= oppenheimer_film.last_updated <= end # type: ignore
 
+        # exist and don't change
         wish_film = film_db_manager._get_film_by_film_id("2EE63000012BHGWDVI")
 
         assert wish_film is not None
@@ -90,6 +98,7 @@ def test_update_films_table():
         assert wish_film.image_url == "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDEwMjI3OTZfL3JDQ3JHNHN3a3hnRlpmbHVwNTZzeDZ5bWs1aS5qcGdffA" # type: ignore # noqa: E501
         assert start <= wish_film.last_updated <= end # type: ignore
 
+        # exist and updates
         wonka_film = film_db_manager._get_film_by_film_id("A6D63000012BHGWDVI")
 
         assert wonka_film is not None
@@ -125,7 +134,7 @@ def test_update_performances_table():
             "is_3d": False,
             "auditorium_id": "10000000015UHQLKCP",
             "auditorium_name": "Kino 1",
-            "last_updated": "2023-11-13 19:14:38.658222"
+            "last_updated": datetime.now()
             }
 
         upsert_case = {
@@ -163,21 +172,22 @@ def test_update_performances_table():
 
         # Execute
         start = datetime.now() - timedelta(seconds=1)  # adding buffer
-        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
 
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
         film_db_manager.update_performances_table(performances_list=[exists, dont_exist, upsert_case])
+
         end = datetime.now() + timedelta(seconds=1)  # adding buffer
 
         # Verify
-        existing_performance = film_db_manager._get_performance_by_performance_id("A6D63000012BHGWDVI")
+        existing_performance = film_db_manager._get_performance_by_performance_id("71D45000023UHQLKCP")
 
         assert existing_performance is not None
         assert existing_performance.performance_id == "71D45000023UHQLKCP" # type: ignore
         assert existing_performance.film_id == "A6D63000012BHGWDVI" # type: ignore
         assert existing_performance.film_id_p == "A6D63000012BHGWDVI" # type: ignore
-        assert existing_performance.performance_datetime == "2023-12-06 17:15:00" # type: ignore
-        assert existing_performance.performance_date == "2023-12-06" # type: ignore
-        assert existing_performance.performance_time == "17:15:00" # type: ignore
+        assert existing_performance.performance_datetime == dt_str_2_datetime("2023-12-06 17:15:00") # type: ignore
+        assert existing_performance.performance_date == date_str_2_date("2023-12-06") # type: ignore
+        assert existing_performance.performance_time == time_str_2_time("17:15:00") # type: ignore
         assert existing_performance.release_type == "englisch/OV" # type: ignore
         assert existing_performance.is_imax is False # type: ignore
         assert existing_performance.is_ov  # type: ignore
@@ -190,11 +200,11 @@ def test_update_performances_table():
 
         assert new_performance is not None
         assert new_performance.performance_id == "9EC45000023UHQLKCP" # type: ignore
-        assert new_performance.film_id == "4ED63000012BHGWDVI" # type: ignore
-        assert new_performance.film_id_p == "4ED63000012BHGWDVI" # type: ignore
-        assert new_performance.performance_datetime == "2023-11-22 16:45:00" # type: ignore
-        assert new_performance.performance_date == "2023-11-22" # type: ignore
-        assert new_performance.performance_time == "16:45:00" # type: ignore
+        assert new_performance.film_id == "DCC63000012BHGWDVI" # type: ignore
+        assert new_performance.film_id_p == "DCC63000012BHGWDVI" # type: ignore
+        assert new_performance.performance_datetime == dt_str_2_datetime("2023-11-22 16:45:00") # type: ignore
+        assert new_performance.performance_date == date_str_2_date("2023-11-22") # type: ignore
+        assert new_performance.performance_time == time_str_2_time("16:45:00") # type: ignore
         assert new_performance.release_type == "IMAX/Digital" # type: ignore
         assert new_performance.is_imax # type: ignore
         assert new_performance.is_ov  is False# type: ignore
@@ -209,9 +219,9 @@ def test_update_performances_table():
         assert upsert_case_test.performance_id == "B5C45000023UHQLKCP" # type: ignore
         assert upsert_case_test.film_id == "DCC63000012BHGWDVI" # type: ignore
         assert upsert_case_test.film_id_p == "DCC63000012BHGWDVI" # type: ignore
-        assert upsert_case_test.performance_datetime == "2023-11-14 17:00:00" # type: ignore
-        assert upsert_case_test.performance_date == "2023-11-14" # type: ignore
-        assert upsert_case_test.performance_time == "17:00:00" # type: ignore
+        assert upsert_case_test.performance_datetime == dt_str_2_datetime("2023-11-14 17:00:00") # type: ignore
+        assert upsert_case_test.performance_date == date_str_2_date("2023-11-14") # type: ignore
+        assert upsert_case_test.performance_time == time_str_2_time("17:00:00") # type: ignore
         assert upsert_case_test.release_type == "Digital" # type: ignore
         assert upsert_case_test.is_imax is False# type: ignore
         assert upsert_case_test.is_ov is False# type: ignore
@@ -234,7 +244,7 @@ def test_update_upcoming_table():
         exists = {
             "title": "Napoleon",
             "release_date": "2023-11-23",
-            "last_updated": "2023-11-13 19:14:43.311786",
+            "last_updated": datetime.now(),
             }
 
         upsert_case = {
@@ -246,49 +256,56 @@ def test_update_upcoming_table():
         dont_exist = {
             "title": "WONKA",
             "release_date": "2023-12-07",
-            "last_updated": datetime.now()
+            "last_updated": datetime.now(),
             }
 
         # Execute
         start = datetime.now() - timedelta(seconds=1)  # adding buffer
-        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
 
-        film_db_manager.update_upcoming_films_table(upcoming_films_list=[exists, dont_exist, upsert_case])
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        film_db_manager.update_upcoming_films_table(upcoming_films_list=[exists, upsert_case, dont_exist])
+
         end = datetime.now() + timedelta(seconds=1)  # adding buffer
 
+        # import time
+        # time.sleep(120)
+
         # Verify
-        film_napoleon = film_db_manager._get_upcoming_film_by_title("Napoleon")
+
+        # exists and don't change
+        film_napoleon = film_db_manager._get_upcoming_film_by_title(exists.get("title").lower()) # type: ignore
 
         assert film_napoleon is not None
         assert film_napoleon.upcoming_film_id == 1 # type: ignore
-        assert film_napoleon.title == "Napoleon" # type: ignore
-        assert film_napoleon.release_date == "2023-11-23" # type: ignore
+        assert film_napoleon.title.lower() == exists.get("title").lower() # type: ignore
+        assert film_napoleon.release_date == date_str_2_date(exists.get("release_date").lower()) # type: ignore
         assert film_napoleon.film_id is None # type: ignore
+        assert film_napoleon.is_released is False # type: ignore
+        assert film_napoleon.is_trackable is True # type: ignore
         assert start <= film_napoleon.last_updated <= end # type: ignore
-        assert film_napoleon.is_released is False # type: ignore
-        assert film_napoleon.is_trackable is True # type: ignore
 
-        film_wonka = film_db_manager._get_upcoming_film_by_title("WONKA")
-
-        assert film_wonka is not None
-        assert film_wonka.upcoming_film_id == 5  # type: ignore
-        assert film_wonka.title == "WONKA" # type: ignore
-        assert film_wonka.release_date == "2023-12-07" # type: ignore
-        assert film_wonka.film_id is None # type: ignore
-        assert start <= film_wonka.last_updated <= end # type: ignore
-        assert film_napoleon.is_released is False # type: ignore
-        assert film_napoleon.is_trackable is True # type: ignore
-
+        # exists and updates
         film_wish = film_db_manager._get_upcoming_film_by_title("Wish")
 
         assert film_wish is not None
         assert film_wish.upcoming_film_id == 3 # type: ignore
-        assert film_wish.title == "Wish" # type: ignore
-        assert film_wish.release_date == "2023-11-23" # type: ignore
-        assert film_wish.film_id is None # type: ignore
-        assert start <= film_wish.last_updated <= end # type: ignore
+        assert film_wish.title.lower() == "Wish".lower() # type: ignore
+        assert film_wish.release_date == date_str_2_date("2023-11-23") # type: ignore
+        assert film_wish.film_id is not None # type: ignore
         assert film_wish.is_released is False # type: ignore
         assert film_wish.is_trackable is True # type: ignore
+        assert start <= film_wish.last_updated <= end # type: ignore
+
+        # don't exist
+        film_wonka = film_db_manager._get_upcoming_film_by_title(dont_exist.get("title").lower()) # type: ignore
+
+        assert film_wonka is not None
+        assert film_wonka.title.lower() == dont_exist.get("title").lower() # type: ignore
+        assert film_wonka.release_date == date_str_2_date(dont_exist.get("release_date").lower()) # type: ignore
+        assert film_wonka.film_id is None # type: ignore
+        assert film_wonka.is_released is False # type: ignore
+        assert film_wonka.is_trackable is True # type: ignore
+        assert start <= film_wonka.last_updated <= end # type: ignore
 
 # [ ]: Test for update_upcoming_films_table
 # [ ]: Test for update_released_films_in_upcoming_films_table

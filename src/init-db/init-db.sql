@@ -30,9 +30,15 @@ CREATE TABLE tracker.performances (
     FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
 );
 
+-- Create a Sequence for upcoming_film_id
+CREATE SEQUENCE tracker.upcoming_film_id_seq
+    INCREMENT BY 1
+    START WITH 1
+    NO CYCLE;
+
 -- Create the upcoming films table
 CREATE TABLE tracker.upcoming_films (
-    upcoming_film_id SERIAL PRIMARY KEY,
+    upcoming_film_id INT DEFAULT nextval('tracker.upcoming_film_id_seq') PRIMARY KEY,
     -- Add a unique constraint to the title column
     title VARCHAR(255) NOT NULL UNIQUE,
     release_date DATE,

@@ -45,19 +45,30 @@ class FilmDatabaseManager:
             logging.warning("Performances list is None")
 
     # TODO: Needs test
+    # BUG: Does not work
+    # INFO: update statement does not work
     def update_upcoming_films_table(self, upcoming_films_list: Optional[List[dict]]) -> None:
         """Updates the upcoming films table."""
 
         if upcoming_films_list is not None:
-            exclude_cols = ["is_release", "is_trackable", "title"]
+
             logging.info("[ ] Updating Upcoming Films table!")
             # Upsert statement
-            upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols=exclude_cols)
-            logging.info("[*] Updated Upcoming Films table!")
+
+            insert_stmt = insert(UpcomingFilms).values(upcoming_films_list)
+
+            update_dict = {
+                'release_date': insert_stmt.excluded['release_date'],
+                'last_updated': insert_stmt.excluded['last_updated']
+            }
+
+            upsert_stmt = insert_stmt.on_conflict_do_update(index_elements=['title'], set_=update_dict)
+
             # Execute the upsert statement
             self._excute_stmt(upsert_stmt)
+            logging.info("[*] Updated Upcoming Films table!")
         else:
-            logging.warning("Performances list is None")
+            logging.warning("Upcoming Films list is None")
 
     # TODO: Needs test
     def update_released_films_in_upcoming_films_table(self) -> None:
@@ -100,7 +111,6 @@ class FilmDatabaseManager:
         # Insert statement
         insert_stmt = insert(table).values(update_list)
 
-        # LEARN: What is excluded?
         # Build a dictionary for updating all columns except the primary key
         update_dict = {col.name: insert_stmt.excluded[col.name] for col in table.__table__.columns if not col.primary_key}
 
@@ -108,11 +118,6 @@ class FilmDatabaseManager:
         if exclude_cols is not None:
             for key in exclude_cols:
                 update_dict.pop(key, None)
-
-        # [X]: Move last_updated to the film_fetcher
-        # CHECK: if this is working
-        # # set the last_update column to the current time
-        # update_dict["last_updated"] = datetime.datetime.now()
 
         # Return the Upsert statement
         return insert_stmt.on_conflict_do_update(index_elements=[getattr(table, id_col_name)], set_=update_dict)
@@ -199,7 +204,7 @@ class FilmDatabaseManager:
         # sourcery skip: extract-duplicate-method
         try:
             with self.session_maker() as session:
-                return session.query(model).filter(filter_condition).first()
+                return session.query(model).filter(filter_condition(model)).first()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
             session.rollback()  # type: ignore
