@@ -44,25 +44,16 @@ class FilmDatabaseManager:
         else:
             logging.warning("Performances list is None")
 
-    # TODO: Needs test
-    # BUG: Does not work
-    # INFO: update statement does not work
     def update_upcoming_films_table(self, upcoming_films_list: Optional[List[dict]]) -> None:
         """Updates the upcoming films table."""
 
         if upcoming_films_list is not None:
 
             logging.info("[ ] Updating Upcoming Films table!")
+
             # Upsert statement
-
-            insert_stmt = insert(UpcomingFilms).values(upcoming_films_list)
-
-            update_dict = {
-                'release_date': insert_stmt.excluded['release_date'],
-                'last_updated': insert_stmt.excluded['last_updated']
-            }
-
-            upsert_stmt = insert_stmt.on_conflict_do_update(index_elements=['title'], set_=update_dict)
+            exclude_cols = ['title', 'is_released', 'is_trackable', 'upcoming_film_id', 'film_id']
+            upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols= exclude_cols)
 
             # Execute the upsert statement
             self._excute_stmt(upsert_stmt)
