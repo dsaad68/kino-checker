@@ -33,8 +33,7 @@ CREATE TABLE tracker.performances (
 -- Create a Sequence for upcoming_film_id
 CREATE SEQUENCE tracker.upcoming_film_id_seq
     INCREMENT BY 1
-    START WITH 1
-    NO CYCLE;
+    START WITH 1;
 
 -- Create the upcoming films table
 CREATE TABLE tracker.upcoming_films (

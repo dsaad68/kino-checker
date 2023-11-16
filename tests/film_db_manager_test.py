@@ -267,9 +267,6 @@ def test_update_upcoming_table():
 
         end = datetime.now() + timedelta(seconds=1)  # adding buffer
 
-        # import time
-        # time.sleep(120)
-
         # Verify
 
         # exists and don't change
