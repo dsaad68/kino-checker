@@ -77,8 +77,6 @@ class Scraper:
                 title = element.select_one(title_selector)
                 release_date = element.select_one(release_date_selector)
                 if title is not None:
-                    # TODO: add last_updated here too
-                    # CHECK: if last_updated works
                     results.append({
                                     "title": title.get_text(),
                                     "release_date": self._get_date(release_date.get_text()),

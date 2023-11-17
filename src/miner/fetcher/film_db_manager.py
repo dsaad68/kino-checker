@@ -61,7 +61,6 @@ class FilmDatabaseManager:
         else:
             logging.warning("Upcoming Films list is None")
 
-    # TODO: Needs test
     def update_released_films_in_upcoming_films_table(self) -> None:
         """update the released films in the upcoming films table."""
 
@@ -72,8 +71,6 @@ class FilmDatabaseManager:
         # Execute the upsert statement
         self._excute_stmt(update_stmt)
 
-    # TODO: Needs test
-    # TODO: Check it works
     def update_users_table(self) -> None:
 
         logging.info("[ ] Updating Users table!")
@@ -205,7 +202,6 @@ class FilmDatabaseManager:
             session.rollback()  # type: ignore
             return None
 
-    # LEARN: Filter by lambda function
     def _get_film_by_title(self, title: str) -> Union[Films, None]:
         """Get an existing row in the films table given its title."""
         return self._execute_query(Films, lambda film: func.lower(film.title) == title.lower())
@@ -225,3 +221,7 @@ class FilmDatabaseManager:
     def _get_upcoming_film_by_title(self, title: str) -> Union[UpcomingFilms, None]:
         """Get an existing row in the upcoming films table given its title."""
         return self._execute_query(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
+
+    def _get_upcoming_user_by_title(self, title: str) -> Union[Users, None]:
+        """Get an existing rows in the users table given its title."""
+        return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())

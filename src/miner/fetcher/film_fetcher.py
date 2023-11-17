@@ -64,8 +64,7 @@ class FilmInfoExtractor:
             logging.warning("API Response is empty!")
             self.film_fetcher_response = None
 
-    # CHECK: if last_updated works
-    # CHECK: if it works with film object instead of dict
+    # IDEA: if it works with film object instead of dict
     def get_films_info_list(self) -> Optional[List[dict]]:
         """Extracts the films from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
@@ -87,8 +86,7 @@ class FilmInfoExtractor:
         return None
 
     # CHECK: the time because of time zone
-    # CHECK: if last_updated works
-    # CHECK: if it works with performance object instead of dict
+    # IDEA: if it works with performance object instead of dict
     def get_performances_list(self) -> Optional[List[dict]]:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response

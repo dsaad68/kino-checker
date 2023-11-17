@@ -92,8 +92,7 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_released_films_in_upcoming_films_table()
 
-        # TODO: fix this logging statement
-        logging.info("Updating the released films in the upcoming films table in DB!")
+        logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
         # [ ]: Querying which users need to be updated

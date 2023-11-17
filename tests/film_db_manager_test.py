@@ -288,7 +288,7 @@ def test_update_upcoming_table():
         assert film_wish.upcoming_film_id == 3 # type: ignore
         assert film_wish.title.lower() == "Wish".lower() # type: ignore
         assert film_wish.release_date == date_str_2_date("2023-11-23") # type: ignore
-        assert film_wish.film_id is not None # type: ignore
+        assert film_wish.film_id is None # type: ignore
         assert film_wish.is_released is False # type: ignore
         assert film_wish.is_trackable is True # type: ignore
         assert start <= film_wish.last_updated <= end # type: ignore
@@ -304,6 +304,51 @@ def test_update_upcoming_table():
         assert film_wonka.is_trackable is True # type: ignore
         assert start <= film_wonka.last_updated <= end # type: ignore
 
-# [ ]: Test for update_upcoming_films_table
-# [ ]: Test for update_released_films_in_upcoming_films_table
-# [ ]: Test for update_users_table
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_update_released_films_in_upcoming_films_table():
+
+    schemas = ["tracker"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Execute
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        film_db_manager.update_released_films_in_upcoming_films_table()
+
+        # Verify
+
+        film_sawx_u = film_db_manager._get_upcoming_film_by_title("SAW X")
+        film_sawx_f = film_db_manager._get_film_by_title("SAW X")
+
+        assert film_sawx_u.is_released # type: ignore
+        assert film_sawx_u.film_id == film_sawx_f.film_id # type: ignore
+
+        film_wish_u = film_db_manager._get_upcoming_film_by_title("Wish")
+        film_wish_f = film_db_manager._get_film_by_title("Wish")
+
+        assert film_wish_u.is_released # type: ignore
+        assert film_wish_u.film_id == film_wish_f.film_id # type: ignore
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_update_users_table():
+
+    schemas = ["tracker"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Execute
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        film_db_manager.update_released_films_in_upcoming_films_table()
+        film_db_manager.update_users_table()
+
+        # Verify
+
+        user_wish = film_db_manager._get_upcoming_user_by_title("Wish")
+        film_wish = film_db_manager._get_film_by_title("Wish")
+
+        assert user_wish.film_id == film_wish.film_id # type: ignore
