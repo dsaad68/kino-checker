@@ -1,7 +1,7 @@
 # %%
 import logging
 
-from typing import List, Union, Dict, Optional, Type, Callable
+from typing import List,Dict, Type, Callable
 
 from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
@@ -21,7 +21,7 @@ class FilmDatabaseManager:
         self.connection_uri = connection_uri
         self.session_maker = self._session_maker()
 
-    def update_films_table(self, films_list: Optional[List[dict]]) -> None:
+    def update_films_table(self, films_list: List[dict] | None) -> None:
         """Updates the films table."""
         if films_list is not None:
             logging.info("[ ] Updating Films table!")
@@ -33,7 +33,7 @@ class FilmDatabaseManager:
         else:
             logging.warning("Films list is None")
 
-    def update_performances_table(self, performances_list: Optional[List[dict]]) -> None:
+    def update_performances_table(self, performances_list: List[dict] | None) -> None:
         """Updates the performances table."""
         if performances_list is not None:
             logging.info("[ ] Updating Performances table!")
@@ -45,7 +45,7 @@ class FilmDatabaseManager:
         else:
             logging.warning("Performances list is None")
 
-    def update_upcoming_films_table(self, upcoming_films_list: Optional[List[dict]]) -> None:
+    def update_upcoming_films_table(self, upcoming_films_list: List[dict] | None) -> None:
         """Updates the upcoming films table."""
 
         if upcoming_films_list is not None:
@@ -82,7 +82,7 @@ class FilmDatabaseManager:
         self._excute_stmt(update_stmt)
 
     @staticmethod
-    def _extract_film_data(film_dict, keys: List[str]) -> Dict[str, Union[str, int]]:
+    def _extract_film_data(film_dict, keys: List[str]) -> Dict[str, str | int]:
         """Extracts film data from a dictionary."""
         return {key: film_dict.get(key) for key in keys}
 
@@ -94,7 +94,7 @@ class FilmDatabaseManager:
         # Define a session factory
         return sessionmaker(bind=engine)
 
-    def _create_upsert_stmt(self, table, id_col_name: str, update_list: List[dict], exclude_cols: Optional[List[str]] = None) -> Insert:
+    def _create_upsert_stmt(self, table, id_col_name: str, update_list: List[dict], exclude_cols: List[str] | None = None) -> Insert:
         """Create an upsert statement for a table"""
 
         # Insert statement
@@ -172,7 +172,7 @@ class FilmDatabaseManager:
             .where(func.lower(Users.title) == func.lower(UpcomingFilms.title))
         )
 
-    def _excute_stmt(self, stmt: Union[Insert, Update]) -> None:
+    def _excute_stmt(self, stmt: Insert | Update) -> None:
         """Execute an upsert statement."""
 
         try:
@@ -186,7 +186,7 @@ class FilmDatabaseManager:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
 
-    def _execute_query(self, model: Type, filter_condition: Callable) -> Union[Type, None]:
+    def _execute_query(self, model: Type, filter_condition: Callable) -> Type | None:
         """Execute a query with a given model and filter condition."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
@@ -202,31 +202,32 @@ class FilmDatabaseManager:
             session.rollback()  # type: ignore
             return None
 
-    def _get_film_by_title(self, title: str) -> Union[Films, None]:
+    def _get_film_by_title(self, title: str) -> Films |None:
         """Get an existing row in the films table given its title."""
         return self._execute_query(Films, lambda film: func.lower(film.title) == title.lower())
 
-    def _get_film_by_film_id(self, film_id: str) -> Union[Films, None]:
+    def _get_film_by_film_id(self, film_id: str) -> Films | None:
         """Get an existing row in the films table given its film id."""
         return self._execute_query(Films, lambda film: film.film_id == film_id)
 
-    def _get_performance_by_performance_id(self, performance_id: str) -> Union[Performances, None]:
+    def _get_performance_by_performance_id(self, performance_id: str) -> Performances | None:
         """Get an existing row in the performances table given its performance id."""
         return self._execute_query(Performances, lambda performance: performance.performance_id == performance_id)
 
-    def _get_performance_by_film_id(self, film_id: str) -> Union[Performances, None]:
+    def _get_performance_by_film_id(self, film_id: str) -> Performances | None:
         """Get an existing row in the performances table given its film id."""
         return self._execute_query(Performances, lambda performance: performance.film_id == film_id)
 
-    def _get_upcoming_film_by_title(self, title: str) -> Union[UpcomingFilms, None]:
+    def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing row in the upcoming films table given its title."""
         return self._execute_query(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
 
-    def _get_upcoming_user_by_title(self, title: str) -> Union[Users, None]:
+    def _get_upcoming_user_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing rows in the users table given its title."""
         return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
 
-    def get_users_to_notify(self) -> Union[List[Users], None]:
+    # TODO: Update this method to return the film info to be used in the notification.
+    def get_users_to_notify(self) -> List[Users] | None:
         """Get list of users to notify."""
 
         # sourcery skip: extract-duplicate-method
@@ -241,3 +242,5 @@ class FilmDatabaseManager:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
             return None
+
+# %%

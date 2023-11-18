@@ -3,15 +3,15 @@
 import os
 import time
 import logging
-# import asyncio
+import asyncio
 
 from alive_progress import alive_bar
 
-# from miner_helpers.tlg_updater import send_status
 # TODO: fix this later
-from fetcher.scrapper import Scraper
-from fetcher.film_db_manager import FilmDatabaseManager
-from fetcher.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
+from utils.scrapper import Scraper
+from utils.film_db_manager import FilmDatabaseManager
+from utils.film_notifier import FilmReleaseNotification
+from utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
 
 from my_logger import Logger
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # create a function that gets the environment variables or raise an error
 
     SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_CONNECTION_URI")
-    # BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+    BOT_TOKEN = get_or_raise(env_name="TELEGRAM_BOT_TOKEN")
 
     TIME_INTERVAL = 120
 
@@ -50,6 +50,7 @@ if __name__ == "__main__":
 
     logging.info("Main starts!")
 
+    # CHECK: Where should be in the loop?
     film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
 
     while True:
@@ -83,10 +84,7 @@ if __name__ == "__main__":
 
         logging.info(f"----- Mining session ended in {elapsed_time:.4f} seconds! -----")
 
-        # Updating Users if there is a chanage in availability
-
         logging.info("----- Updating session starts! -----")
-
         start_time = time.time()
 
         logging.info("Updating the released films in the upcoming films table in DB!")
@@ -98,8 +96,10 @@ if __name__ == "__main__":
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
 
-        # [ ]: Sending message to users
-        # asyncio.run(send_status(users_list, BOT_TOKEN))
+        logging.info("Send notification to users!")
+        film_notifier = FilmReleaseNotification(BOT_TOKEN, users_list)
+        asyncio.run(film_notifier.run())
+
 
         end_time = time.time()
         elapsed_time = end_time - start_time

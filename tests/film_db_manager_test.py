@@ -9,7 +9,7 @@ from integeration_db.integration_db import IntegrationDb, EnvVar
 
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
-from miner.fetcher.film_db_manager import FilmDatabaseManager # noqa: E402
+from miner.utils.film_db_manager import FilmDatabaseManager # noqa: E402
 
 CONTAINER_NAME = "postgres:alpine3.18"
 
@@ -353,6 +353,7 @@ def test_update_users_table():
 
         assert user_wish.film_id == film_wish.film_id # type: ignore
 
+# TODO : Update this test
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_get_users_to_notify():
