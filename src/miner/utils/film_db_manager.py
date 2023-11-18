@@ -1,15 +1,14 @@
 # %%
 import logging
 
-from typing import List,Dict, Type, Callable
-
-from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
+from typing import List, Dict, Type, Callable
+from sqlalchemy.sql import select, func, join, outerjoin
 from sqlalchemy.dialects.postgresql import insert, Insert
 from sqlalchemy import Update, create_engine, update, and_
 
-from .db_model import Films, Performances, UpcomingFilms, Users
+from .db_model import Films, Performances, UpcomingFilms, Users, UsersFilmInfo
 
 # %%
 
@@ -115,6 +114,7 @@ class FilmDatabaseManager:
     def _create_update_released_film_stmt() -> Update:
         """Create an update statement for released films in the upcoming films table.
 
+        SQL Query:
         ```sql
         -- Update Released Films
         UPDATE tracker.upcoming_films
@@ -144,6 +144,7 @@ class FilmDatabaseManager:
     def _create_users_table_film_id_update_stmt() -> Update:
         """Create an update statement for updating released films id in the users table.
 
+        SQL Query:
         ```sql
         -- Update Users with Released Films
         UPDATE tracker.users u
@@ -226,14 +227,94 @@ class FilmDatabaseManager:
         """Get an existing rows in the users table given its title."""
         return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
 
-    # TODO: Update this method to return the film info to be used in the notification.
-    def get_users_to_notify(self) -> List[Users] | None:
-        """Get list of users to notify."""
+    def get_users_to_notify(self) -> List[UsersFilmInfo] | None:
+        """Get list of users to notify.
+
+        SQL Query:
+        ```sql
+        WITH film_info AS (
+            SELECT
+                f.film_id,
+                f.title,
+                f.length_in_minutes,
+                f.last_updated,
+                f.nationwide_start,
+                BOOL_OR(p.is_imax) AS is_imax,
+                BOOL_OR(p.is_ov) AS is_ov,
+                BOOL_OR(p.is_3d) AS is_3d
+            FROM
+                tracker.films f
+            JOIN
+                tracker.performances p ON f.film_id = p.film_id
+            GROUP BY
+                f.film_id
+        )
+        SELECT
+            u.chat_id,
+            u.message_id,
+            fi.title,
+            fi.length_in_minutes,
+            fi.last_updated,
+            fi.nationwide_start,
+            fi.is_imax,
+            fi.is_ov,
+            fi.is_3d
+        FROM
+            tracker.users u
+        LEFT JOIN
+            film_info fi ON u.film_id = fi.film_id
+        WHERE
+            u.film_id IS NOT NULL
+            AND NOT u.notified;
+        ```
+        """
+
+        # Define the CTE
+        film_info = (
+            select(
+                Films.film_id,
+                Films.title,
+                Films.length_in_minutes,
+                Films.last_updated,
+                Films.nationwide_start,
+                func.bool_or(Performances.is_imax).label('is_imax'),
+                func.bool_or(Performances.is_ov).label('is_ov'),
+                func.bool_or(Performances.is_3d).label('is_3d')
+            )
+            .select_from(join(Films, Performances, Films.film_id == Performances.film_id))
+            .group_by(Films.film_id)
+            .cte('film_info')
+        )
+
+        # Define the main SELECT statement
+        select_stmt = (
+            select(
+                Users.user_id,
+                Users.chat_id,
+                Users.message_id,
+                Users.notified,
+                film_info.c.film_id,
+                film_info.c.title,
+                film_info.c.length_in_minutes,
+                film_info.c.last_updated,
+                film_info.c.nationwide_start,
+                film_info.c.is_imax,
+                film_info.c.is_ov,
+                film_info.c.is_3d)
+            .select_from( outerjoin(Users, film_info, Users.film_id == film_info.c.film_id) )
+            .where(
+                and_(Users.film_id.isnot(None), ~Users.notified)
+                )
+            )
 
         # sourcery skip: extract-duplicate-method
         try:
             with self.session_maker() as session:
-                return session.execute(select(Users).where(Users.film_id.isnot(None), Users.notified.is_(False))).scalars().all()
+                users = session.execute(select_stmt).all()
+                return [ UsersFilmInfo(*user)
+                    for user in users
+                ]
+
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
             session.rollback()  # type: ignore

@@ -1,7 +1,7 @@
 import logging
 import requests
 
-from typing import List, Optional
+from typing import List
 from datetime import date, time, datetime
 
 CENTER_OID = "6F000000014BHGWDVI"
@@ -27,7 +27,7 @@ class FilmFetcher:
         self.headers = headers
         self.session_id = self._get_session_id()
 
-    def _get_session_id(self) -> Optional[str]:
+    def _get_session_id(self) -> str | None:
         url = "https://cineorder.filmpalast.net/api/session"
 
         headers = self.headers | {"center-oid": self.center_oid}
@@ -40,7 +40,7 @@ class FilmFetcher:
             logging.error(f"An error occurred: {e}")
             return None
 
-    def get_film_list(self, date_from: str, date_to: str) -> Optional[List]:
+    def get_film_list(self, date_from: str, date_to: str) -> List | None:
         url = "https://cineorder.filmpalast.net/api/films"
 
         payload = {"cinemadate.from": date_from, "cinemadate.to": date_to}
@@ -57,7 +57,7 @@ class FilmFetcher:
 
 class FilmInfoExtractor:
     """This class extracts the films and performances from the film_fetcher_response."""
-    def __init__(self, film_fetcher_response: Optional[list]):
+    def __init__(self, film_fetcher_response: list | None):
         if film_fetcher_response is not None:
             self.film_fetcher_response = film_fetcher_response
         else:
@@ -65,7 +65,7 @@ class FilmInfoExtractor:
             self.film_fetcher_response = None
 
     # IDEA: if it works with film object instead of dict
-    def get_films_info_list(self) -> Optional[List[dict]]:
+    def get_films_info_list(self) -> List[dict] | None:
         """Extracts the films from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:
@@ -86,7 +86,7 @@ class FilmInfoExtractor:
         return None
 
     # IDEA: if it works with performance object instead of dict
-    def get_performances_list(self) -> Optional[List[dict]]:
+    def get_performances_list(self) -> List[dict] | None:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:
@@ -125,7 +125,7 @@ class FilmInfoExtractor:
         return ("OV" in release_type or "englisch" in release_type) if release_type is not None else False
 
     @staticmethod
-    def _extract_time(performanceDateTime: str) -> Optional[time]:
+    def _extract_time(performanceDateTime: str) -> time | None:
         """This function extracts the time from the performanceDateTime"""
         if performanceDateTime is None:
             return None
@@ -133,7 +133,7 @@ class FilmInfoExtractor:
         return dt.time()
 
     @staticmethod
-    def _extract_date(performanceDateTime: str) -> Optional[date]:
+    def _extract_date(performanceDateTime: str) -> date | None:
         """This function extracts the date from the performanceDateTime"""
         if performanceDateTime is None:
             return None
@@ -141,7 +141,7 @@ class FilmInfoExtractor:
         return dt.date()
 
     @staticmethod
-    def _empty_dict_checker(data: dict) -> Optional[dict]:
+    def _empty_dict_checker(data: dict) -> dict | None:
         """This function checks if a dictionary is empty and returns None if it is"""
         if data is not None:
             return data

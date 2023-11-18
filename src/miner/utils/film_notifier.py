@@ -5,12 +5,14 @@ import asyncio
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
+from .db_model import UsersFilmInfo
+
 # %%
 
 class FilmReleaseNotification:
     """ This class sends a notification about a release of a film to all the users in the list """
 
-    def __init__(self, BOT_TOKEN: str, users_list: list):
+    def __init__(self, BOT_TOKEN: str, users_list: list[UsersFilmInfo]):
         self.bot = AsyncTeleBot(BOT_TOKEN)
         self.users_list = users_list
 

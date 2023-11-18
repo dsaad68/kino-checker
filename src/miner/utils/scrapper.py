@@ -3,9 +3,9 @@ import logging
 import requests
 
 from bs4 import BeautifulSoup
+from typing import List, Tuple
 from datetime import datetime, date
 from requests import RequestException
-from typing import List, Tuple, Optional
 
 
 class Scraper:
@@ -49,7 +49,7 @@ class Scraper:
 
         return results
 
-    def _get_website(self, url) -> Tuple[Optional[BeautifulSoup], int]:
+    def _get_website(self, url) -> Tuple[BeautifulSoup | None, int]:
         """Retrieves a website and returns its BeautifulSoup object and status code."""
 
         try:
@@ -63,7 +63,7 @@ class Scraper:
             return None, 999
 
     # IDEA: if it works with upcoming film object instead of dict
-    def _extractor(self, soup) -> Optional[List[dict]]:
+    def _extractor(self, soup) -> List[dict] | None:
         """Extracts data from a BeautifulSoup object."""
 
         results: List[dict] = []
@@ -88,7 +88,7 @@ class Scraper:
             logging.error(f"An error occurred: {e}")
             return None
 
-    def _get_date(self, input) -> Optional[date]:
+    def _get_date(self, input) -> date | None:
         """Returns the current date in the format 'YYYY-MM-DD' if input is not None."""
 
         if input is None:

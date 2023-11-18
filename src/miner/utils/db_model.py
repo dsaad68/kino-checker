@@ -1,13 +1,16 @@
+#%%
 from sqlalchemy import MetaData
+from dataclasses import dataclass
+from datetime import date, datetime
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey, Sequence
 
+#%%
 # Define the schema for the tracker database
 metadata_obj = MetaData(schema="tracker")
 
 # Define a base class for declarative models
 Base = declarative_base(metadata=metadata_obj)
-
 
 # Define a model for the tracker.films table
 class Films(Base):
@@ -56,6 +59,7 @@ class UpcomingFilms(Base):
     is_released = Column(Boolean, default=False)
     is_trackable = Column(Boolean, default=True)
 
+
 # Define a model for the tracker.users table
 class Users(Base):
     __tablename__ = "users"
@@ -65,3 +69,23 @@ class Users(Base):
     film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=False)
     title = Column(String(255), nullable=False)
     notified = Column(Boolean, default=False)
+
+
+@dataclass
+class UsersFilmInfo:
+    """Dataclass for users film info"""
+    user_id: int
+    chat_id: str
+    message_id: str
+    notified: bool
+    film_id: str
+    title: str
+    length_in_minutes: int
+    last_updated: datetime
+    nationwide_start: date
+    is_imax: bool
+    is_ov: bool
+    is_3d: bool
+
+    def get_last_updated(self) -> str:
+        return self.last_updated.strftime('%Y-%m-%d %H:%M:%S')
