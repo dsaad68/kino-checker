@@ -352,3 +352,27 @@ def test_update_users_table():
         film_wish = film_db_manager._get_film_by_title("Wish")
 
         assert user_wish.film_id == film_wish.film_id # type: ignore
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_get_users_to_notify():
+
+    schemas = ["tracker"]
+    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Execute
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        user_list = film_db_manager.get_users_to_notify()
+
+        assert len(user_list) > 0
+        user = user_list[0]
+
+        assert user.user_id == 2
+        assert user.chat_id == "222211111"
+        assert user.message_id == "1010"
+        assert user.title == "Wonka"
+        assert user.notified is False
+        assert user.film_id is not None
+        assert user.film_id == "A6D63000012BHGWDVI"

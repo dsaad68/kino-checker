@@ -185,14 +185,13 @@ class FilmDatabaseManager:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
 
-    # LEARN: Type
     def _execute_query(self, model: Type, filter_condition: Callable) -> Union[Type, None]:
         """Execute a query with a given model and filter condition."""
 
         # sourcery skip: extract-duplicate-method
         try:
             with self.session_maker() as session:
-                return session.query(model).filter(filter_condition(model)).first()
+                return session.execute(select(model).where(filter_condition(model))).scalars().first()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
             session.rollback()  # type: ignore
@@ -225,3 +224,19 @@ class FilmDatabaseManager:
     def _get_upcoming_user_by_title(self, title: str) -> Union[Users, None]:
         """Get an existing rows in the users table given its title."""
         return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
+
+    def get_users_to_notify(self) -> Union[List[Users], None]:
+        """Get list of users to notify."""
+
+        # sourcery skip: extract-duplicate-method
+        try:
+            with self.session_maker() as session:
+                return session.execute(select(Users).where(Users.film_id.isnot(None), Users.notified.is_(False))).scalars().all()
+        except SQLAlchemyError as error:
+            logging.error(f"Database Error: {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+        except Exception as error:
+            logging.error(f"ERROR : {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None

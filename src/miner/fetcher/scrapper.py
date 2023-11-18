@@ -62,6 +62,7 @@ class Scraper:
             logging.error(f"An error occurred: {e}")
             return None, 999
 
+    # IDEA: if it works with upcoming film object instead of dict
     def _extractor(self, soup) -> Optional[List[dict]]:
         """Extracts data from a BeautifulSoup object."""
 

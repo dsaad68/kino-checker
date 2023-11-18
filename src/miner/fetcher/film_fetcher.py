@@ -85,7 +85,6 @@ class FilmInfoExtractor:
         logging.warn("Film Fetcher Response is empty!")
         return None
 
-    # CHECK: the time because of time zone
     # IDEA: if it works with performance object instead of dict
     def get_performances_list(self) -> Optional[List[dict]]:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
