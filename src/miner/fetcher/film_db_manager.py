@@ -13,6 +13,7 @@ from .db_model import Films, Performances, UpcomingFilms, Users
 
 # %%
 
+# IDEA: Think about breakdown of this class two classes one for updating and one for querying
 class FilmDatabaseManager:
     """This class manages the films and performances tables in the database"""
 
@@ -188,7 +189,7 @@ class FilmDatabaseManager:
     def _execute_query(self, model: Type, filter_condition: Callable) -> Union[Type, None]:
         """Execute a query with a given model and filter condition."""
 
-        # sourcery skip: extract-duplicate-method
+        # sourcery skip: class-extract-method, extract-duplicate-method
         try:
             with self.session_maker() as session:
                 return session.execute(select(model).where(filter_condition(model))).scalars().first()

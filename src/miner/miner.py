@@ -95,8 +95,8 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
-        # [ ]: Querying which users need to be updated
-        # users_list = film_db_manager.get_users_to_notify()
+        logging.info("Getting the list of users to notify!")
+        users_list = film_db_manager.get_users_to_notify()
 
         # [ ]: Sending message to users
         # asyncio.run(send_status(users_list, BOT_TOKEN))
