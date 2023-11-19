@@ -154,7 +154,6 @@ class FilmDatabaseManager:
         WHERE uf.is_trackable = TRUE
         AND uf.is_released = FALSE
         AND u.title = f.title;
-
         ```
         """
         # Scalar subquery

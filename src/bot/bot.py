@@ -4,18 +4,18 @@ import os
 import telebot
 import logging
 
-from bot_helpers.db_info_finder import DBInfoFinder
 from bot_helpers.answers import answer
+from bot_helpers.db_info_finder import DBInfoFinder
 
 from my_logger import Logger
 
 # %%
 
+# [ ] improve this
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 # %%
-
 
 def restart(message):
     new_message = "Do you want to restart or do you want to go back to the films list?"
@@ -28,7 +28,6 @@ def restart(message):
 
 
 # %%
-
 
 @bot.message_handler(commands=["start", "restart"])
 def send_welcome(message):

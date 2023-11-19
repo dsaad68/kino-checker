@@ -15,9 +15,10 @@ INSERT INTO tracker.upcoming_films ("title", "release_date", "film_id", "last_up
 ('Raus aus dem Teich', '2023-12-21', NULL, NULL, 'f', 't');
 
 -- Sample data for performances table
+-- INFO: performance_datetime performance_datetime is always 10 days from current date
 INSERT INTO tracker.performances ("performance_id", "film_id", "film_id_p", "performance_datetime", "performance_date", "performance_time", "release_type", "is_imax", "is_ov", "is_3d", "auditorium_id", "auditorium_name", "last_updated") VALUES
-('71D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', '2023-12-06 17:15:00', '2023-12-06', '17:15:00', 'englisch/OV', 'f', 't', 'f', '10000000015UHQLKCP', 'Kino 1', '2023-11-13 19:14:38.658222'),
-('61D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', '2023-12-06 20:00:00', '2023-12-06', '20:00:00', 'IMAX/Digital', 't', 'f', 'f', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222'),
+('71D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', CURRENT_TIMESTAMP + INTERVAL '10 days', CURRENT_DATE + INTERVAL '10 days', '17:15:00', 'englisch/OV', 'f', 't', 'f', '10000000015UHQLKCP', 'Kino 1', '2023-11-13 19:14:38.658222'),
+('61D45000023UHQLKCP', 'A6D63000012BHGWDVI', 'A6D63000012BHGWDVI', CURRENT_TIMESTAMP + INTERVAL '10 days', CURRENT_DATE + INTERVAL '10 days', '20:00:00', 'IMAX/Digital', 't', 'f', 'f', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222'),
 ('C9C45000023UHQLKCP', 'DCC63000012BHGWDVI', 'DCC63000012BHGWDVI', '2023-11-13 20:00:00', '2023-11-13', '20:00:00', 'englisch/IMAX/OV/3D', 't', 't', 't', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222'),
 ('B5C45000023UHQLKCP', 'DCC63000012BHGWDVI', 'DCC63000012BHGWDVI', '2023-11-14 17:00:00', '2023-11-14', '17:00:00', 'englisch/IMAX/OV/3D', 't', 't', 't', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222');
 

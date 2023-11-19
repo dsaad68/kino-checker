@@ -15,6 +15,8 @@ CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
+# IDEA: move helper functions to a separate file
+# Helper functions
 dt_str_2_datetime = lambda datetime_string: datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S") # noqa: E731
 date_str_2_date = lambda date_string: datetime.strptime(date_string, "%Y-%m-%d").date() # noqa: E731
 time_str_2_time = lambda time_string: datetime.strptime(time_string, "%H:%M:%S").time() # noqa: E731
