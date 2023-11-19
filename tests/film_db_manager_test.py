@@ -373,7 +373,7 @@ def test_get_users_to_notify():
 
         assert user.user_id == 2
         assert user.chat_id == "222211111"
-        assert user.message_id == "1010"
+        assert user.message_id == "1020"
         assert user.title == "Wonka"
         assert user.notified is False
         assert user.film_id is not None

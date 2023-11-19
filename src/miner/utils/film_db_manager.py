@@ -187,7 +187,7 @@ class FilmDatabaseManager:
             session.rollback()  # type: ignore
 
     def _execute_query(self, model: Type, filter_condition: Callable) -> Type | None:
-        """Execute a query with a given model and filter condition."""
+        """Execute a query with a given a statement."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:

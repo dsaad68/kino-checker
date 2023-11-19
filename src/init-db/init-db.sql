@@ -48,9 +48,14 @@ CREATE TABLE tracker.upcoming_films (
     FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
 );
 
+-- Create a Sequence for upcoming_film_id
+CREATE SEQUENCE tracker.user_id_seq
+    INCREMENT BY 1
+    START WITH 1;
+
 -- Create the users table
 CREATE TABLE tracker.users (
-    user_id SERIAL PRIMARY KEY,
+    user_id INT DEFAULT nextval('tracker.user_id_seq') PRIMARY KEY,
     chat_id VARCHAR(255) NOT NULL,
     message_id VARCHAR(255) NOT NULL,
     film_id VARCHAR(255),

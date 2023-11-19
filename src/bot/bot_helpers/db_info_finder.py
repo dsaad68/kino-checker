@@ -2,14 +2,14 @@
 
 import logging
 
-from typing import Type
+from typing import Type, Callable
 from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine, and_, distinct
+from sqlalchemy import create_engine, update, and_, distinct
 # from sqlalchemy.dialects.postgresql import Insert
 
-from .db_model import Films, UpcomingFilms, Performances #, Users
+from .db_model import Films, UpcomingFilms, Performances, Users
 
 # %%
 
@@ -19,7 +19,7 @@ class FilmInfoFinder:
 
     def __init__(self, connection_uri: str):
         self.connection_uri = connection_uri
-        self.session_maker = self._session_maker()
+        self._session_maker = self._session_maker()
 
     def _session_maker(self) -> sessionmaker:
         """Create a session factory for connecting to the database."""
@@ -30,10 +30,10 @@ class FilmInfoFinder:
         return sessionmaker(bind=engine)
 
     def get_upcommings_films_list(self) -> list[Type] | None:
-        return self._execute_query(self._create_upcommings_films_stmt())
+        return self._execute_query_all(self._create_upcommings_films_stmt())
 
     def get_showing_films_list(self) -> list[Type] | None:
-        return self._execute_query(self._create_showing_films_stmt())
+        return self._execute_query_all(self._create_showing_films_stmt())
 
     def _create_upcommings_films_stmt(self) -> select:
         return select(UpcomingFilms.title).where( and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == False) ) # noqa: E712
@@ -45,12 +45,51 @@ class FilmInfoFinder:
             .where(Performances.performance_date >= func.current_date())
             )
 
-    def _execute_query(self, stmt) -> list[Type] | None:
-        """Execute a query with a given model and filter condition."""
+    # [ ] Insert a user info to the database for notification
+    def upsert_users(self, chat_id, message_id, title) -> bool:
+        """ Insert a user info to the database for notification.
+            If the row with the same chat_id and title already exists, it just updates the message_id.
+            Returns True if the upsert is successful, False otherwise."""
+
+        # sourcery skip: extract-duplicate-method, use-named-expression
+        try:
+            with self._session_maker() as session:
+
+                # Check if a row with the same chat_id and title already exists
+                stmt = select(Users).filter(Users.chat_id == chat_id, func.lower(Users.title) == title.lower())
+                existing_row = session.execute(stmt).scalar_one_or_none()
+
+                if existing_row:
+                    # Update the existing row
+                    update_stmt = (
+                        update(Users)
+                        .where(Users.chat_id == chat_id, func.lower(Users.title) == title.lower())
+                        .values(message_id=message_id)
+                    )
+                    session.execute(update_stmt)
+                else:
+                    # Create a new row
+                    new_row = Users(chat_id=chat_id, message_id=message_id, title=title)
+                    session.add(new_row)
+
+                session.commit()
+            return True
+
+        except SQLAlchemyError as error:
+            logging.error(f"Database Error: {error}", exc_info=True)
+            session.rollback()
+            return False
+        except Exception as error:  # Consider more specific exceptions
+            logging.error(f"Error: {error}", exc_info=True)
+            session.rollback()
+            return False
+
+    def _execute_query_all(self, stmt) -> list[Type] | None:
+        """Execute a query with a given a statement."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
-            with self.session_maker() as session:
+            with self._session_maker() as session:
                 return session.execute(stmt).scalars().all()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
@@ -61,9 +100,32 @@ class FilmInfoFinder:
             session.rollback()  # type: ignore
             return None
 
-    # [ ] Get the performances info for a given film
-    # [ ] Insert a user info to the database for notification
+    # FIX: This method doesn't work, it needs title too
+    def _get_user_by_chat_id(self, chat_id: str):
+        """Get an existing user in the users table given its chat_id."""
+        return self._execute_query_one(Users, lambda user: user.chat_id == chat_id)
 
+    def _get_user_by_user_id(self, user_id: int) -> Type | None:
+        """Get an existing user in the users table given its user_id."""
+        return self._execute_query_one(Users, lambda user: user.user_id == user_id)
+
+    def _execute_query_one(self, model: Type, filter_condition: Callable) -> Type | None:
+        """Execute a query with a given model and filter condition."""
+
+        # sourcery skip: class-extract-method, extract-duplicate-method
+        try:
+            with self._session_maker() as session:
+                return session.execute(select(model).where(filter_condition(model))).scalars().first()
+        except SQLAlchemyError as error:
+            logging.error(f"Database Error: {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+        except Exception as error:
+            logging.error(f"ERROR : {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+
+    # [ ] Get the performances info for a given film
     # def get_film_info_db(self, title: str) -> dict:
     #     try:
     #         with self.session_maker() as session:
@@ -83,21 +145,3 @@ class FilmInfoFinder:
     #     except Exception as error:
     #         logging.error(f"ERROR: {error}", exc_info=True)
     #         return {}
-
-    # def update_users_db(self, chat_id, message_id, title) -> None:
-    #     # sourcery skip: hoist-statement-from-if, use-named-expression
-
-    #     try:
-    #         with self.session_maker() as session:
-    #             # checks if a row with the same chat_id and title already exists
-    #             existing_row = session.query(Users).filter(Users.chat_id == str(chat_id), Users.title == title).first()
-    #             if existing_row:
-    #                 # update the existing row
-    #                 existing_row.message_id = message_id
-    #             else:
-    #                 # create a new row
-    #                 new_row = Users(chat_id=chat_id, message_id=message_id, title=title)
-    #                 session.add(new_row)
-    #             session.commit()
-    #     except Exception as error:
-    #         logging.error(f"ERROR: {error}", exc_info=True)
