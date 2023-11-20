@@ -7,7 +7,6 @@ from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, update, and_, distinct
-# from sqlalchemy.dialects.postgresql import Insert
 
 from .db_model import Films, UpcomingFilms, Performances, Users
 
@@ -29,6 +28,38 @@ class FilmInfoFinder:
         # Define a session factory
         return sessionmaker(bind=engine)
 
+    def get_film_id_by_title(self, title: str):
+        """returns film_id by title from films table"""
+        film = self._execute_query_one(Films, lambda film: func.lower(film.title) == title.lower())
+        return film.film_id
+
+    def check_performance_version_availability(self, film_id, versions:list) -> bool:
+        """ Checks if the perfomance of a film is available based on the versions"""
+        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+        stmt = select(Performances).where( and_(Performances.film_id == film_id, *version_filter))
+        result = self._execute_query_all(stmt)
+        return len(result) > 0
+
+    def get_performance_ids_by_version(self, film_id, versions:list) -> list[str] | None:
+        """ Checks if the perfomance of a film is available based on the versions"""
+        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+        stmt = select(Performances.performance_id).where( and_(Performances.film_id == film_id, *version_filter))
+        return self._execute_query_all(stmt)
+
+    # TODO: needs test
+    # TODO: Improve the query with performance_id
+    def get_performance_dates(self, film_id, versions:list) -> list[Type] | None:
+        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+        stmt = select(Performances.performance_date).where(and_(Performances.film_id == film_id, *version_filter))
+        return self._execute_query_all(stmt)
+
+    # TODO: needs test
+    # TODO: Improve the query with performance_id
+    def get_performance_hours(self, film_id, versions, performance_date):
+        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+        stmt = select(Performances.performance_time).where(Performances.film_id == film_id, Performances.performance_date == performance_date, *version_filter)
+        return self._execute_query_all(stmt)
+
     def get_upcommings_films_list(self) -> list[Type] | None:
         return self._execute_query_all(self._create_upcommings_films_stmt())
 
@@ -45,7 +76,6 @@ class FilmInfoFinder:
             .where(Performances.performance_date >= func.current_date())
             )
 
-    # [ ] Insert a user info to the database for notification
     def upsert_users(self, chat_id, message_id, title) -> bool:
         """ Insert a user info to the database for notification.
             If the row with the same chat_id and title already exists, it just updates the message_id.
@@ -84,6 +114,15 @@ class FilmInfoFinder:
             session.rollback()
             return False
 
+    def _get_user_by_chat_id(self, chat_id: str):
+        # FIX: This method doesn't work, it needs title too
+        """Get an existing user in the users table given its chat_id."""
+        return self._execute_query_one(Users, lambda user: user.chat_id == chat_id)
+
+    def _get_user_by_user_id(self, user_id: int) -> Type | None:
+        """Get an existing user in the users table given its user_id."""
+        return self._execute_query_one(Users, lambda user: user.user_id == user_id)
+
     def _execute_query_all(self, stmt) -> list[Type] | None:
         """Execute a query with a given a statement."""
 
@@ -100,18 +139,8 @@ class FilmInfoFinder:
             session.rollback()  # type: ignore
             return None
 
-    # FIX: This method doesn't work, it needs title too
-    def _get_user_by_chat_id(self, chat_id: str):
-        """Get an existing user in the users table given its chat_id."""
-        return self._execute_query_one(Users, lambda user: user.chat_id == chat_id)
-
-    def _get_user_by_user_id(self, user_id: int) -> Type | None:
-        """Get an existing user in the users table given its user_id."""
-        return self._execute_query_one(Users, lambda user: user.user_id == user_id)
-
     def _execute_query_one(self, model: Type, filter_condition: Callable) -> Type | None:
         """Execute a query with a given model and filter condition."""
-
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
             with self._session_maker() as session:
@@ -124,24 +153,3 @@ class FilmInfoFinder:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
             return None
-
-    # [ ] Get the performances info for a given film
-    # def get_film_info_db(self, title: str) -> dict:
-    #     try:
-    #         with self.session_maker() as session:
-    #             film = session.query(Films).filter(Films.title == title).first()
-    #         if film:
-    #             return {
-    #                 "title": film.title,
-    #                 "availability": film.availability,
-    #                 "imax_3d_ov": film.imax_3d_ov,
-    #                 "imax_ov": film.imax_ov,
-    #                 "hd_ov": film.hd_ov,
-    #                 "last_checked": film.last_checked,
-    #                 "link": film.link,
-    #             }
-    #         logging.info(f"No film with title {title} found in the database")
-    #         return {}
-    #     except Exception as error:
-    #         logging.error(f"ERROR: {error}", exc_info=True)
-    #         return {}
