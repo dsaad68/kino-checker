@@ -4,18 +4,22 @@ import os
 import telebot
 import logging
 
-from bot_helpers.answers import answer
-from bot_helpers.db_info_finder import DBInfoFinder
+from utils.answers import answer
+from utils.db_info_finder import FilmInfoFinder
 
 from my_logger import Logger
 
 # %%
 
-# [ ] improve this
-TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-bot = telebot.TeleBot(TOKEN)
+def get_or_raise(env_name: str) -> str:
+    value = os.environ.get(env_name)
+    if value is not None:
+        return value
+    else:
+        raise ValueError(f"Missing environment variable {env_name}")
 
-# %%
+TOKEN = get_or_raise("TELEGRAM_BOT_TOKEN")
+bot = telebot.TeleBot(TOKEN)
 
 def restart(message):
     new_message = "Do you want to restart or do you want to go back to the films list?"
@@ -25,9 +29,6 @@ def restart(message):
     markup.add(telebot.types.KeyboardButton("/ZKM_Films_List"))
 
     bot.send_message(message.chat.id, new_message, reply_markup=markup)
-
-
-# %%
 
 @bot.message_handler(commands=["start", "restart"])
 def send_welcome(message):
@@ -76,9 +77,9 @@ if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
 
-    SQL_CONNECTION_URI = os.environ.get("POSTGRES_CONNECTION_URI")
+    SQL_CONNECTION_URI = get_or_raise("POSTGRES_CONNECTION_URI")
 
-    db_info_finder = DBInfoFinder(SQL_CONNECTION_URI)
+    db_info_finder = FilmInfoFinder(SQL_CONNECTION_URI)
 
     logging.info("----- Bot starts to run! -----")
 

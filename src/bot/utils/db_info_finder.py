@@ -2,6 +2,7 @@
 
 import logging
 
+from datetime import date, time
 from typing import Type, Callable
 from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
@@ -46,18 +47,17 @@ class FilmInfoFinder:
         stmt = select(Performances.performance_id).where( and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    # TODO: needs test
-    # TODO: Improve the query with performance_id
-    def get_performance_dates(self, film_id, versions:list) -> list[Type] | None:
+    def get_performance_dates_by_film_id(self, film_id, versions:list) -> list[date] | None:
         version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
-        stmt = select(Performances.performance_date).where(and_(Performances.film_id == film_id, *version_filter))
+        stmt = select(distinct(Performances.performance_date)).where(and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    # TODO: needs test
-    # TODO: Improve the query with performance_id
-    def get_performance_hours(self, film_id, versions, performance_date):
+    def get_performance_hours_by_film_id(self, film_id, versions, performance_date) -> list[time] | None:
         version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
-        stmt = select(Performances.performance_time).where(Performances.film_id == film_id, Performances.performance_date == performance_date, *version_filter)
+        stmt = (
+                select(distinct(Performances.performance_time))
+                .where(and_(Performances.film_id == film_id, Performances.performance_date == performance_date, *version_filter))
+                )
         return self._execute_query_all(stmt)
 
     def get_upcommings_films_list(self) -> list[Type] | None:

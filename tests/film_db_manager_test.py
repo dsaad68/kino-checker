@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from integeration_db.docker_container import Docker
 from integeration_db.integration_db import IntegrationDb, EnvVar
+from integeration_db.utils import str_2_datetime, str_2_date, str_2_time
 
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
@@ -14,12 +15,6 @@ from miner.utils.film_db_manager import FilmDatabaseManager # noqa: E402
 CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
-
-# IDEA: move helper functions to a separate file
-# Helper functions
-dt_str_2_datetime = lambda datetime_string: datetime.strptime(datetime_string, "%Y-%m-%d %H:%M:%S") # noqa: E731
-date_str_2_date = lambda date_string: datetime.strptime(date_string, "%Y-%m-%d").date() # noqa: E731
-time_str_2_time = lambda time_string: datetime.strptime(time_string, "%H:%M:%S").time() # noqa: E731
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
@@ -187,9 +182,9 @@ def test_update_performances_table():
         assert existing_performance.performance_id == "71D45000023UHQLKCP" # type: ignore
         assert existing_performance.film_id == "A6D63000012BHGWDVI" # type: ignore
         assert existing_performance.film_id_p == "A6D63000012BHGWDVI" # type: ignore
-        assert existing_performance.performance_datetime == dt_str_2_datetime("2023-12-06 17:15:00") # type: ignore
-        assert existing_performance.performance_date == date_str_2_date("2023-12-06") # type: ignore
-        assert existing_performance.performance_time == time_str_2_time("17:15:00") # type: ignore
+        assert existing_performance.performance_datetime == str_2_datetime("2023-12-06 17:15:00") # type: ignore
+        assert existing_performance.performance_date == str_2_date("2023-12-06") # type: ignore
+        assert existing_performance.performance_time == str_2_time("17:15:00") # type: ignore
         assert existing_performance.release_type == "englisch/OV" # type: ignore
         assert existing_performance.is_imax is False # type: ignore
         assert existing_performance.is_ov  # type: ignore
@@ -204,9 +199,9 @@ def test_update_performances_table():
         assert new_performance.performance_id == "9EC45000023UHQLKCP" # type: ignore
         assert new_performance.film_id == "DCC63000012BHGWDVI" # type: ignore
         assert new_performance.film_id_p == "DCC63000012BHGWDVI" # type: ignore
-        assert new_performance.performance_datetime == dt_str_2_datetime("2023-11-22 16:45:00") # type: ignore
-        assert new_performance.performance_date == date_str_2_date("2023-11-22") # type: ignore
-        assert new_performance.performance_time == time_str_2_time("16:45:00") # type: ignore
+        assert new_performance.performance_datetime == str_2_datetime("2023-11-22 16:45:00") # type: ignore
+        assert new_performance.performance_date == str_2_date("2023-11-22") # type: ignore
+        assert new_performance.performance_time == str_2_time("16:45:00") # type: ignore
         assert new_performance.release_type == "IMAX/Digital" # type: ignore
         assert new_performance.is_imax # type: ignore
         assert new_performance.is_ov  is False# type: ignore
@@ -221,9 +216,9 @@ def test_update_performances_table():
         assert upsert_case_test.performance_id == "B5C45000023UHQLKCP" # type: ignore
         assert upsert_case_test.film_id == "DCC63000012BHGWDVI" # type: ignore
         assert upsert_case_test.film_id_p == "DCC63000012BHGWDVI" # type: ignore
-        assert upsert_case_test.performance_datetime == dt_str_2_datetime("2023-11-14 17:00:00") # type: ignore
-        assert upsert_case_test.performance_date == date_str_2_date("2023-11-14") # type: ignore
-        assert upsert_case_test.performance_time == time_str_2_time("17:00:00") # type: ignore
+        assert upsert_case_test.performance_datetime == str_2_datetime("2023-11-14 17:00:00") # type: ignore
+        assert upsert_case_test.performance_date == str_2_date("2023-11-14") # type: ignore
+        assert upsert_case_test.performance_time == str_2_time("17:00:00") # type: ignore
         assert upsert_case_test.release_type == "Digital" # type: ignore
         assert upsert_case_test.is_imax is False# type: ignore
         assert upsert_case_test.is_ov is False# type: ignore
@@ -277,7 +272,7 @@ def test_update_upcoming_table():
         assert film_napoleon is not None
         assert film_napoleon.upcoming_film_id == 1 # type: ignore
         assert film_napoleon.title.lower() == exists.get("title").lower() # type: ignore
-        assert film_napoleon.release_date == date_str_2_date(exists.get("release_date").lower()) # type: ignore
+        assert film_napoleon.release_date == str_2_date(exists.get("release_date").lower()) # type: ignore
         assert film_napoleon.film_id is None # type: ignore
         assert film_napoleon.is_released is False # type: ignore
         assert film_napoleon.is_trackable is True # type: ignore
@@ -289,7 +284,7 @@ def test_update_upcoming_table():
         assert film_wish is not None
         assert film_wish.upcoming_film_id == 3 # type: ignore
         assert film_wish.title.lower() == "Wish".lower() # type: ignore
-        assert film_wish.release_date == date_str_2_date("2023-11-23") # type: ignore
+        assert film_wish.release_date == str_2_date("2023-11-23") # type: ignore
         assert film_wish.film_id is None # type: ignore
         assert film_wish.is_released is False # type: ignore
         assert film_wish.is_trackable is True # type: ignore
@@ -300,7 +295,7 @@ def test_update_upcoming_table():
 
         assert film_wonka is not None
         assert film_wonka.title.lower() == dont_exist.get("title").lower() # type: ignore
-        assert film_wonka.release_date == date_str_2_date(dont_exist.get("release_date").lower()) # type: ignore
+        assert film_wonka.release_date == str_2_date(dont_exist.get("release_date").lower()) # type: ignore
         assert film_wonka.film_id is None # type: ignore
         assert film_wonka.is_released is False # type: ignore
         assert film_wonka.is_trackable is True # type: ignore

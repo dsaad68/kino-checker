@@ -3,12 +3,14 @@ import os
 import sys
 import pytest
 import logging
+from datetime import datetime, timedelta
 
 from integeration_db.docker_container import Docker
+from integeration_db.utils import str_2_date, str_2_time
 from integeration_db.integration_db import IntegrationDb, EnvVar
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
-from bot.bot_helpers.db_info_finder import FilmInfoFinder # noqa: E402
+from bot.utils.db_info_finder import FilmInfoFinder # noqa: E402
 
 #%%
 CONTAINER_NAME = "postgres:alpine3.18"
@@ -22,6 +24,11 @@ def schemas():
 @pytest.fixture
 def init_scripts():
     return [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+
+@pytest.fixture
+def date_ten_days_in_future_date():
+    """ It returns a date 10 days in the future """
+    return datetime.now().date() + timedelta(days=10)
 
 #%%
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
@@ -60,8 +67,6 @@ def test_get_showing_films_list(schemas, init_scripts):
         # Verify
         assert len(showing_films_list) > 0
         assert set(showing_films_list).issubset(set(expected_films))
-
-        # CHECK: test the date of performance
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
@@ -192,3 +197,70 @@ def test_get_performance_ids_by_version(schemas, init_scripts):
         assert len(wonka_imax_ov) == 0
         assert set(wonka_ov).issubset(set(wonka_ov_expected))
         assert set(wonka_imax).issubset(set(wonka_imax_expected))
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_get_performance_dates_by_film_id(schemas, init_scripts, date_ten_days_in_future_date):
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Prepare
+        version_1 = ['is_imax']
+        version_2 = ['is_ov']
+        version_3 = ['is_imax', 'is_ov']
+
+        marvels_expected_dates = [ str_2_date('2023-11-13'), str_2_date('2023-11-14')]
+
+        # Execute
+        film_info_finder = FilmInfoFinder(CONNECTION_STRING)
+
+        performance_dates_1 = film_info_finder.get_performance_dates_by_film_id('A6D63000012BHGWDVI', version_1)
+        performance_dates_2 = film_info_finder.get_performance_dates_by_film_id('A6D63000012BHGWDVI', version_2)
+        performance_dates_3 = film_info_finder.get_performance_dates_by_film_id('A6D63000012BHGWDVI', version_3)
+
+        performance_dates_4 = film_info_finder.get_performance_dates_by_film_id('DCC63000012BHGWDVI', version_1)
+        performance_dates_5 = film_info_finder.get_performance_dates_by_film_id('DCC63000012BHGWDVI', version_2)
+        performance_dates_6 = film_info_finder.get_performance_dates_by_film_id('DCC63000012BHGWDVI', version_3)
+
+        # Verify
+        assert len(performance_dates_1) == 1
+        assert len(performance_dates_2) == 1
+        assert len(performance_dates_3) == 0
+        assert len(performance_dates_4) == 2
+        assert len(performance_dates_5) == 2
+        assert len(performance_dates_6) == 2
+
+        assert performance_dates_1[0] == date_ten_days_in_future_date
+        assert performance_dates_2[0] == date_ten_days_in_future_date
+        assert performance_dates_3 == []
+
+        assert set(performance_dates_4).issubset(set(marvels_expected_dates))
+        assert set(performance_dates_5).issubset(set(marvels_expected_dates))
+        assert set(performance_dates_6).issubset(set(marvels_expected_dates))
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_get_performance_hours_by_film_id(schemas, init_scripts, date_ten_days_in_future_date):
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Prepare
+        version_1 = ['is_imax']
+        version_2 = ['is_ov']
+        version_3 = ['is_imax', 'is_ov']
+
+        # Execute
+        film_info_finder = FilmInfoFinder(CONNECTION_STRING)
+
+        performance_hours_1 = film_info_finder.get_performance_hours_by_film_id('A6D63000012BHGWDVI', version_1, date_ten_days_in_future_date)
+        performance_hours_2 = film_info_finder.get_performance_hours_by_film_id('A6D63000012BHGWDVI', version_2, date_ten_days_in_future_date)
+        performance_hours_3 = film_info_finder.get_performance_hours_by_film_id('A6D63000012BHGWDVI', version_3, date_ten_days_in_future_date)
+
+        # Verify
+        assert len(performance_hours_1) == 1
+        assert len(performance_hours_2) == 1
+        assert len(performance_hours_3) == 0
+
+        assert performance_hours_1[0] == str_2_time('20:00:00')
+        assert performance_hours_2[0] == str_2_time('17:15:00')
+        assert performance_hours_3 == []
