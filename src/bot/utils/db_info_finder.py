@@ -64,6 +64,9 @@ class FilmInfoFinder:
         return self._execute_query_all(self._create_upcommings_films_stmt())
 
     def get_showing_films_list(self) -> list[Type] | None:
+        """ Get a list of films that are currently showing.
+            INFO: performance_date >= current_date
+        """
         return self._execute_query_all(self._create_showing_films_stmt())
 
     def _create_upcommings_films_stmt(self) -> select:
@@ -76,7 +79,7 @@ class FilmInfoFinder:
             .where(Performances.performance_date >= func.current_date())
             )
 
-    def upsert_users(self, chat_id, message_id, title) -> bool:
+    def upsert_users(self, chat_id:str, message_id:str, title:str) -> bool:
         """ Insert a user info to the database for notification.
             If the row with the same chat_id and title already exists, it just updates the message_id.
             Returns True if the upsert is successful, False otherwise."""

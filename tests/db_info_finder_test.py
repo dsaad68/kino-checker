@@ -55,7 +55,6 @@ def test_get_showing_films_list(schemas, init_scripts):
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
         # Prepare
-        # Prepare
         expected_films = ['Wonka']
 
         # Execute
