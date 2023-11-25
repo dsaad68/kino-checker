@@ -10,19 +10,7 @@ from my_logger import Logger
 
 # from utils.answers import answer
 from utils.db_info_finder import FilmInfoFinder
-# %%
-
-def filter_upcoming_films(message: types.Message, upcoming_films_list: list[str]) -> types.Message | None:
-    if upcoming_films_list is None:
-        return None
-    if message.text in upcoming_films_list:
-        return message
-
-def filter_showing_films(message: types.Message, showing_films_list: list[str]) -> types.Message | None:
-    if showing_films_list is None:
-        return None
-    if message.text in showing_films_list:
-        return message
+from utils.filters import filter_upcoming_films, filter_showing_films
 
 #%%
 def get_or_raise(env_name: str) -> str:
@@ -74,6 +62,7 @@ def track_upcommings_films(message):
     global upcoming_films_list
     upcoming_films_list = None
 
+# INFO: Works fine
 @bot.message_handler(commands=["Showing_Films"])
 def showing_films(message):
     """Shows the list of showing films."""
