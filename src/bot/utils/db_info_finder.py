@@ -13,8 +13,6 @@ from .db_model import Films, UpcomingFilms, Performances, Users
 
 # %%
 
-# [ ] Update this class to new schema
-
 class FilmInfoFinder:
 
     def __init__(self, connection_uri: str):
@@ -34,26 +32,28 @@ class FilmInfoFinder:
         film = self._execute_query_one(Films, lambda film: func.lower(film.title) == title.lower())
         return film.film_id
 
-    def check_performance_version_availability(self, film_id, versions:list) -> bool:
+    def check_performance_version_availability(self, film_id:str, versions:dict) -> bool:
         """ Checks if the perfomance of a film is available based on the versions"""
-        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+
+        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = select(Performances).where( and_(Performances.film_id == film_id, *version_filter))
         result = self._execute_query_all(stmt)
         return len(result) > 0
 
-    def get_performance_ids_by_version(self, film_id, versions:list) -> list[str] | None:
+    def get_performance_ids_by_version(self, film_id:str, versions:list) -> list[str] | None:
         """ Checks if the perfomance of a film is available based on the versions"""
-        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+
+        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = select(Performances.performance_id).where( and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    def get_performance_dates_by_film_id(self, film_id, versions:list) -> list[date] | None:
-        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+    def get_performance_dates_by_film_id(self, film_id:str, versions:list) -> list[date] | None:
+        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = select(distinct(Performances.performance_date)).where(and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    def get_performance_hours_by_film_id(self, film_id, versions, performance_date) -> list[time] | None:
-        version_filter= [ getattr(Performances, version) == True for version in versions ] # noqa: E712
+    def get_performance_hours_by_film_id(self, film_id:str, versions, performance_date) -> list[time] | None:
+        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = (
                 select(distinct(Performances.performance_time))
                 .where(and_(Performances.film_id == film_id, Performances.performance_date == performance_date, *version_filter))

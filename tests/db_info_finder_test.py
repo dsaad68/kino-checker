@@ -127,6 +127,7 @@ def test_get_film_id_by_title(schemas, init_scripts):
         assert marvels_film_id
         assert marvels_film_id == 'DCC63000012BHGWDVI'
 
+# TODO: Update the test
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_check_performance_version_availability(schemas, init_scripts):
@@ -136,15 +137,19 @@ def test_check_performance_version_availability(schemas, init_scripts):
         # Execute
         film_info_finder = FilmInfoFinder(CONNECTION_STRING)
 
-        is_marvel_3d = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', ['is_3d'])
-        is_marvel_3d_ov = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', ['is_3d', 'is_ov'])
-        is_marvel_3d_ov_imax = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', ['is_3d', 'is_ov', 'is_imax'])
+        # Check if is_3d and is_imax set to 0 that means indifferent to imax
+        is_marvel_3d = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', {'is_3d': True, 'is_imax':0})
+        # Check if is_ov and is_3d , and also is_imax set to 0 that means indifferent to imax
+        is_marvel_3d_ov = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', {'is_3d': True, 'is_ov': True, 'is_imax':0})
+        is_marvel_3d_ov_imax = film_info_finder.check_performance_version_availability('DCC63000012BHGWDVI', {'is_3d':True, 'is_ov':True, 'is_imax':True})
 
-        is_wonka_3d = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', ['is_3d'])
-        is_wonka_ov = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', ['is_ov'])
-        is_wonka_imax = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', ['is_imax'])
-        is_wonka_imax_ov = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', ['is_imax', 'is_ov'])
-        is_wonka_imax_3d = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', ['is_imax', 'is_3d'])
+        # Check if is_ov and is_imax set to 0 that means indifferent to imax
+        is_wonka_ov = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', {'is_ov': True, 'is_imax':0})
+        # Check if is_3d and is_imax set to 0 that means indifferent to imax
+        is_wonka_3d = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', {'is_3d': True, 'is_imax':0})
+        is_wonka_imax = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', {'is_imax': True})
+        is_wonka_imax_ov = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', {'is_imax':True, 'is_ov':True})
+        is_wonka_imax_3d = film_info_finder.check_performance_version_availability('A6D63000012BHGWDVI', {'is_imax':True, 'is_3d':True})
 
         # Verify
         assert is_marvel_3d
@@ -157,6 +162,7 @@ def test_check_performance_version_availability(schemas, init_scripts):
         assert is_wonka_imax_ov is False
         assert is_wonka_imax_3d is False
 
+# TODO: Update
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_get_performance_ids_by_version(schemas, init_scripts):
@@ -171,15 +177,19 @@ def test_get_performance_ids_by_version(schemas, init_scripts):
         # Execute
         film_info_finder = FilmInfoFinder(CONNECTION_STRING)
 
-        marvels_3d = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI', ['is_3d', 'is_ov'])
-        marvels_3d_ov = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI',['is_3d', 'is_ov'])
-        marvels_3d_ov_imax = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI',['is_3d', 'is_ov', 'is_imax'])
+        # Checks if is_3d and is_imax set to 0 that means indifferent to imax
+        marvels_3d = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI', {'is_3d': True, 'is_imax': 0})
+        # Checks if is_ov and is_3d , and also is_imax set to 0 that means indifferent to imax
+        marvels_3d_ov = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI',{'is_3d': True, 'is_ov': True, 'is_imax': 0})
+        marvels_3d_ov_imax = film_info_finder.get_performance_ids_by_version('DCC63000012BHGWDVI',{'is_3d': True, 'is_ov': True, 'is_imax': True})
 
-        wonka_3d = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', ['is_3d'])
-        wonka_ov = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', ['is_ov'])
-        wonka_imax = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', ['is_imax'])
-        wonka_3d_imax = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', ['is_3d', 'is_imax'])
-        wonka_imax_ov = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', ['is_imax', 'is_ov'])
+        # Checks if is_ov and is_imax set to 0 that means indifferent to imax
+        wonka_3d = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', {'is_3d': True, 'is_imax': 0})
+        # Checks if is_3d ,and also is_imax set and is_3d to 0 that means indifferent to imax
+        wonka_ov = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', {'is_ov': True, 'is_imax': 0, 'is_3d': 0})
+        wonka_imax = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', {'is_imax': True})
+        wonka_3d_imax = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', {'is_3d': True, 'is_imax': True})
+        wonka_imax_ov = film_info_finder.get_performance_ids_by_version('A6D63000012BHGWDVI', {'is_imax': True, 'is_ov': True})
 
         # Verify
         assert len(marvels_3d) == 2
@@ -204,9 +214,9 @@ def test_get_performance_dates_by_film_id(schemas, init_scripts, date_ten_days_i
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
         # Prepare
-        version_1 = ['is_imax']
-        version_2 = ['is_ov']
-        version_3 = ['is_imax', 'is_ov']
+        version_1 = {'is_imax': True}
+        version_2 = {'is_ov': True}
+        version_3 = {'is_imax': True, 'is_ov': True}
 
         marvels_expected_dates = [ str_2_date('2023-11-13'), str_2_date('2023-11-14')]
 
@@ -244,9 +254,9 @@ def test_get_performance_hours_by_film_id(schemas, init_scripts, date_ten_days_i
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
         # Prepare
-        version_1 = ['is_imax']
-        version_2 = ['is_ov']
-        version_3 = ['is_imax', 'is_ov']
+        version_1 = {'is_imax': True}
+        version_2 = {'is_ov': True}
+        version_3 = {'is_imax': True, 'is_ov': True}
 
         # Execute
         film_info_finder = FilmInfoFinder(CONNECTION_STRING)

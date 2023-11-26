@@ -9,6 +9,7 @@ from telebot import types
 from my_logger import Logger
 
 # from utils.answers import answer
+from utils.call_parser import CallParser
 from utils.db_info_finder import FilmInfoFinder
 from utils.filters import filter_upcoming_films, filter_showing_films
 
@@ -80,37 +81,72 @@ def showing_films(message):
 
 @bot.message_handler(func=lambda message: filter_showing_films(message, showing_films_list))
 def showing_films_ov_filter(message):
+    """Inline keyboard for filtering showing films based on OV availability."""
 
     film_id = db_info_finder.get_film_id_by_title(message.text)
 
     keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton(text='Yes', callback_data=f'{film_id}|is_ov'))
-    keyboard.add(types.InlineKeyboardButton(text='No', callback_data=f'{film_id}|is_ov'))
-    keyboard.add(types.InlineKeyboardButton(text='Doesn\'t matter', callback_data=f'{film_id}|is_ov'))
+    keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'[{film_id}]film_id|[true]is_ov'))
+    keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'[{film_id}]film_id|[false]is_ov'))
+    keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'[{film_id}]film_id|[0]is_ov'))
+    #keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=message.text))
 
-    bot.send_message(message.chat.id, "Are you looking for OV Version?:", reply_markup=keyboard)
+    bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith(('is_ov')))
 def showing_films_imax_filter_callback(call):
+    """Inline keyboard for filtering showing films based on IMAX availability."""
 
     logging.info(f"Call Data: {call.data}")
-    keyboard = types.InlineKeyboardMarkup()
-    keyboard.add(types.InlineKeyboardButton(text='Yes', callback_data=f'{call.message.text}|is_imax'))
-    keyboard.add(types.InlineKeyboardButton(text='No', callback_data=f'{call.message.text}|is_imax'))
-    keyboard.add(types.InlineKeyboardButton(text='Doesn\'t matter', callback_data=f'{call.message.text}|is_imax'))
 
-    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for IMAX Version?", reply_markup=keyboard)
+    query_dict = CallParser.parse(call.data)
+    film_id = query_dict.pop('film_id')
 
+    if db_info_finder.check_performance_version_availability(film_id, query_dict):
 
-# def restart(message):
-#     new_message = "Do you want to restart or do you want to go back to the films list?"
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|[true]is_imax'))
+        keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|[false]is_imax'))
+        keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|[0]is_imax'))
+        #keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=call.data))
 
-#     markup = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
-#     markup.add(telebot.types.KeyboardButton("/restart"))
-#     markup.add(telebot.types.KeyboardButton("/Upcoming_Films"))
-#     markup.add(telebot.types.KeyboardButton("/Showing_Films"))
-#     bot.send_message(message.chat.id, new_message, reply_markup=markup)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for IMAX Version?", reply_markup=keyboard)
 
+    else:
+        bot.send_message(call.message.chat.id, "Did'nt find what you are looking for. Please try again.")
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith(('is_imax')))
+def showing_films_3d_filter_callback(call):
+
+    logging.info(f"Call Data: {call.data}")
+    query_dict = CallParser.parse(call.data)
+    film_id = query_dict.pop('film_id')
+
+    if db_info_finder.check_performance_version_availability(film_id, query_dict):
+
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|[true]is_3d'))
+        keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|[false]is_3d'))
+        keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|[0]is_3d'))
+        #keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=call.data))
+
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for 3D Version?", reply_markup=keyboard)
+
+    else:
+        bot.send_message(call.message.chat.id, "Did'nt find what you are looking for. Please try again.")
+
+# TODO: Fix this function
+@bot.callback_query_handler(func=lambda call: call.data.endswith(('is_3d')))
+def showing_films_date_filter_callback(call):
+
+    logging.info(f"Call Data: {call.data}")
+    query_dict = CallParser.parse(call.data)
+    film_id = query_dict.pop('film_id')
+
+    if db_info_finder.check_performance_version_availability(film_id, query_dict):
+        pass
+    else:
+        bot.send_message(call.message.chat.id, "Did'nt find what you are looking for. Please try again.")
 
 # %%
 
