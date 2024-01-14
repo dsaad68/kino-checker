@@ -40,19 +40,21 @@ class FilmInfoFinder:
         result = self._execute_query_all(stmt)
         return len(result) > 0
 
-    def get_performance_ids_by_version(self, film_id:str, versions:list) -> list[str] | None:
+    def get_performance_ids_by_version(self, film_id:str, versions:dict) -> list[str] | None:
         """ Checks if the perfomance of a film is available based on the versions"""
 
         version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = select(Performances.performance_id).where( and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    def get_performance_dates_by_film_id(self, film_id:str, versions:list) -> list[date] | None:
+    def get_performance_dates_by_film_id(self, film_id:str, versions:dict) -> list[date] | None:
+        """ Retrieves the performance dates of a film based on the versions"""
+
         version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = select(distinct(Performances.performance_date)).where(and_(Performances.film_id == film_id, *version_filter))
         return self._execute_query_all(stmt)
 
-    def get_performance_hours_by_film_id(self, film_id:str, versions, performance_date) -> list[time] | None:
+    def get_performance_hours_by_film_id(self, film_id:str, versions:dict, performance_date) -> list[time] | None:
         version_filter= [ getattr(Performances, key) == value for key, value in versions.items() if value != 0 ] # noqa: E712
         stmt = (
                 select(distinct(Performances.performance_time))
