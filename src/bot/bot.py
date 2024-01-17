@@ -1,6 +1,7 @@
 # %%
 
 import os
+import re
 import telebot
 import logging
 
@@ -89,6 +90,7 @@ def showing_films_ov_filter(message):
     keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{film_id},fid|1,ov'))
     keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{film_id},fid|0,ov'))
     keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{film_id},fid|2,ov'))
+    # Fix Go back button
     keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=message.text))
 
     bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)
@@ -140,23 +142,43 @@ def showing_films_date_filter_callback(call):
 
     logging.info(f"Call Data: {call.data}")
     query_dict = CallParser.parse(call.data)
+    logging.info(f"Query Dict: {query_dict}")
+
     film_id = query_dict.pop('film_id')
 
     if db_info_finder.check_performance_version_availability(film_id, query_dict):
 
         date_list = db_info_finder.get_performance_dates_by_film_id(film_id, query_dict)
 
-        logging.info(f"Date List: {date_list}")
-
         keyboard = types.InlineKeyboardMarkup()
         for date in date_list:
             date_str = date.strftime('%Y-%m-%d')
-            logging.info(f"{call.data}|{date_str},date")
-            keyboard.add(types.InlineKeyboardButton(text=date_str, callback_data=f"call.data|{date_str}"))
+            keyboard.add(types.InlineKeyboardButton(text=date_str, callback_data=f'{call.data}|{date_str}'))
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Choose a date:", reply_markup=keyboard)
     else:
         bot.send_message(call.message.chat.id, "Didn't find what you are looking for. Please try again.")
+
+@bot.callback_query_handler(func = lambda call: bool(re.search(CallParser.DATE_PATTERN_ENDING, call.data)))
+def showing_films_time_filter_callback(call):
+
+    logging.info(f"Call Data: {call.data}")
+    query_dict = CallParser.parse(call.data)
+    # film_id = query_dict.pop('film_id')
+
+    # TODO: Add filter for time
+    logging.info(f"Query Dict: {query_dict}")
+
+@bot.callback_query_handler(func = lambda call: bool(re.search(CallParser.TIME_PATTERN_ENDING, call.data)))
+def showing_films_links(call):
+
+    logging.info(f"Call Data: {call.data}")
+    query_dict = CallParser.parse(call.data)
+    # film_id = query_dict.pop('film_id')
+
+    # TODO: Add filter
+    logging.info(f"Query Dict: {query_dict}")
+
 
 # %%
 

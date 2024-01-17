@@ -10,6 +10,9 @@ class CallParser:
     DATE_PATTERN = re.compile(r'(\d{4}-\d{2}-\d{2})')
     TIME_PATTERN = re.compile(r'(\d{2}:\d{2})')
 
+    DATE_PATTERN_ENDING = re.compile(r'(\d{4}-\d{2}-\d{2})$')
+    TIME_PATTERN_ENDING = re.compile(r'(\d{2}:\d{2})$')
+
     @staticmethod
     def parse(input_string) -> dict:
         """Parses the input string and returns a dictionary of key-value pairs."""
