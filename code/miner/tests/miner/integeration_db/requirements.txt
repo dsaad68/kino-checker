@@ -1,0 +1,4 @@
+pytest
+docker
+python-dotenv
+SQLAlchemy==2.0.12

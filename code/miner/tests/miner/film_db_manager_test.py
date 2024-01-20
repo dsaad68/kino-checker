@@ -1,5 +1,4 @@
 import os
-import sys
 import pytest
 
 from datetime import datetime, timedelta
@@ -8,20 +7,24 @@ from integeration_db.docker_container import Docker
 from integeration_db.integration_db import IntegrationDb, EnvVar
 from integeration_db.utils import str_2_datetime, str_2_date, str_2_time
 
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
-from miner.utils.film_db_manager import FilmDatabaseManager # noqa: E402
+from miner.utils.film_db_manager import FilmDatabaseManager
 
 CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
+@pytest.fixture
+def schemas():
+    return ["tracker"]
+
+@pytest.fixture
+def init_scripts():
+    return [os.path.abspath("./code/init-db/init-db.sql"),
+            os.path.abspath("./code/init-db/sample-data.sql")]
+
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_update_films_table():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_update_films_table(schemas, init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -110,10 +113,7 @@ def test_update_films_table():
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_update_performances_table():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_update_performances_table(schemas, init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -230,10 +230,7 @@ def test_update_performances_table():
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_update_upcoming_table():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_update_upcoming_table(schemas, init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -304,10 +301,7 @@ def test_update_upcoming_table():
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_update_released_films_in_upcoming_films_table():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_update_released_films_in_upcoming_films_table(schemas, init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -331,10 +325,7 @@ def test_update_released_films_in_upcoming_films_table():
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_update_users_table():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_update_users_table(schemas, init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -352,10 +343,7 @@ def test_update_users_table():
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
-def test_get_users_to_notify():
-
-    schemas = ["tracker"]
-    init_scripts = [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+def test_get_users_to_notify(schemas,init_scripts):
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 

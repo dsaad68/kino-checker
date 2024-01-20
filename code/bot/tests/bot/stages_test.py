@@ -1,8 +1,4 @@
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
-from bot.utils.states import State # noqa: E402
+from bot.utils.states import State
 
 def test_states():
     assert State.BUY.go_back() == State.TIME

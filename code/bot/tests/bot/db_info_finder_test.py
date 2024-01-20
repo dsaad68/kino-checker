@@ -1,16 +1,15 @@
 #%%
 import os
-import sys
 import pytest
 import logging
+
 from datetime import datetime, timedelta
 
 from integeration_db.docker_container import Docker
 from integeration_db.utils import str_2_date, str_2_time
 from integeration_db.integration_db import IntegrationDb, EnvVar
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../src/"))
-from bot.utils.db_info_finder import FilmInfoFinder # noqa: E402
+from bot.utils.db_info_finder import FilmInfoFinder
 
 #%%
 CONTAINER_NAME = "postgres:alpine3.18"
@@ -23,7 +22,8 @@ def schemas():
 
 @pytest.fixture
 def init_scripts():
-    return [os.path.abspath("src/init-db/init-db.sql"), os.path.abspath("src/init-db/sample-data.sql")]
+    return [os.path.abspath("./code/init-db/init-db.sql"),
+            os.path.abspath("./code/init-db/sample-data.sql")]
 
 @pytest.fixture
 def date_ten_days_in_future_date():
