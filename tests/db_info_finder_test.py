@@ -127,7 +127,6 @@ def test_get_film_id_by_title(schemas, init_scripts):
         assert marvels_film_id
         assert marvels_film_id == 'DCC63000012BHGWDVI'
 
-# TODO: Update the test
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_check_performance_version_availability(schemas, init_scripts):
@@ -162,7 +161,6 @@ def test_check_performance_version_availability(schemas, init_scripts):
         assert is_wonka_imax_ov is False
         assert is_wonka_imax_3d is False
 
-# TODO: Update
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_get_performance_ids_by_version(schemas, init_scripts):

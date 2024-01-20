@@ -165,7 +165,6 @@ def showing_films_date_filter_callback(call):
             keyboard.add(types.InlineKeyboardButton(text=date_str, callback_data=f'{call.data}|{date_str}'))
         keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
-
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Choose a date:", reply_markup=keyboard)
     else:
         bot.send_message(call.message.chat.id, "Didn't find what you are looking for. Please try again.")
