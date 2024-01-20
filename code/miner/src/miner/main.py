@@ -8,10 +8,10 @@ import asyncio
 from alive_progress import alive_bar
 
 # TODO: fix this later
-from utils.scrapper import Scraper
-from utils.film_db_manager import FilmDatabaseManager
-from utils.film_notifier import FilmReleaseNotification
-from utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
+from miner.utils.scrapper import Scraper
+from miner.utils.film_db_manager import FilmDatabaseManager
+from miner.utils.film_notifier import FilmReleaseNotification
+from miner.utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
 
 from my_logger import Logger
 

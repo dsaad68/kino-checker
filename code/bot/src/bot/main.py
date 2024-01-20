@@ -10,9 +10,9 @@ from telebot import types
 from my_logger import Logger
 
 # from utils.answers import answer
-from utils.call_parser import CallParser
-from utils.db_info_finder import FilmInfoFinder
-from utils.filters import filter_upcoming_films, filter_showing_films
+from bot.utils.call_parser import CallParser
+from bot.utils.db_info_finder import FilmInfoFinder
+from bot.utils.filters import filter_upcoming_films, filter_showing_films
 
 #%%
 def get_or_raise(env_name: str) -> str:

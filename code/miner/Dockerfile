@@ -12,9 +12,9 @@ WORKDIR /app
 RUN pip install --upgrade pip
 
 # Copy the directory contents into the container at /app/
-COPY ./my_logger ./my_logger
+COPY ./code/my_logger ./my_logger
 RUN pip install --no-cache-dir ./my_logger
-COPY ./miner ./miner
+COPY ./code/miner ./miner
 RUN pip install --no-cache-dir ./miner
 
 # Expose the port the app runs on
