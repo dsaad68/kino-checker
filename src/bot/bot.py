@@ -39,6 +39,16 @@ def send_welcome(message):
     bot.reply_to(message, f"Howdy {message.from_user.first_name}, please choose from the list?", reply_markup=markup_start)
 
 # INFO: Works fine
+@bot.callback_query_handler(func=lambda call: call.data == "restart")
+def restart(call):
+    """Sends a welcome message and show level 1 menu."""
+    markup_start = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
+    markup_start.add(telebot.types.KeyboardButton("/Upcoming_Films"))
+    markup_start.add(telebot.types.KeyboardButton("/Showing_Films"))
+
+    bot.send_message(call.message.chat.id, "Please choose from the list?", reply_markup=markup_start)
+
+# INFO: Works fine
 @bot.message_handler(commands=["Upcoming_Films"])
 def upcoming_films(message):
     """Shows the list of upcoming films."""
@@ -91,7 +101,7 @@ def showing_films_ov_filter(message):
     keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{film_id},fid|0,ov'))
     keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{film_id},fid|2,ov'))
     # Fix Go back button
-    keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=message.text))
+    keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
     bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)
 
@@ -100,7 +110,6 @@ def showing_films_imax_filter_callback(call):
     """Inline keyboard for filtering showing films based on IMAX availability."""
 
     logging.info(f"Call Data: {call.data}")
-
     query_dict = CallParser.parse(call.data)
     film_id = query_dict.pop('film_id')
 
@@ -110,7 +119,7 @@ def showing_films_imax_filter_callback(call):
         keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|1,imax'))
         keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|0,imax'))
         keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|2,imax'))
-        keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=call.data))
+        keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for IMAX Version?", reply_markup=keyboard)
 
@@ -130,7 +139,7 @@ def showing_films_3d_filter_callback(call):
         keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|1,3d'))
         keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|0,3d'))
         keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|2,3d'))
-        keyboard.add(types.InlineKeyboardButton(text="🔙 Go back!", callback_data=call.data))
+        keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for 3D Version?", reply_markup=keyboard)
 
@@ -154,6 +163,8 @@ def showing_films_date_filter_callback(call):
         for date in date_list:
             date_str = date.strftime('%Y-%m-%d')
             keyboard.add(types.InlineKeyboardButton(text=date_str, callback_data=f'{call.data}|{date_str}'))
+        keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
+
 
         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Choose a date:", reply_markup=keyboard)
     else:
@@ -164,10 +175,21 @@ def showing_films_time_filter_callback(call):
 
     logging.info(f"Call Data: {call.data}")
     query_dict = CallParser.parse(call.data)
-    # film_id = query_dict.pop('film_id')
+    film_id = query_dict.pop('film_id')
+    performance_date = query_dict.pop('date')
 
-    # TODO: Add filter for time
     logging.info(f"Query Dict: {query_dict}")
+
+    time_list = db_info_finder.get_performance_hours_by_film_id(film_id, query_dict, performance_date)
+
+    keyboard = types.InlineKeyboardMarkup()
+    for time in time_list:
+        time_str = time.strftime('%H:%M')
+        keyboard.add(types.InlineKeyboardButton(text=time_str, callback_data=f'{call.data}|{time_str}'))
+    keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
+
+
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Choose a date:", reply_markup=keyboard)
 
 @bot.callback_query_handler(func = lambda call: bool(re.search(CallParser.TIME_PATTERN_ENDING, call.data)))
 def showing_films_links(call):
@@ -176,7 +198,9 @@ def showing_films_links(call):
     query_dict = CallParser.parse(call.data)
     # film_id = query_dict.pop('film_id')
 
-    # TODO: Add filter
+    # TODO: Add filter send performance link as a message
+    # performance_link = f"https://cineorder.filmpalast.net/zkm/movie/{title}/{film_id}/performance/{performance_id}"
+
     logging.info(f"Query Dict: {query_dict}")
 
 
