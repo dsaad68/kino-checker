@@ -8,17 +8,16 @@ RUN apt update && apt upgrade -y && apt install gcc -y && apt-get clean
 
 WORKDIR /app
 
-# Copy the directory contents into the container at /app/
-COPY ./bot .
-
 # Install requirements
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
 
-# Install the custom logger
+# Copy the directory contents into the container at /app/
 COPY ./my_logger ./my_logger
 RUN pip install --no-cache-dir ./my_logger
+COPY ./bot ./bot
+RUN pip install --no-cache-dir ./bot
 
 # Expose the port the app runs on
 EXPOSE 80
 
-CMD [ "python", "bot.py" ]
+CMD [ "python", "-m", "bot.main" ]

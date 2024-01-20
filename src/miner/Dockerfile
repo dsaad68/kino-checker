@@ -8,17 +8,16 @@ RUN apt update && apt upgrade -y && apt install gcc -y && apt-get clean
 
 WORKDIR /app
 
-# Copy the directory contents into the container at /app/
-COPY ./miner .
-
 # Install requirements
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
 
-# Install the custom logger
+# Copy the directory contents into the container at /app/
 COPY ./my_logger ./my_logger
 RUN pip install --no-cache-dir ./my_logger
+COPY ./miner ./miner
+RUN pip install --no-cache-dir ./miner
 
 # Expose the port the app runs on
 EXPOSE 80
 
-CMD [ "python", "miner.py" ]
+CMD [ "python", "-m", "miner.main" ]
