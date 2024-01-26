@@ -52,6 +52,7 @@ if __name__ == "__main__":
 
     # CHECK: Where should be in the loop?
     film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
+    film_notifier = FilmReleaseNotification(BOT_TOKEN)
 
     while True:
         logging.info("----- Mining session starts! -----")
@@ -98,8 +99,7 @@ if __name__ == "__main__":
 
         logging.info("Send notification to users!")
         film_notifier = FilmReleaseNotification(BOT_TOKEN, users_list)
-        asyncio.run(film_notifier.run())
-
+        asyncio.run(film_notifier.run(users_list))
 
         end_time = time.time()
         elapsed_time = end_time - start_time

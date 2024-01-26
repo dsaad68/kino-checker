@@ -11,3 +11,4 @@ test*.*
 .pytest_cache
 .venv
 venv
+taskfile.yml

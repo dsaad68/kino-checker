@@ -8,7 +8,7 @@ from sqlalchemy.sql import select, func, join, outerjoin
 from sqlalchemy.dialects.postgresql import insert, Insert
 from sqlalchemy import Update, create_engine, update, and_
 
-from .db_model import Films, Performances, UpcomingFilms, Users, UsersFilmInfo
+from miner.utils.db_model import Films, Performances, UpcomingFilms, Users, UsersFilmInfo
 
 # %%
 
