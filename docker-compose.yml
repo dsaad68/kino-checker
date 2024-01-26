@@ -19,6 +19,7 @@ services:
       - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
     restart: always
 
+  # TODO: Add cleaner later
   # cleaner:
   #   build:
   #     context: .

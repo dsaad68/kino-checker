@@ -7,7 +7,6 @@ import asyncio
 
 from alive_progress import alive_bar
 
-# TODO: fix this later
 from miner.utils.scrapper import Scraper
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_notifier import FilmReleaseNotification
