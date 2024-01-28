@@ -250,6 +250,7 @@ class FilmDatabaseManager:
         """Get an existing row in the users table given its user id."""
         return self._execute_query(Users, lambda user: user.user_id == user_id)
 
+    # Bug: info on the `main.py` file
     def get_users_to_notify(self) -> List[UsersFilmInfo] | None:
         """Get list of users to notify.
 
