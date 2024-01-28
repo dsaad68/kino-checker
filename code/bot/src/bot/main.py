@@ -64,6 +64,7 @@ def upcoming_films(message):
     bot.send_message(message.chat.id, "Choose a film:", reply_markup=markup_films)
 
 # INFO: Works fine
+# IDEA: User should be able to choose the version of the film
 @bot.message_handler(func=lambda message: filter_upcoming_films(message, upcoming_films_list))
 def track_upcommings_films(message):
     """Tracks the availability of upcoming films."""
