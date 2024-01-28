@@ -81,7 +81,7 @@ if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
 
-    SQL_CONNECTION_URI = get_or_raise("POSTGRES_CONNECTION_URI")
+    SQL_CONNECTION_URI = get_or_raise("POSTGRES_DB_CONNECTION_URI")
 
     db_info_finder = FilmInfoFinder(SQL_CONNECTION_URI)
 

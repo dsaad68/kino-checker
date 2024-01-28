@@ -78,7 +78,7 @@ if __name__ == "__main__":
     logger.get_logger()
 
     # Define the SQL connection URI
-    SQL_CONNECTION_URI = os.environ.get("POSTGRES_CONNECTION_URI")
+    SQL_CONNECTION_URI = os.environ.get("POSTGRES_DB_CONNECTION_URI")
 
     TIME_INTERVAL = 180
 

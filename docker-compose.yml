@@ -7,7 +7,7 @@ services:
       dockerfile: ./code/miner/Dockerfile
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
+      - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
     restart: always
 
   bot:
@@ -16,7 +16,7 @@ services:
       dockerfile: ./code/bot/Dockerfile
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
+      - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
     restart: always
 
   # TODO: Add cleaner later
@@ -25,5 +25,5 @@ services:
   #     context: .
   #     dockerfile: ./code/cleaner/Dockerfile
   #   environment:
-  #     - POSTGRES_CONNECTION_URI=${POSTGRES_CONNECTION_URI}
+  #     - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
   #   restart: always

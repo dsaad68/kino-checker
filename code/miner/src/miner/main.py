@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     # create a function that gets the environment variables or raise an error
 
-    SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_CONNECTION_URI")
+    SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_DB_CONNECTION_URI")
     BOT_TOKEN = get_or_raise(env_name="TELEGRAM_BOT_TOKEN")
 
     TIME_INTERVAL = 120
@@ -51,7 +51,6 @@ if __name__ == "__main__":
 
     # CHECK: Where should be in the loop?
     film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
-    film_notifier = FilmReleaseNotification(BOT_TOKEN)
 
     while True:
         logging.info("----- Mining session starts! -----")
@@ -97,8 +96,9 @@ if __name__ == "__main__":
         users_list = film_db_manager.get_users_to_notify()
 
         logging.info("Send notification to users!")
-        film_notifier = FilmReleaseNotification(BOT_TOKEN, users_list)
-        asyncio.run(film_notifier.run(users_list))
+        if users_list:
+            film_notifier = FilmReleaseNotification(BOT_TOKEN)
+            asyncio.run(film_notifier.run(users_list))
 
         end_time = time.time()
         elapsed_time = end_time - start_time

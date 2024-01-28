@@ -32,7 +32,8 @@ class FilmReleaseNotification:
     async def run(self, users_list: list[UsersFilmInfo]):
         """ Runs the notification. """
         try:
-            await self.send_notification(users_list)
+            if not users_list:
+                await self.send_notification(users_list)
         finally:
             await self.bot.close_session()
 
