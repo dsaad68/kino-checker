@@ -22,7 +22,7 @@ def get_or_raise(env_name: str) -> str:
     else:
         raise ValueError(f"Missing environment variable {env_name}")
 
-TOKEN = get_or_raise("ZKM_TRACKER_BOT_TOKEN")
+TOKEN = get_or_raise("TELEGRAM_BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
 upcoming_films_list = None
