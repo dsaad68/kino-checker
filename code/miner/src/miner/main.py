@@ -98,7 +98,7 @@ if __name__ == "__main__":
             asyncio.run(film_notifier.shutdown())
             logging.info(f"Number of users has been notified: {len(users_list)}")
 
-            # FIX: Does not work
+            # Bug: Does not work because of the bug above
             logging.info("Updating the notification status of notified users in the users table in DB!")
             film_db_manager.update_notified_users_table(users_list)
             logging.info("Updated the notification status of notified users in the users table in DB!")

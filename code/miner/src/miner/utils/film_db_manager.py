@@ -273,8 +273,10 @@ class FilmDatabaseManager:
                 f.film_id
         )
         SELECT
+            u.user_id,
             u.chat_id,
             u.message_id,
+            u.notified,
             fi.title,
             fi.length_in_minutes,
             fi.last_updated,
@@ -316,7 +318,8 @@ class FilmDatabaseManager:
                 Users.chat_id,
                 Users.message_id,
                 Users.notified,
-                film_info.c.film_id,
+                Users.film_id,
+                #film_info.c.film_id,
                 film_info.c.title,
                 film_info.c.length_in_minutes,
                 film_info.c.last_updated,
