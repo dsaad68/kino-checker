@@ -3,10 +3,10 @@ import logging
 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
-from typing import List, Dict, Type, Callable
+from typing import List, Dict, Type, Callable, Tuple
 from sqlalchemy.sql import select, func, join, outerjoin
 from sqlalchemy.dialects.postgresql import insert, Insert
-from sqlalchemy import Update, create_engine, update, and_
+from sqlalchemy import Update, create_engine, update, and_, tuple_
 
 from miner.utils.db_model import Films, Performances, UpcomingFilms, Users, UsersFilmInfo
 
@@ -83,13 +83,23 @@ class FilmDatabaseManager:
         # Execute the update statement
         self._excute_stmt(update_stmt)
 
+    def update_notified_users_table(self, users_list: List[UsersFilmInfo]) -> None:
+
+        logging.info("[ ] Updating notified users' status Users table!")
+        # Update statement
+        user_film_pair = [(ufi.user_id, ufi.film_id) for ufi in users_list]
+        update_stmt = self._create_notfied_users_update_stmt(user_film_pair)
+        logging.info("[*] Updated notified users' status Users table!")
+        # Execute the update statement
+        self._excute_stmt(update_stmt)
+
     @staticmethod
     def _extract_film_data(film_dict, keys: List[str]) -> Dict[str, str | int]:
         """Extracts film data from a dictionary."""
         return {key: film_dict.get(key) for key in keys}
 
     def _session_maker(self) -> sessionmaker:
-        """Create a session factory for connecting to the database."""
+        """Creates a session factory for connecting to the database."""
 
         # Define the database connection
         engine = create_engine(self.connection_uri, pool_size=2, max_overflow=2)
@@ -97,7 +107,7 @@ class FilmDatabaseManager:
         return sessionmaker(bind=engine)
 
     def _create_upsert_stmt(self, table, id_col_name: str, update_list: List[dict], exclude_cols: List[str] | None = None) -> Insert:
-        """Create an upsert statement for a table"""
+        """Creates an upsert statement for a table"""
 
         # Insert statement
         insert_stmt = insert(table).values(update_list)
@@ -115,7 +125,7 @@ class FilmDatabaseManager:
 
     @staticmethod
     def _create_update_released_film_stmt() -> Update:
-        """Create an update statement for released films in the upcoming films table.
+        """Creates an update statement for released films in the upcoming films table.
 
         SQL Query:
         ```sql
@@ -145,7 +155,7 @@ class FilmDatabaseManager:
 
     @staticmethod
     def _create_users_table_film_id_update_stmt() -> Update:
-        """Create an update statement for updating released films id in the users table.
+        """Creates an update statement for updating released films id in the users table.
 
         # INFO: Corrected query
         SQL Query:
@@ -173,6 +183,15 @@ class FilmDatabaseManager:
             .values(film_id=subquery.c.film_id)
             .where(func.lower(Users.title) == func.lower(subquery.c.title))
         )
+
+    @staticmethod
+    def _create_notfied_users_update_stmt(user_film_pairs: List[Tuple[int, str]]) -> Update:
+        """ Creates an update statement for notifying users.
+        Sets notified = True for pair of user_id and film_id.
+        """
+
+        return update(Users).where(
+            tuple_(Users.user_id, Users.film_id).in_(user_film_pairs)).values(notified=True)
 
     def _excute_stmt(self, stmt: Insert | Update) -> None:
         """Execute an upsert statement."""

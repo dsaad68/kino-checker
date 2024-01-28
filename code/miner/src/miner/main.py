@@ -23,6 +23,7 @@ def get_or_raise(env_name: str) -> str:
 
 
 # %%
+# sourcery skip: use-named-expression
 if __name__ == "__main__":
     logger = Logger(file_handler=True)
     logger.get_logger()
@@ -81,18 +82,27 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
+        # BUG: Sometimes is not working.
+        # INFO: The Reason is that the films can be added to the film table, but there are no performances in the performances table.
+        # INFO: The definition of availability needs to be changed.
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
-        logging.info(f"Number of users to notify: {len(users_list)}")
-        logging.info(f"Users to notify: {users_list}")
 
-        # FIX: THIS IS NOT WORKING!
         if users_list:
-            logging.info("Send notification to users!")
+
+            logging.info(f"Number of users to notify: {len(users_list)}")
+            logging.info(f"Users to notify: {users_list}")
+
+            logging.info("Sending notification to users!")
             film_notifier = FilmReleaseNotification(BOT_TOKEN)
             asyncio.run(film_notifier.send_notification(users_list))
             asyncio.run(film_notifier.shutdown())
             logging.info(f"Number of users has been notified: {len(users_list)}")
+
+            # TODO: Add a function to set notification status in users table
+            logging.info("Updating the notification status of notified users in the users table in DB!")
+            film_db_manager.update_notified_users_table(users_list)
+            logging.info("Updated the notification status of notified users in the users table in DB!")
 
         end_time = time.time()
         elapsed_time = end_time - start_time

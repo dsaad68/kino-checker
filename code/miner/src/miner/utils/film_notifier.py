@@ -3,7 +3,6 @@
 import logging
 import asyncio
 
-# from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
 from miner.utils.db_model import UsersFilmInfo
@@ -29,8 +28,8 @@ class FilmReleaseNotification:
             logging.info("Bot session is closing.")
             await self.bot.close_session()
             logging.info("Bot session is closed.")
-        finally:
-            logging.info("Bot session is already closed.")
+        except Exception as error:
+            logging.error(f"An error occurred while closing the bot session: {error}", exc_info=True)
 
     # TODO: Improve this
     @staticmethod

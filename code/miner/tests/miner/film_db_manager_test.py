@@ -351,8 +351,9 @@ def test_get_users_to_notify(schemas,init_scripts):
         film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
         user_list = film_db_manager.get_users_to_notify()
 
-        assert len(user_list) > 0
-        user = user_list[0]
+        # Verify
+        assert len(user_list) > 0 # type: ignore
+        user = user_list[0]       # type: ignore
 
         assert user.user_id == 2
         assert user.chat_id == "222211111"
@@ -366,3 +367,5 @@ def test_get_users_to_notify(schemas,init_scripts):
         assert user.is_ov
         assert user.length_in_minutes == 120
         assert user.last_updated.strftime('%Y-%m-%d %H:%M:%S') == '2023-11-13 19:14:38'
+
+# TODO: add test for update_notified_users_table
