@@ -91,6 +91,7 @@ if __name__ == "__main__":
             logging.info("Send notification to users!")
             film_notifier = FilmReleaseNotification(BOT_TOKEN)
             asyncio.run(film_notifier.send_notification(users_list))
+            asyncio.run(film_notifier.shutdown())
             logging.info(f"Number of users has been notified: {len(users_list)}")
 
         end_time = time.time()
