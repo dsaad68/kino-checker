@@ -35,12 +35,16 @@ class FilmReleaseNotification:
         try:
             if not users_list:
                 await self.send_notification(users_list)
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+
+    async def shutdown(self):
+        try:
+            logging.info("Bot session is closing.")
+            await self.bot.close_session()
+            logging.info("Bot session is closed.")
         finally:
-            if self.bot.session_manager is not None and self.bot.session_manager.session is not None:
-                await self.bot.close_session()
-                logging.info("Telegram Bot Session is closed.")
-            else:
-                logging.info("Telegram Bot Session is already closed.")
+            logging.info("Bot session is already closed.")
 
     # TODO: Improve this
     @staticmethod
