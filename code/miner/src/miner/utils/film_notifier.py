@@ -10,18 +10,19 @@ from miner.utils.db_model import UsersFilmInfo
 
 # %%
 
-# class FilmReleaseNotification:
-#     """ This class sends a notification about a release of a film to all the users in the list """
+class FilmReleaseNotification:
+    """ This class sends a notification about a release of a film to all the users in the list """
 
-#     def __init__(self, BOT_TOKEN: str):
-#         self.bot = AsyncTeleBot(BOT_TOKEN)
+    def __init__(self, BOT_TOKEN: str):
+        self.bot = AsyncTeleBot(BOT_TOKEN)
 
-#     async def _send_message_task(self, user):
-#         """Sends a notification about a release of a film to an user."""
-#         try:
-#             await self.bot.send_message(user.chat_id, self._message(user))
-#         except Exception as e:
-#             logging.error(f"Failed to send message to {user.chat_id}: {e}")
+    async def send_notification(self, users_list: list[UsersFilmInfo]):
+        """Sends a notification about a release of a film to all the users in the list """
+
+        tasks = [ asyncio.create_task(self.bot.send_message(chat_id=user.chat_id, text=message(user)))
+                for user in users_list]
+
+        return await asyncio.gather(*tasks)
 
 #     # TODO: Improve this
 #     async def send_notification(self, users_list: list[UsersFilmInfo]):
@@ -46,11 +47,11 @@ from miner.utils.db_model import UsersFilmInfo
 #         finally:
 #             logging.info("Bot session is already closed.")
 
-#     # TODO: Improve this
-#     @staticmethod
-#     def _message(user: UsersFilmInfo) -> str:
-#         """ Message to be sent to the user. """
-#         return  f"✅🎥 {user.title} became availabe! 🎥✅\n"
+    # TODO: Improve this
+    @staticmethod
+    def _message(user: UsersFilmInfo) -> str:
+        """ Message to be sent to the user. """
+        return  f"✅🎥 {user.title} became availabe! 🎥✅\n"
 
 
 #%%
