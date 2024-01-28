@@ -95,10 +95,13 @@ if __name__ == "__main__":
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
 
+        logging.info(f"Number of users to notify: {len(users_list)}")
+
         logging.info("Send notification to users!")
         if users_list:
             film_notifier = FilmReleaseNotification(BOT_TOKEN)
             asyncio.run(film_notifier.run(users_list))
+            logging.info(f"Number of users has been notified: {len(users_list)}")
 
         end_time = time.time()
         elapsed_time = end_time - start_time
