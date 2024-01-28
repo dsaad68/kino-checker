@@ -12,7 +12,6 @@ from miner.utils.db_model import Films, Performances, UpcomingFilms, Users, User
 
 # %%
 
-# IDEA: Think about breakdown of this class two classes one for updating and one for querying
 class FilmDatabaseManager:
     """This class manages the films and performances tables in the database"""
 
@@ -246,6 +245,10 @@ class FilmDatabaseManager:
     def _get_upcoming_user_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing rows in the users table given its title."""
         return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
+
+    def _get_user_by_user_id(self, user_id: int) -> Users | None:
+        """Get an existing row in the users table given its user id."""
+        return self._execute_query(Users, lambda user: user.user_id == user_id)
 
     def get_users_to_notify(self) -> List[UsersFilmInfo] | None:
         """Get list of users to notify.

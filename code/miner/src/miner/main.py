@@ -39,7 +39,6 @@ if __name__ == "__main__":
 
     logging.info("Main starts!")
 
-    # CHECK: Where should be in the loop?
     film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
 
     while True:
@@ -99,7 +98,7 @@ if __name__ == "__main__":
             asyncio.run(film_notifier.shutdown())
             logging.info(f"Number of users has been notified: {len(users_list)}")
 
-            # TODO: Add a function to set notification status in users table
+            # FIX: Does not work
             logging.info("Updating the notification status of notified users in the users table in DB!")
             film_db_manager.update_notified_users_table(users_list)
             logging.info("Updated the notification status of notified users in the users table in DB!")

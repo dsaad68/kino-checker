@@ -368,4 +368,25 @@ def test_get_users_to_notify(schemas,init_scripts):
         assert user.length_in_minutes == 120
         assert user.last_updated.strftime('%Y-%m-%d %H:%M:%S') == '2023-11-13 19:14:38'
 
-# TODO: add test for update_notified_users_table
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_update_notified_users_table(schemas,init_scripts):
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Execute
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        user_list = film_db_manager.get_users_to_notify()
+        film_db_manager.update_notified_users_table(user_list)
+
+        # Verify
+        user_id = user_list[0].user_id
+        user = film_db_manager._get_user_by_user_id(user_id)
+
+        assert user.user_id == 2
+        assert user.chat_id == "222211111"
+        assert user.message_id == "1020"
+        assert user.title == "Wonka"
+        assert user.notified is True
+        assert user.film_id is not None
+        assert user.film_id == "A6D63000012BHGWDVI"
