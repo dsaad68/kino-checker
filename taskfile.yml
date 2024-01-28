@@ -1,0 +1,30 @@
+version: '3'
+
+tasks:
+  run-bot:
+    cmds:
+      - powershell.exe ./.venv/Scripts/Activate.ps1
+      - python.exe ./code/bot/src/bot/main.py
+
+  run-miner:
+    cmds:
+      - powershell.exe ./.venv/Scripts/Activate.ps1
+      - python.exe ./code/miner/src/miner/main.py
+
+  docker-compose-up:
+    cmds:
+      - docker compose up
+
+  docker_remove_all:
+    cmds:
+      - echo "{{.IMAGE_LIST}}"
+      - docker-compose down
+      - for: { var: .IMAGE_LIST}
+        cmd: docker rmi {{.ITEM}}
+    vars:
+      IMAGE_LIST:
+        sh: docker compose ps -a --format json | jq -s '[.[] | .Image]'
+
+  test-create-test-db:
+    cmds:
+      - docker run -e POSTGRES_PASSWORD="another!!22TEST" -p 5432:5432 -d --name traker_test_db postgres:alpine3.18
