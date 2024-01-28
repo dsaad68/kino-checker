@@ -7,7 +7,7 @@ import asyncio
 
 from miner.utils.scrapper import Scraper
 from miner.utils.film_db_manager import FilmDatabaseManager
-from miner.utils.film_notifier import FilmReleaseNotification
+from miner.utils.film_notifier import send_status #, FilmReleaseNotification
 from miner.utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
 
 from my_logger import Logger
@@ -87,11 +87,13 @@ if __name__ == "__main__":
 
         # FIX: THIS IS NOT WORKING!
         if users_list:
-            logging.info("Send notification to users!")
-            film_notifier = FilmReleaseNotification(BOT_TOKEN)
-            asyncio.run(film_notifier.run(users_list))
-            # film_notifier.shutdown()
-            logging.info(f"Number of users has been notified: {len(users_list)}")
+            # logging.info("Send notification to users!")
+            # film_notifier = FilmReleaseNotification(BOT_TOKEN)
+            # asyncio.run(film_notifier.run(users_list))
+            # # film_notifier.shutdown()
+            # logging.info(f"Number of users has been notified: {len(users_list)}")
+
+            asyncio.run(send_status(users_list, BOT_TOKEN))
 
         end_time = time.time()
         elapsed_time = end_time - start_time
