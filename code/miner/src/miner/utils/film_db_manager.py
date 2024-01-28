@@ -62,7 +62,7 @@ class FilmDatabaseManager:
             logging.warning("Upcoming Films list is None")
 
     def update_released_films_in_upcoming_films_table(self) -> None:
-        """update the released films in the upcoming films table.
+        """Updates the released films in the upcoming films table.
         If a film is released then its film_id will be updated in the upcoming films table.
         It is used to trigger to notification that a film has been released.
         """
@@ -147,32 +147,31 @@ class FilmDatabaseManager:
     def _create_users_table_film_id_update_stmt() -> Update:
         """Create an update statement for updating released films id in the users table.
 
+        # INFO: Corrected query
         SQL Query:
         ```sql
         -- Update Users with Released Films
         UPDATE tracker.users u
-        SET film_id = f.film_id
-        FROM tracker.films f
-        JOIN tracker.upcoming_films uf ON f.title = uf.title
+        SET film_id = uf.film_id
+        FROM tracker.upcoming_films uf
         WHERE uf.is_trackable = TRUE
-        AND uf.is_released = FALSE
-        AND u.title = f.title;
+        AND uf.is_released = TRUE
+        AND u.title = uf.title;
         ```
         """
         # Scalar subquery
         # Subquery with case-insensitive comparison
         subquery = (
-            select(Films.film_id)
-            .join(UpcomingFilms, func.lower(Films.title) == func.lower(UpcomingFilms.title))
-            .where(and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == False))  # noqa: E712
-            .scalar_subquery()
+            select(UpcomingFilms.film_id, UpcomingFilms.title)
+            .where(and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == True))  # noqa: E712
+            .subquery()
         )
 
         # Update statement with case-insensitive comparison
         return (
             update(Users)
-            .values(film_id=subquery)
-            .where(func.lower(Users.title) == func.lower(UpcomingFilms.title))
+            .values(film_id=subquery.c.film_id)
+            .where(func.lower(Users.title) == func.lower(subquery.c.title))
         )
 
     def _excute_stmt(self, stmt: Insert | Update) -> None:

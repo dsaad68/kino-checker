@@ -5,8 +5,6 @@ import time
 import logging
 import asyncio
 
-from alive_progress import alive_bar
-
 from miner.utils.scrapper import Scraper
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_notifier import FilmReleaseNotification
@@ -15,15 +13,6 @@ from miner.utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CE
 from my_logger import Logger
 
 # %%
-
-
-def sleep_with_progress(seconds):
-    with alive_bar(seconds) as bar:
-        bar.title("Sleepmeter")
-        for _ in range(seconds):
-            time.sleep(1)
-            bar()
-
 
 def get_or_raise(env_name: str) -> str:
     value = os.environ.get(env_name)
@@ -89,16 +78,17 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_released_films_in_upcoming_films_table()
 
+        # FIX: THIS IS NOT WORKING!
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
-
         logging.info(f"Number of users to notify: {len(users_list)}")
 
-        logging.info("Send notification to users!")
+        # FIX: THIS IS NOT WORKING!
         if users_list:
+            logging.info("Send notification to users!")
             film_notifier = FilmReleaseNotification(BOT_TOKEN)
             asyncio.run(film_notifier.run(users_list))
             logging.info(f"Number of users has been notified: {len(users_list)}")
@@ -110,4 +100,3 @@ if __name__ == "__main__":
 
         # Sleep for 10 Min
         logging.info(f"==+== Sleeping for {TIME_INTERVAL/60} Min! ==+==")
-        sleep_with_progress(TIME_INTERVAL)
