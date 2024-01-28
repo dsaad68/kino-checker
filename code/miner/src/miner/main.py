@@ -78,7 +78,6 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the upcoming films table in DB!")
         film_db_manager.update_released_films_in_upcoming_films_table()
 
-        # FIX: THIS IS NOT WORKING!
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
@@ -101,3 +100,4 @@ if __name__ == "__main__":
 
         # Sleep for 10 Min
         logging.info(f"==+== Sleeping for {TIME_INTERVAL/60} Min! ==+==")
+        time.sleep(TIME_INTERVAL)
