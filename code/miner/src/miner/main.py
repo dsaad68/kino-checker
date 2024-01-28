@@ -43,7 +43,7 @@ if __name__ == "__main__":
     SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_DB_CONNECTION_URI")
     BOT_TOKEN = get_or_raise(env_name="TELEGRAM_BOT_TOKEN")
 
-    TIME_INTERVAL = 120
+    TIME_INTERVAL = 600
 
     url = "https://www.filmpalast.net/vorschau.html"
 
