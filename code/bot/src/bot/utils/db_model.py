@@ -69,6 +69,7 @@ class Users(Base):
     film_id = Column(String(255), ForeignKey("tracker.films.film_id"), nullable=False)
     title = Column(String(255), nullable=False)
     notified = Column(Boolean, default=False)
+    flags = Column(String(255), nullable=False)
 
 
 @dataclass

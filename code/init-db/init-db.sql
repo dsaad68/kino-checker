@@ -61,5 +61,6 @@ CREATE TABLE tracker.users (
     film_id VARCHAR(255),
     title VARCHAR(255) NOT NULL,
     notified BOOLEAN DEFAULT FALSE,
+    flags VARCHAR(255) NOT NULL,
     FOREIGN KEY (film_id) REFERENCES tracker.films(film_id)
 );

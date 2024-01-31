@@ -3,7 +3,7 @@
 import logging
 
 from datetime import date, time
-from typing import Type, Callable
+from typing import Type, Callable, Any
 from sqlalchemy.sql import select, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -62,8 +62,8 @@ class FilmInfoFinder:
                 )
         return self._execute_query_all(stmt)
 
-    def get_upcommings_films_list(self) -> list[Type] | None:
-        return self._execute_query_all(self._create_upcommings_films_stmt())
+    def get_upcomings_films_list(self) -> list[dict[str, Any]] | None:
+        return self._execute_query_mapping_all(self._create_upcomings_films_stmt())
 
     def get_showing_films_list(self) -> list[Type] | None:
         """ Get a list of films that are currently showing.
@@ -71,8 +71,8 @@ class FilmInfoFinder:
         """
         return self._execute_query_all(self._create_showing_films_stmt())
 
-    def _create_upcommings_films_stmt(self) -> select:
-        return select(UpcomingFilms.title).where( and_(UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == False) ) # noqa: E712
+    def _create_upcomings_films_stmt(self) -> select:
+        return select(UpcomingFilms.title, UpcomingFilms.upcoming_film_id).where( and_(UpcomingFilms.is_trackable, ~ UpcomingFilms.is_released) ) # noqa: E712
 
     def _create_showing_films_stmt(self) -> select:
         return (
@@ -81,7 +81,7 @@ class FilmInfoFinder:
             .where(Performances.performance_date >= func.current_date())
             )
 
-    def upsert_users(self, chat_id:str, message_id:str, title:str) -> bool:
+    def upsert_users(self, chat_id:str, message_id:str, title:str, flags:str) -> bool:
         """ Insert a user info to the database for notification.
             If the row with the same chat_id and title already exists, it just updates the message_id.
             Returns True if the upsert is successful, False otherwise."""
@@ -99,12 +99,12 @@ class FilmInfoFinder:
                     update_stmt = (
                         update(Users)
                         .where(Users.chat_id == chat_id, func.lower(Users.title) == title.lower())
-                        .values(message_id=message_id)
+                        .values(message_id=message_id, flags=flags)
                     )
                     session.execute(update_stmt)
                 else:
                     # Create a new row
-                    new_row = Users(chat_id=chat_id, message_id=message_id, title=title)
+                    new_row = Users(chat_id=chat_id, message_id=message_id, title=title, flags=flags)
                     session.add(new_row)
 
                 session.commit()
@@ -133,7 +133,7 @@ class FilmInfoFinder:
 
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
-            with self._session_maker() as session:
+            with self._session_maker() as session: # type: ignore
                 return session.execute(stmt).scalars().all()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
@@ -148,8 +148,24 @@ class FilmInfoFinder:
         """Execute a query with a given model and filter condition."""
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
-            with self._session_maker() as session:
+            with self._session_maker() as session: # type: ignore
                 return session.execute(select(model).where(filter_condition(model))).scalars().first()
+        except SQLAlchemyError as error:
+            logging.error(f"Database Error: {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+        except Exception as error:
+            logging.error(f"ERROR : {error}", exc_info=True)
+            session.rollback()  # type: ignore
+            return None
+
+    def _execute_query_mapping_all(self, stmt) -> list[dict] | None:
+        """Execute a query with a given a statement."""
+
+        # sourcery skip: class-extract-method, extract-duplicate-method
+        try:
+            with self._session_maker() as session: # type: ignore
+                return session.execute(stmt).mappings().all()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
             session.rollback()  # type: ignore

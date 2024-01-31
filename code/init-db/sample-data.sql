@@ -23,7 +23,9 @@ INSERT INTO tracker.performances ("performance_id", "film_id", "film_id_p", "per
 ('B5C45000023UHQLKCP', 'DCC63000012BHGWDVI', 'DCC63000012BHGWDVI', '2023-11-14 17:00:00', '2023-11-14', '17:00:00', 'englisch/IMAX/OV/3D', 't', 't', 't', '30000000015UHQLKCP', 'Kino 3', '2023-11-13 19:14:38.658222');
 
 -- Sample data for users table
-INSERT INTO tracker.users ("chat_id", "message_id", "film_id", "title", "notified") VALUES
-('222211111', '1010', NULL, 'Wish', 'f'),
-('222211111', '1020', 'A6D63000012BHGWDVI', 'Wonka', 'f'),
-('222211111', '1030', NULL, 'Napoleon', 'f');
+-- Check: this for testing
+INSERT INTO tracker.users ("chat_id", "message_id", "film_id", "title", "notified", "flags") VALUES
+('222211111', '1010', NULL, 'Wish', 'f', '1,ov|2,imax|0,3d'),
+('222211111', '1020', 'A6D63000012BHGWDVI', 'Wonka', 'f', '1,ov|2,imax|0,3d'),
+('222211111', '1030', NULL, 'Napoleon', 'f', '2,ov|2,imax|0,3d'),
+('333311111', '1040', NULL, 'Wish', 'f', '0,ov|1,imax|0,3d');

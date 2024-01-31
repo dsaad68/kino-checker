@@ -5,12 +5,12 @@ import os
 import telebot
 import logging
 
-# from telebot import types
+from telebot import types
 
 from my_logger import Logger
 
 # from utils.answers import answer
-# from bot.utils.call_parser import CallParser
+from bot.utils.call_parser import CallParser
 from bot.utils.db_info_finder import FilmInfoFinder
 from bot.utils.filters import filter_upcoming_films #, filter_showing_films
 
@@ -53,9 +53,13 @@ def restart(call):
 def upcoming_films(message):
     """Shows the list of upcoming films."""
 
-    films_list = db_info_finder.get_upcommings_films_list()
-    global upcoming_films_list
-    upcoming_films_list = films_list.copy()
+    films_list = db_info_finder.get_upcomings_films_list()
+    films_dict = {film['title'].lower(): film['upcoming_film_id'] for film in films_list}
+
+    global upcoming_films_dict
+    upcoming_films_dict = films_dict.copy()
+
+    upcoming_films_list = list(upcoming_films_dict.keys())
 
     markup_films = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     for film in upcoming_films_list:
@@ -63,17 +67,64 @@ def upcoming_films(message):
 
     bot.send_message(message.chat.id, "Choose a film:", reply_markup=markup_films)
 
-# INFO: Works fine
-# IDEA: User should be able to choose the version of the film
 @bot.message_handler(func=lambda message: filter_upcoming_films(message, upcoming_films_list))
-def track_upcommings_films(message):
+def upcoming_films_ov_filter(message):
+    """Inline keyboard for filtering upcoming films based on OV availability."""
+
+    film_id = db_info_finder.get_film_id_by_title(message.text)
+
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{film_id},uf|1,ov'))
+    keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{film_id},uf|0,ov'))
+    keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{film_id},uf|2,ov'))
+    # Fix Go back button
+    keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
+
+    bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith(('ov')))
+def upcoming_films_imax_filter_callback(call):
+    """Inline keyboard for filtering upcoming films based on IMAX availability."""
+
+    logging.info(f"Call Data: {call.data}")
+
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|1,imax'))
+    keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|0,imax'))
+    keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|2,imax'))
+    keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
+
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for IMAX Version?", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith(('imax')))
+def upcoming_films_3d_filter_callback(call):
+
+    logging.info(f"Call Data: {call.data}")
+
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{call.data}|1,3d'))
+    keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{call.data}|0,3d'))
+    keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{call.data}|2,3d'))
+    keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
+
+    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Are you looking for 3D Version?", reply_markup=keyboard)
+
+@bot.callback_query_handler(func=lambda call: call.data.endswith(('3d')))
+def track_upcommings_films(call):
     """Tracks the availability of upcoming films."""
 
-    db_info_finder.upsert_users(message_id=str(message.message_id), chat_id=str(message.chat.id), title=message.text)
-    bot.send_message(chat_id=message.chat.id, text="You will be informed when the tickets become available to buy.")
+    logging.info(f"Call Data: {call.data}")
 
-    global upcoming_films_list
-    upcoming_films_list = None
+    input_dict = CallParser.parse_for_input(call.data)
+
+    film_title = upcoming_films_dict.get(input_dict.get('uf'))
+
+    # fix this
+    db_info_finder.upsert_users(message_id=str(call.message.message_id), chat_id=str(call.message.chat.id), title=film_title, flags=input_dict.get('flags'))
+    bot.send_message(chat_id=call.message.chat.id, text="You will be informed when the tickets become available to buy.")
+
+    global upcoming_films_dict
+    upcoming_films_dict = None
 
 
 # %%
