@@ -39,3 +39,18 @@ def test_call_parser_two_flag():
     print(result)
     # verify
     assert result == expected_result
+
+def test_call_parser_without_film_id():
+    # Case 2: With 0s
+    # prepare
+    expected_result = {
+        "is_ov": True,
+        'is_3d': False}
+
+    # execute
+    input_string = "1,ov|2,imax|0,3d"
+    result = CallParser.parse(input_string)
+
+    print(result)
+    # verify
+    assert result == expected_result

@@ -81,9 +81,12 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
-        # BUG: Sometimes is not working.
-        # INFO: The Reason is that the films can be added to the film table, but there are no performances in the performances table.
-        # INFO: The definition of availability needs to be changed.
+        # NOTE: Sometimes `film_db_manager.get_users_to_notify()` it does not working properly.
+        # INFO: There is an observed issue where films are successfully added to the 'film' table without corresponding entries in the 'performances' table.
+        # INFO: This discrepancy leads to inconsistencies in data representation and may affect functionalities relying on complete film-performance relationships.
+        # INFO: Revise the definition of 'film availability'.
+        # INFO: It could also be later be solved with more personalized approach like 'film availability' based on performance options.
+
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
 
@@ -93,15 +96,17 @@ if __name__ == "__main__":
             logging.info(f"Users to notify: {users_list}")
 
             logging.info("Sending notification to users!")
-            film_notifier = FilmReleaseNotification(BOT_TOKEN)
-            asyncio.run(film_notifier.send_notification(users_list))
-            asyncio.run(film_notifier.shutdown())
-            logging.info(f"Number of users has been notified: {len(users_list)}")
-
-            # Check: might not work because of the bug above
-            logging.info("Updating the notification status of notified users in the users table in DB!")
-            film_db_manager.update_notified_users_table(users_list)
-            logging.info("Updated the notification status of notified users in the users table in DB!")
+            try:
+                film_notifier = FilmReleaseNotification(BOT_TOKEN)
+                asyncio.run(film_notifier.send_notification(users_list))
+                asyncio.run(film_notifier.shutdown())
+                logging.info(f"Number of users has been notified: {len(users_list)}")
+            except Exception as error:
+                logging.error(f"An error occurred while sending notifications: {error}", exc_info=True)
+            else:
+                logging.info("Updating the notification status of notified users in the users table in DB!")
+                film_db_manager.update_notified_users_table(users_list)
+                logging.info("Updated the notification status of notified users in the users table in DB!")
 
         end_time = time.time()
         elapsed_time = end_time - start_time
