@@ -1,7 +1,7 @@
 aiohttp==3.8.4
 beautifulsoup4==4.12.2
 pyTelegramBotAPI==4.11.0
-requests==2.29.0
+requests==2.31.0
 SQLAlchemy==2.0.12
 opencensus==0.11.2
 opencensus-context==0.1.3
