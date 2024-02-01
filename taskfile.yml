@@ -19,8 +19,10 @@ tasks:
     cmds:
       - echo "{{.IMAGE_LIST}}"
       - docker-compose down
-      - for: { var: .IMAGE_LIST}
-        cmd: docker rmi {{.ITEM}}
+      - docker rmi kino-checker-miner:latest
+      - docker rmi kino-checker-bot:latest
+      # - for: { var: .IMAGE_LIST}
+      #   cmd: docker rmi {{.ITEM}}:latest
     vars:
       IMAGE_LIST:
         sh: docker compose ps -a --format json | jq -s '[.[] | .Image]'

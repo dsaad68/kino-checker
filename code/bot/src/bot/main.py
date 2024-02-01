@@ -25,8 +25,8 @@ def get_or_raise(env_name: str) -> str:
 TOKEN = get_or_raise("TELEGRAM_BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
 
-upcoming_films_list = None
-showing_films_list = None
+upcoming_films_dict = None
+upcoming_films_dict = None
 
 # INFO: Works fine
 @bot.message_handler(commands=["start", "restart"])
@@ -54,12 +54,13 @@ def upcoming_films(message):
     """Shows the list of upcoming films."""
 
     films_list = db_info_finder.get_upcomings_films_list()
-    films_dict = {film['title'].lower(): film['upcoming_film_id'] for film in films_list}
+    films_dict = {film['upcoming_film_id']: film['title'].lower() for film in films_list}
 
     global upcoming_films_dict
     upcoming_films_dict = films_dict.copy()
 
-    upcoming_films_list = list(upcoming_films_dict.keys())
+    global upcoming_films_list
+    upcoming_films_list = list(upcoming_films_dict.values())
 
     markup_films = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     for film in upcoming_films_list:
@@ -71,13 +72,19 @@ def upcoming_films(message):
 def upcoming_films_ov_filter(message):
     """Inline keyboard for filtering upcoming films based on OV availability."""
 
-    film_id = db_info_finder.get_film_id_by_title(message.text)
+    logging.info(f"Message: {message.text}")
+
+    reversed_dict = {v: k for k, v in upcoming_films_dict.items()}
+
+    film_id = reversed_dict.get(message.text)
+
+    logging.info(f"film_id: {film_id}")
 
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{film_id},uf|1,ov'))
     keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{film_id},uf|0,ov'))
     keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{film_id},uf|2,ov'))
-    # Fix Go back button
+    # FIX: Go back button
     keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
     bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)
@@ -113,18 +120,22 @@ def upcoming_films_3d_filter_callback(call):
 def track_upcommings_films(call):
     """Tracks the availability of upcoming films."""
 
+    global upcoming_films_dict
+    global upcoming_films_list
+
     logging.info(f"Call Data: {call.data}")
 
     input_dict = CallParser.parse_for_input(call.data)
+    # logging.info(f"Input Dict: {input_dict}")
 
     film_title = upcoming_films_dict.get(input_dict.get('uf'))
+    # logging.info(f"film_title Dict: {film_title}")
 
-    # fix this
     db_info_finder.upsert_users(message_id=str(call.message.message_id), chat_id=str(call.message.chat.id), title=film_title, flags=input_dict.get('flags'))
     bot.send_message(chat_id=call.message.chat.id, text="You will be informed when the tickets become available to buy.")
 
-    global upcoming_films_dict
     upcoming_films_dict = None
+    upcoming_films_list = None
 
 
 # %%
