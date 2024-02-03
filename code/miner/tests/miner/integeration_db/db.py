@@ -1,6 +1,9 @@
+#%%
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 
+#%%
 
 def session_maker(connection_url: str) -> sessionmaker[Session]:
     # Define the database connection

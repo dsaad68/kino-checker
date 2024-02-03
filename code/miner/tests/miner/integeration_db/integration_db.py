@@ -1,11 +1,14 @@
+#%%
+
 import os
 import enum
 import logging
 
-from dotenv import load_dotenv
 from sqlalchemy import text
+from dotenv import load_dotenv
 from sqlalchemy.engine import create_engine
 
+#%%
 
 class EnvVar(enum.Enum):
     INT_DB_URL = enum.auto()

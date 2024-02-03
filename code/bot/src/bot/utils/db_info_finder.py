@@ -2,8 +2,8 @@
 
 import logging
 
-from datetime import date, time
 from typing import Type, Any
+from datetime import date, time
 from sqlalchemy.sql import select, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import update, and_, distinct

@@ -1,6 +1,8 @@
 #%%
 import re
 
+#%%
+
 class CallParser:
     """Class for parsing the input string and returning a dictionary of key-value pairs."""
 

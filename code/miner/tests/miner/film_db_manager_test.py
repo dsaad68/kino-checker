@@ -1,3 +1,4 @@
+#%%
 import os
 import pytest
 
@@ -8,6 +9,8 @@ from integeration_db.integration_db import IntegrationDb, EnvVar
 from integeration_db.utils import str_2_datetime, str_2_date, str_2_time
 
 from miner.utils.film_db_manager import FilmDatabaseManager
+
+#%%
 
 CONTAINER_NAME = "postgres:alpine3.18"
 

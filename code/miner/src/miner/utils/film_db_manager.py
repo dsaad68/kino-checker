@@ -3,11 +3,11 @@ import logging
 
 from typing import List, Dict, Tuple
 from sqlalchemy.sql import select, func
-from sqlalchemy.dialects.postgresql import insert, Insert
 from sqlalchemy import Update, update, and_, tuple_
+from sqlalchemy.dialects.postgresql import insert, Insert
 
-from common.call_parser import CallParser
 from common.db.manager import DBManager
+from common.call_parser import CallParser
 from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo
 
 

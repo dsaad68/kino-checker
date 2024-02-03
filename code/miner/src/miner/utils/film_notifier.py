@@ -5,7 +5,7 @@ import asyncio
 
 from telebot.async_telebot import AsyncTeleBot
 
-from miner.utils.db_model import UsersFilmInfo
+from common.db.db_model import UsersFilmInfo
 
 # %%
 

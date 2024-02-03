@@ -1,8 +1,12 @@
+#%%
+
 import logging
 import requests
 
 from typing import List
 from datetime import date, time, datetime
+
+#%%
 
 CENTER_OID = "6F000000014BHGWDVI"
 HEADERS = {
@@ -20,7 +24,7 @@ HEADERS = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 }
 
-
+#%%
 class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
         self.center_oid = center_oid
