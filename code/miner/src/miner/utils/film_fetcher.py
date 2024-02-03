@@ -109,7 +109,7 @@ class FilmInfoExtractor:
                     "auditorium_name": performance.get("auditoriumName"),
                     "auditorium_id": performance.get("auditoriumId"),
                     "last_updated": datetime.now(),
-                    # TODO: Add this later
+                    # NOTE: Is this needed? if yes, add this later
                     # **self._empty_dict_checker(performance.get("access")),
                 }
                 for film in film_list  # type: ignore
