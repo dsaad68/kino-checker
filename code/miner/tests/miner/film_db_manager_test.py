@@ -362,10 +362,10 @@ def test_get_users_to_notify(schemas,init_scripts):
         assert user.notified is False
         assert user.film_id is not None
         assert user.film_id == "A6D63000012BHGWDVI"
-        assert user.is_imax
+        assert user.flags == "1,ov|2,imax|0,3d"
+        assert user.is_imax is False
         assert user.is_3d is False
         assert user.is_ov
-        assert user.length_in_minutes == 120
         assert user.last_updated.strftime('%Y-%m-%d %H:%M:%S') == '2023-11-13 19:14:38'
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")

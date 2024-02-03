@@ -15,7 +15,8 @@ dependencies = [
     "opencensus-context==0.1.3",
     "opencensus-ext-azure==1.1.9",
     "psycopg2-binary==2.9.6",
-    "asyncio==3.4.3"
+    "asyncio==3.4.3",
+    "common"
 ]
 
 [project.optional-dependencies]

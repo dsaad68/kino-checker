@@ -1,23 +1,23 @@
 # %%
 import logging
 
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
-from typing import List, Dict, Type, Callable, Tuple
-from sqlalchemy.sql import select, func, join, outerjoin
+from typing import List, Dict, Tuple
+from sqlalchemy.sql import select, func
 from sqlalchemy.dialects.postgresql import insert, Insert
-from sqlalchemy import Update, create_engine, update, and_, tuple_
+from sqlalchemy import Update, update, and_, tuple_
 
-from miner.utils.db_model import Films, Performances, UpcomingFilms, Users, UsersFilmInfo
+from common.call_parser import CallParser
+from common.db.manager import DBManager
+from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo
+
 
 # %%
 
-class FilmDatabaseManager:
+class FilmDatabaseManager(DBManager):
     """This class manages the films and performances tables in the database"""
 
     def __init__(self, connection_uri: str):
-        self.connection_uri = connection_uri
-        self.session_maker = self._session_maker()
+        super().__init__(connection_uri)
 
     def update_films_table(self, films_list: List[dict] | None) -> None:
         """Updates the films table."""
@@ -26,7 +26,7 @@ class FilmDatabaseManager:
             # Upsert statement
             upsert_stmt = self._create_upsert_stmt(Films, "film_id", films_list)
             # Execute the upsert statement
-            self._excute_stmt(upsert_stmt)
+            self.execute_insert_stmt(upsert_stmt)
             logging.info("[*] Updated Films table!")
         else:
             logging.warning("Films list is None")
@@ -38,7 +38,7 @@ class FilmDatabaseManager:
             # Upsert statement
             upsert_stmt = self._create_upsert_stmt(Performances, "performance_id", performances_list)
             # Execute the upsert statement
-            self._excute_stmt(upsert_stmt)
+            self.execute_insert_stmt(upsert_stmt)
             logging.info("[*] Updated Performances table!")
         else:
             logging.warning("Performances list is None")
@@ -55,7 +55,7 @@ class FilmDatabaseManager:
             upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols= exclude_cols)
 
             # Execute the upsert statement
-            self._excute_stmt(upsert_stmt)
+            self.execute_insert_stmt(upsert_stmt)
             logging.info("[*] Updated Upcoming Films table!")
         else:
             logging.warning("Upcoming Films list is None")
@@ -71,7 +71,7 @@ class FilmDatabaseManager:
         update_stmt = self._create_update_released_film_stmt()
         logging.info("[*] Updated released films in Upcoming Films table!")
         # Execute the upsert statement
-        self._excute_stmt(update_stmt)
+        self.execute_insert_stmt(update_stmt)
 
     def update_users_table(self) -> None:
 
@@ -80,7 +80,7 @@ class FilmDatabaseManager:
         update_stmt = self._create_users_table_film_id_update_stmt()
         logging.info("[*] Updated Users table!")
         # Execute the update statement
-        self._excute_stmt(update_stmt)
+        self.execute_insert_stmt(update_stmt)
 
     def update_notified_users_table(self, users_list: List[UsersFilmInfo]) -> None:
 
@@ -90,20 +90,12 @@ class FilmDatabaseManager:
         update_stmt = self._create_notfied_users_update_stmt(user_film_pair)
         logging.info("[*] Updated notified users' status Users table!")
         # Execute the update statement
-        self._excute_stmt(update_stmt)
+        self.execute_insert_stmt(update_stmt)
 
     @staticmethod
     def _extract_film_data(film_dict, keys: List[str]) -> Dict[str, str | int]:
         """Extracts film data from a dictionary."""
         return {key: film_dict.get(key) for key in keys}
-
-    def _session_maker(self) -> sessionmaker:
-        """Creates a session factory for connecting to the database."""
-
-        # Define the database connection
-        engine = create_engine(self.connection_uri, pool_size=2, max_overflow=2)
-        # Define a session factory
-        return sessionmaker(bind=engine)
 
     def _create_upsert_stmt(self, table, id_col_name: str, update_list: List[dict], exclude_cols: List[str] | None = None) -> Insert:
         """Creates an upsert statement for a table"""
@@ -192,164 +184,109 @@ class FilmDatabaseManager:
         return update(Users).where(
             tuple_(Users.user_id, Users.film_id).in_(user_film_pairs)).values(notified=True)
 
-    def _excute_stmt(self, stmt: Insert | Update) -> None:
-        """Execute an upsert statement."""
-
-        try:
-            # Create a new session
-            with self.session_maker() as session:
-                # Execute the upsert statement
-                session.execute(stmt)
-                # Commit the changes and close the session
-                session.commit()
-        except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
-
-    def _execute_query(self, model: Type, filter_condition: Callable) -> Type | None:
-        """Execute a query with a given a statement."""
-
-        # sourcery skip: class-extract-method, extract-duplicate-method
-        try:
-            with self.session_maker() as session:
-                return session.execute(select(model).where(filter_condition(model))).scalars().first()
-        except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()  # type: ignore
-            return None
-        except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
-            return None
-
     def _get_film_by_title(self, title: str) -> Films |None:
         """Get an existing row in the films table given its title."""
-        return self._execute_query(Films, lambda film: func.lower(film.title) == title.lower())
+        return self.execute_fetch_one(Films, lambda film: func.lower(film.title) == title.lower())
 
     def _get_film_by_film_id(self, film_id: str) -> Films | None:
         """Get an existing row in the films table given its film id."""
-        return self._execute_query(Films, lambda film: film.film_id == film_id)
+        return self.execute_fetch_one(Films, lambda film: film.film_id == film_id)
 
     def _get_performance_by_performance_id(self, performance_id: str) -> Performances | None:
         """Get an existing row in the performances table given its performance id."""
-        return self._execute_query(Performances, lambda performance: performance.performance_id == performance_id)
+        return self.execute_fetch_one(Performances, lambda performance: performance.performance_id == performance_id)
 
     def _get_performance_by_film_id(self, film_id: str) -> Performances | None:
         """Get an existing row in the performances table given its film id."""
-        return self._execute_query(Performances, lambda performance: performance.film_id == film_id)
+        return self.execute_fetch_one(Performances, lambda performance: performance.film_id == film_id)
 
     def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing row in the upcoming films table given its title."""
-        return self._execute_query(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
+        return self.execute_fetch_one(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
 
     def _get_upcoming_user_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing rows in the users table given its title."""
-        return self._execute_query(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
+        return self.execute_fetch_one(UpcomingFilms, lambda user: func.lower(user.title) == title.lower())
 
     def _get_user_by_user_id(self, user_id: int) -> Users | None:
         """Get an existing row in the users table given its user id."""
-        return self._execute_query(Users, lambda user: user.user_id == user_id)
+        return self.execute_fetch_one(Users, lambda user: user.user_id == user_id)
 
-    # Bug: info on the `main.py` file
-    def get_users_to_notify(self) -> List[UsersFilmInfo] | None:
-        """Get list of users to notify.
+    def get_users_to_notify(self) -> List[UsersFilmInfo]:
+        """Get list of users to notify with information about first available performance based on user preferences.
 
         SQL Query:
         ```sql
-        WITH film_info AS (
-            SELECT
-                f.film_id,
-                f.title,
-                f.length_in_minutes,
-                f.last_updated,
-                f.nationwide_start,
-                BOOL_OR(p.is_imax) AS is_imax,
-                BOOL_OR(p.is_ov) AS is_ov,
-                BOOL_OR(p.is_3d) AS is_3d
-            FROM
-                tracker.films f
-            JOIN
-                tracker.performances p ON f.film_id = p.film_id
-            GROUP BY
-                f.film_id
-        )
         SELECT
+            u.film_id,
+            u.title,
             u.user_id,
             u.chat_id,
             u.message_id,
             u.notified,
-            fi.title,
-            fi.length_in_minutes,
-            fi.last_updated,
-            fi.nationwide_start,
-            fi.is_imax,
-            fi.is_ov,
-            fi.is_3d
+            u.flags,
+            p.is_3d,
+            p.is_ov,
+            p.is_imax,
+            p.last_updated
         FROM
-            tracker.users u
-        LEFT JOIN
-            film_info fi ON u.film_id = fi.film_id
+            tracker.users as u
+        INNER JOIN
+            tracker.performances as p ON u.film_id = p.film_id
         WHERE
-            u.film_id IS NOT NULL
-            AND NOT u.notified;
+            u.notified = FALSE
+            AND u.film_id IS NOT NULL;
         ```
+        Returns
+        -------
+        List[UsersFilmInfo]
+            List of users to notify.
         """
 
-        # Define the CTE
-        film_info = (
-            select(
-                Films.film_id,
-                Films.title,
-                Films.length_in_minutes,
-                Films.last_updated,
-                Films.nationwide_start,
-                func.bool_or(Performances.is_imax).label('is_imax'),
-                func.bool_or(Performances.is_ov).label('is_ov'),
-                func.bool_or(Performances.is_3d).label('is_3d')
-            )
-            .select_from(join(Films, Performances, Films.film_id == Performances.film_id))
-            .group_by(Films.film_id)
-            .cte('film_info')
-        )
+        users_list = []
 
-        # Define the main SELECT statement
-        select_stmt = (
-            select(
-                Users.user_id,
-                Users.chat_id,
-                Users.message_id,
-                Users.notified,
-                Users.film_id,
-                Users.title,
-                # film_info.c.film_id,
-                # film_info.c.title,
-                film_info.c.length_in_minutes,
-                film_info.c.last_updated,
-                film_info.c.nationwide_start,
-                film_info.c.is_imax,
-                film_info.c.is_ov,
-                film_info.c.is_3d)
-            .select_from( outerjoin(Users, film_info, Users.film_id == film_info.c.film_id) )
-            .where(
-                and_(Users.film_id.isnot(None), ~Users.notified)
-                )
+        # Join Users with Performances to fetch in a single query
+        query = ( select(Users.film_id, Users.title, Users.flags,
+                        Users.user_id, Users.chat_id, Users.message_id, Users.notified,
+                        Performances.is_3d, Performances.is_ov, Performances.is_imax, Performances.last_updated)
+                .join(Performances, Users.film_id == Performances.film_id)
+                .where(and_(Users.notified == False, Users.film_id.isnot(None)))  # noqa: E712
             )
 
-        # sourcery skip: extract-duplicate-method
-        try:
-            with self.session_maker() as session:
-                users = session.execute(select_stmt).all()
-                return [ UsersFilmInfo(*user)
-                    for user in users
-                ]
+        unnotified_users = self.execute_query_mapping_all(query)
 
-        except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()  # type: ignore
-            return None
-        except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
-            return None
+        if unnotified_users is not None:
 
-# %%
+            # Use a set to avoid duplicate users
+            seen = set()
+
+            # Filter users based on user's preferences
+            unnotified_users = [user
+                                for user in unnotified_users
+                                if all(getattr(user, key) == value for key, value in CallParser.parse(user.flags).items() if value != 2)]
+
+            unnotified_users = [user
+                                for user in unnotified_users
+                                if (user.user_id, user.film_id) not in seen and not seen.add((user.user_id, user.film_id))]
+
+            for user in unnotified_users:
+                # create a UsersFilmInfo object with the user's data and performance data
+                user = UsersFilmInfo(
+                    user_id=user.user_id,
+                    chat_id=user.chat_id,
+                    message_id=user.message_id,
+                    notified=user.notified,
+                    film_id=user.film_id,
+                    title=user.title,
+                    # length_in_minutes=performance.length_in_minutes,
+                    last_updated=user.last_updated,
+                    # nationwide_start=performance.nationwide_start,
+                    is_imax=user.is_imax,
+                    is_ov=user.is_ov,
+                    is_3d=user.is_3d,
+                    flags=user.flags
+                    )
+
+                users_list.append(user)
+
+        return users_list

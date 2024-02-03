@@ -1,6 +1,6 @@
 #%%
 
-from bot.utils.call_parser import CallParser
+from common.call_parser import CallParser
 
 #%%
 

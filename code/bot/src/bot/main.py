@@ -10,7 +10,7 @@ from telebot import types
 from my_logger import Logger
 
 # from utils.answers import answer
-from bot.utils.call_parser import CallParser
+from common.call_parser import CallParser
 from bot.utils.db_info_finder import FilmInfoFinder
 from bot.utils.filters import filter_upcoming_films #, filter_showing_films
 
@@ -74,8 +74,8 @@ def upcoming_films_ov_filter(message):
 
     logging.info(f"Message: {message.text}")
 
+    # IDEA: Create a function that searches in reverse dictionary
     reversed_dict = {v: k for k, v in upcoming_films_dict.items()}
-
     film_id = reversed_dict.get(message.text)
 
     logging.info(f"film_id: {film_id}")
