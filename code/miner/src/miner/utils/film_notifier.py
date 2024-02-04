@@ -32,14 +32,12 @@ class FilmReleaseNotification:
         except Exception as error:
             logging.error(f"An error occurred while closing the bot session: {error}", exc_info=True)
 
-    # TODO: Improve this
-    @staticmethod
-    def _message(user: UsersFilmInfo) -> str:
+    def _message(self, user: UsersFilmInfo) -> str:
         """ Message to be sent to the user. """
         return  f"""✅🎥 {user.title} became availabe! 🎥✅\n
                 \n
                 \n
-                🎟️🎟️🎟️link to buy tickets: {user.url}🎟️🎟️🎟️\n
+                🎟️🎟️🎟️link to buy tickets: {self._create_url(user)}🎟️🎟️🎟️\n
                 """
 
     @staticmethod
@@ -61,3 +59,10 @@ class FilmReleaseNotification:
         formatted_string = formatted_string.strip('-')
 
         return formatted_string
+
+    def _create_url(self, user: UsersFilmInfo) -> str:
+        """Create url"""
+
+        name = self._format_name_for_url(user.name)
+
+        return f"https://cineorder.filmpalast.net/zkm/movie/{'imax-' if user.is_imax else ''}{name}{'-ov' if user.is_ov else ''}{'-3d' if user.is_3d else ''}/{user.film_id}/performance/{user.performance_id}"

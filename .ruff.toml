@@ -2,4 +2,4 @@
 target-version = "py311"
 
 # Maximum line length
-line-length = 165
+line-length = 210
