@@ -90,6 +90,7 @@ class FilmInfoExtractor:
         return None
 
     # IDEA: if it works with performance object instead of dict
+    # TODO: add 4K later
     def get_performances_list(self) -> List[dict] | None:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response

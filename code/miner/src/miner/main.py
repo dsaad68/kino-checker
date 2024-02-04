@@ -81,12 +81,6 @@ if __name__ == "__main__":
         logging.info("Updating the released films in the users table in DB!")
         film_db_manager.update_users_table()
 
-        # NOTE: Sometimes `film_db_manager.get_users_to_notify()` it does not working properly.
-        # INFO: There is an observed issue where films are successfully added to the 'film' table without corresponding entries in the 'performances' table.
-        # INFO: This discrepancy leads to inconsistencies in data representation and may affect functionalities relying on complete film-performance relationships.
-        # INFO: Revise the definition of 'film availability'.
-        # INFO: It could also be later be solved with more personalized approach like 'film availability' based on performance options.
-
         logging.info("Getting the list of users to notify!")
         users_list = film_db_manager.get_users_to_notify()
 

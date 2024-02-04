@@ -248,8 +248,11 @@ class FilmDatabaseManager(DBManager):
         # Join Users with Performances to fetch in a single query
         query = ( select(Users.film_id, Users.title, Users.flags,
                         Users.user_id, Users.chat_id, Users.message_id, Users.notified,
+                        Films.name,
+                        Performances.performance_id,
                         Performances.is_3d, Performances.is_ov, Performances.is_imax, Performances.last_updated)
                 .join(Performances, Users.film_id == Performances.film_id)
+                .join(Films, Users.film_id == Films.film_id)
                 .where(and_(Users.notified == False, Users.film_id.isnot(None)))  # noqa: E712
             )
 
@@ -278,13 +281,13 @@ class FilmDatabaseManager(DBManager):
                     notified=user.notified,
                     film_id=user.film_id,
                     title=user.title,
-                    # length_in_minutes=performance.length_in_minutes,
                     last_updated=user.last_updated,
-                    # nationwide_start=performance.nationwide_start,
                     is_imax=user.is_imax,
                     is_ov=user.is_ov,
                     is_3d=user.is_3d,
-                    flags=user.flags
+                    flags=user.flags,
+                    name=user.name,
+                    performance_id=user.performance_id
                     )
 
                 users_list.append(user)

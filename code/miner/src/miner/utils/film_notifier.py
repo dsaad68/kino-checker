@@ -1,5 +1,6 @@
 # %%
 
+import re
 import logging
 import asyncio
 
@@ -35,4 +36,28 @@ class FilmReleaseNotification:
     @staticmethod
     def _message(user: UsersFilmInfo) -> str:
         """ Message to be sent to the user. """
-        return  f"✅🎥 {user.title} became availabe! 🎥✅\n"
+        return  f"""✅🎥 {user.title} became availabe! 🎥✅\n
+                \n
+                \n
+                🎟️🎟️🎟️link to buy tickets: {user.url}🎟️🎟️🎟️\n
+                """
+
+    @staticmethod
+    def _format_name_for_url(input_string: str) -> str:
+        """Format name for url."""
+
+        # Convert to lowercase
+        formatted_string = input_string.lower()
+
+        # Replace specific characters with their desired representations
+        # This can be adjusted or extended based on further rules or exceptions
+        formatted_string = formatted_string.replace('&', '%26')
+
+        # Replace sequences of characters not in the allowed set with a single hyphen
+        # Allowed characters are letters, numbers, hyphens, percent signs, exclamation marks, and parentheses
+        formatted_string = re.sub(r"[^a-z0-9-%!()´.üäöß]+", '-', formatted_string)
+
+        # Remove potential leading or trailing hyphens
+        formatted_string = formatted_string.strip('-')
+
+        return formatted_string

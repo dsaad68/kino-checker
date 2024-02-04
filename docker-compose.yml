@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: ./code/miner/Dockerfile
+    env_file:
+      - .env
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
@@ -14,6 +16,8 @@ services:
     build:
       context: .
       dockerfile: ./code/bot/Dockerfile
+    env_file:
+      - .env
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}

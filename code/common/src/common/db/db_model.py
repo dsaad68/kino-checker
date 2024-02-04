@@ -81,13 +81,13 @@ class UsersFilmInfo:
     notified: bool
     film_id: str
     title: str
-    # length_in_minutes: int
     last_updated: datetime
-    # nationwide_start: date
     is_imax: bool
     is_ov: bool
     is_3d: bool
     flags: str
+    name:str
+    performance_id: str
 
     def get_last_updated(self) -> str:
         return self.last_updated.strftime('%Y-%m-%d %H:%M:%S')

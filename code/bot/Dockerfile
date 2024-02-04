@@ -14,6 +14,8 @@ RUN pip install --upgrade pip
 # Copy the directory contents into the container at /app/
 COPY ./code/my_logger ./my_logger
 RUN pip install --no-cache-dir ./my_logger
+COPY ./code/common ./common
+RUN pip install --no-cache-dir ./common
 COPY ./code/bot ./bot
 RUN pip install --no-cache-dir ./bot
 
