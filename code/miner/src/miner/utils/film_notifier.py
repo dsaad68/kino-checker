@@ -37,7 +37,9 @@ class FilmReleaseNotification:
         return  f"""✅🎥 {user.title} became availabe! 🎥✅\n
                 \n
                 \n
-                🎟️🎟️🎟️link to buy tickets: {self._create_url(user)}🎟️🎟️🎟️\n
+                🎟️🎟️🎟️link to buy tickets: 🎟️🎟️🎟️
+                \n
+                \n {self._create_url(user)}\n
                 """
 
     @staticmethod
