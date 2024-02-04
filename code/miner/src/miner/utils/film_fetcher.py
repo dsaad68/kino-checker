@@ -110,8 +110,7 @@ class FilmInfoExtractor:
                     "auditorium_name": performance.get("auditoriumName"),
                     "auditorium_id": performance.get("auditoriumId"),
                     "last_updated": datetime.now(),
-                    # NOTE: Is this needed? if yes, add this later
-                    # **self._empty_dict_checker(performance.get("access")),
+                    # INFO: There is more information like `access` (performance.get("access")) in the API
                 }
                 for film in film_list  # type: ignore
                 for performance in film.get("performances")

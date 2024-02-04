@@ -111,11 +111,6 @@ class FilmInfoFinder(DBManager):
             session.rollback()
             return False
 
-    def _get_user_by_chat_id(self, chat_id: str):
-        # FIX: This method doesn't work, it needs title too
-        """Get an existing user in the users table given its chat_id."""
-        return self.execute_fetch_one(Users, lambda user: user.chat_id == chat_id)
-
     def _get_user_by_user_id(self, user_id: int) -> Type | None:
         """Get an existing user in the users table given its user_id."""
         return self.execute_fetch_one(Users, lambda user: user.user_id == user_id)
