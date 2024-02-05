@@ -1,6 +1,6 @@
 -- add an upcoming film to upcoming_films table
 INSERT INTO "tracker"."upcoming_films" ("upcoming_film_id", "title", "release_date", "film_id", "last_updated", "is_released", "is_trackable") VALUES
-(38, 'test film', '2024-08-29', NULL, '2024-02-04 23:49:20.025985', 'f', 't');
+(100, 'test film', '2024-08-29', NULL, '2024-02-04 23:49:20.025985', 'f', 't');
 
 -- add a film to films table
 INSERT INTO "tracker"."films" ("film_id", "title", "name", "production_year", "length_in_minutes", "nationwide_start", "image_url", "last_updated") VALUES
