@@ -1,7 +1,5 @@
 # %%
 
-import os
-# import re
 import telebot
 import logging
 
@@ -9,18 +7,14 @@ from telebot import types
 
 from my_logger import Logger
 
-# from utils.answers import answer
 from common.call_parser import CallParser
+from common.helpers import get_or_raise, reverse_dict_search
+
 from bot.utils.db_info_finder import FilmInfoFinder
 from bot.utils.filters import filter_upcoming_films #, filter_showing_films
 
 #%%
-def get_or_raise(env_name: str) -> str:
-    value = os.environ.get(env_name)
-    if value is not None:
-        return value
-    else:
-        raise ValueError(f"Missing environment variable {env_name}")
+
 
 TOKEN = get_or_raise("TELEGRAM_BOT_TOKEN")
 bot = telebot.TeleBot(TOKEN)
@@ -74,9 +68,7 @@ def upcoming_films_ov_filter(message):
 
     logging.info(f"Message: {message.text}")
 
-    # IDEA: Create a function that searches in reverse dictionary
-    reversed_dict = {v: k for k, v in upcoming_films_dict.items()}
-    film_id = reversed_dict.get(message.text)
+    film_id = reverse_dict_search(upcoming_films_dict, message.text)
 
     logging.info(f"film_id: {film_id}")
 
@@ -84,7 +76,7 @@ def upcoming_films_ov_filter(message):
     keyboard.add(types.InlineKeyboardButton(text='✅ Yes', callback_data=f'{film_id},uf|1,ov'))
     keyboard.add(types.InlineKeyboardButton(text='⛔ No', callback_data=f'{film_id},uf|0,ov'))
     keyboard.add(types.InlineKeyboardButton(text="🤷 Doesn't matter", callback_data=f'{film_id},uf|2,ov'))
-    # FIX: Go back button
+    # IDEA: Go back button instead of restart
     keyboard.add(types.InlineKeyboardButton(text="🔙 Restart!", callback_data="restart"))
 
     bot.send_message(message.chat.id, "Are you looking for OV Version?", reply_markup=keyboard)

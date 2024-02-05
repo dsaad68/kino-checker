@@ -1,25 +1,17 @@
 # %%
 
-import os
 import time
 import logging
 import asyncio
+
+from my_logger import Logger
+
+from common.helpers import get_or_raise
 
 from miner.utils.scrapper import Scraper
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_notifier import FilmReleaseNotification
 from miner.utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
-
-from my_logger import Logger
-
-# %%
-
-def get_or_raise(env_name: str) -> str:
-    value = os.environ.get(env_name)
-    if value is not None:
-        return value
-    else:
-        raise ValueError(f"Missing environment variable {env_name}")
 
 
 # %%

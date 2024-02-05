@@ -1,27 +1,49 @@
 version: '3'
 
 services:
+
+  db:
+    image: postgres:alpine3.18
+    restart: always
+    env_file:
+      - ./env.env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
   miner:
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: ./code/miner/Dockerfile
     env_file:
-      - .env
+      - ./env.env
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
     restart: always
 
   bot:
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: ./code/bot/Dockerfile
     env_file:
-      - .env
+      - ./env.env
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
     restart: always
+
+volumes:
+  db:
 
   # TODO: Add cleaner later
   # cleaner:
