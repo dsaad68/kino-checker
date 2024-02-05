@@ -7,9 +7,8 @@ test*.*
 *_bckp.*
 .ruff_cache
 *.egg-info
-miner/my_logger
-bot/my_logger
-cleaner/my_logger
 .vscode
 .pytest_cache
 .venv
+venv
+diagram.png
