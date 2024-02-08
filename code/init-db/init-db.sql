@@ -1,6 +1,9 @@
 -- Create the tracker schema
 CREATE SCHEMA IF NOT EXISTS tracker;
 
+-- Setting Default search_path for the User
+-- ALTER ROLE username SET search_path TO tracker;
+
 -- Create the films table
 CREATE TABLE tracker.films (
     film_id VARCHAR(255) PRIMARY KEY,
