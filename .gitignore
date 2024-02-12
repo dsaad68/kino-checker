@@ -12,3 +12,4 @@ test*.*
 .venv
 venv
 diagram.png
+step.save
