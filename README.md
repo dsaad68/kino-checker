@@ -12,7 +12,7 @@ dd
 
 1. *Set the environment variables*\n
 Use the .env file to add environment variables for Docker Compose.
-2. *To start a the bot, you can use the docker-compose up command in the terminal.*\n
+2. *To start the bot, you can use the docker compose-up command in the terminal.*\n
 ```shell
 docker compose up
 ```
