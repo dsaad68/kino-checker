@@ -14,7 +14,7 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
-      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      # - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/create_tables.sql
       # NOTE: uncomment for linux
       # - ./code/init-db/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
 
@@ -42,6 +42,9 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
+      - DB_DILECT_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
+      - ELEVEN_API_KEY=${ELEVEN_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     restart: always
 
 volumes:
