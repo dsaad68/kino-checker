@@ -301,6 +301,82 @@ def test_update_upcoming_table(schemas, init_scripts):
         assert film_wonka.is_trackable is True # type: ignore
         assert start <= film_wonka.last_updated <= end # type: ignore
 
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_update_upcoming_table_cardinality_violation(schemas, init_scripts):
+    """This test is written for a situation when CardinalityViolation is raised."""
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        # Prepare
+        exists = {
+            "title": "Napoleon",
+            "release_date": "2023-11-23",
+            "last_updated": datetime.now(),
+            }
+
+        upsert_case = {
+            "title": "Wish",
+            "release_date": "2023-11-23",
+            "last_updated": datetime.now(),
+        }
+
+        upsert_case_duplicate = {
+            "title": "Wish",
+            "release_date": "2023-11-25",
+            "last_updated": datetime.now(),
+        }
+
+        dont_exist = {
+            "title": "WONKA",
+            "release_date": "2023-12-07",
+            "last_updated": datetime.now(),
+            }
+
+        # Execute
+        start = datetime.now() - timedelta(seconds=1)  # adding buffer
+
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        film_db_manager.update_upcoming_films_table(upcoming_films_list=[exists, upsert_case, upsert_case_duplicate, dont_exist])
+
+        end = datetime.now() + timedelta(seconds=1)  # adding buffer
+
+        # Verify
+
+        # exists and don't change
+        film_napoleon = film_db_manager._get_upcoming_film_by_title(exists.get("title").lower()) # type: ignore
+
+        assert film_napoleon is not None
+        assert film_napoleon.upcoming_film_id == 1 # type: ignore
+        assert film_napoleon.title.lower() == exists.get("title").lower() # type: ignore
+        assert film_napoleon.release_date == str_2_date(exists.get("release_date").lower()) # type: ignore
+        assert film_napoleon.film_id is None # type: ignore
+        assert film_napoleon.is_released is False # type: ignore
+        assert film_napoleon.is_trackable is True # type: ignore
+        assert start <= film_napoleon.last_updated <= end # type: ignore
+
+        # exists and updates
+        film_wish = film_db_manager._get_upcoming_film_by_title("Wish")
+
+        assert film_wish is not None
+        assert film_wish.upcoming_film_id == 3 # type: ignore
+        assert film_wish.title.lower() == "Wish".lower() # type: ignore
+        assert film_wish.release_date == str_2_date("2023-11-25") # type: ignore
+        assert film_wish.film_id is None # type: ignore
+        assert film_wish.is_released is False # type: ignore
+        assert film_wish.is_trackable is True # type: ignore
+        assert start <= film_wish.last_updated <= end # type: ignore
+
+        # don't exist
+        film_wonka = film_db_manager._get_upcoming_film_by_title(dont_exist.get("title").lower()) # type: ignore
+
+        assert film_wonka is not None
+        assert film_wonka.title.lower() == dont_exist.get("title").lower() # type: ignore
+        assert film_wonka.release_date == str_2_date(dont_exist.get("release_date").lower()) # type: ignore
+        assert film_wonka.film_id is None # type: ignore
+        assert film_wonka.is_released is False # type: ignore
+        assert film_wonka.is_trackable is True # type: ignore
+        assert start <= film_wonka.last_updated <= end # type: ignore
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")

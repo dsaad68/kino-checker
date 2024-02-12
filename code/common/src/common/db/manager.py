@@ -5,9 +5,10 @@ from typing import Type, Callable
 
 from sqlalchemy.sql import select
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine, Update
+from psycopg2.errors import CardinalityViolation
 from sqlalchemy.dialects.postgresql import Insert
+from sqlalchemy.exc import SQLAlchemyError, ProgrammingError
 
 #%%
 
@@ -36,6 +37,16 @@ class DBManager:
                 session.execute(stmt)
                 # Commit the changes and close the session
                 session.commit()
+        except ProgrammingError as error:
+            # Check if the original error is a CardinalityViolation
+            if isinstance(error.orig, CardinalityViolation):
+                logging.error("CardinalityViolation error occurred", exc_info=True)
+                session.rollback()
+                raise CardinalityViolation from error
+            else:
+                logging.error(f"ProgrammingError: {error}", exc_info=True)
+            # Rollback the transaction
+            session.rollback()
         except Exception as error:
             logging.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore

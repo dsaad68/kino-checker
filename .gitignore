@@ -13,3 +13,4 @@ test*.*
 venv
 diagram.png
 step.save
+.handler-saves
