@@ -75,7 +75,7 @@ class FilmDatabaseManager(DBManager):
                 logging.error(f"[!] Duplicate films found in Upcoming Films table. Error: {e}")
                 logging.warning("[!] Duplicate films found in Upcoming Films table. Deduplicating upcoming films!")
 
-                deduplicated_upcoming_films_list = deduplicate_list_dict(upcoming_films_list)
+                deduplicated_upcoming_films_list = deduplicate_list_dict(upcoming_films_list, key="title")
 
                 # Upsert statement
                 upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", deduplicated_upcoming_films_list, exclude_cols= exclude_cols)
