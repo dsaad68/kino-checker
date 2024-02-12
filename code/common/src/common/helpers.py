@@ -48,3 +48,27 @@ def reverse_dict_search(input_dict: dict, value: Any) -> Optional[Any]:
     """
 
     return next((key for key, val in input_dict.items() if val == value), None)
+
+
+def deduplicate_list_dict(input_list: list[dict], key: str) -> list[dict]:
+    """Deduplicate list of dicts based on a key
+
+    Note: This function returns the last found dict in the list
+
+    Parameters
+    ----------
+    input_list : list
+        List to deduplicate
+    key : str
+        Key to use for deduplication
+
+    Returns
+    -------
+    list
+        Deduplicated list of dicts
+    """
+
+    unique = {film.get(key): film for film in input_list if key in film}
+
+    # Convert the dictionary back to a list
+    return list(unique.values())

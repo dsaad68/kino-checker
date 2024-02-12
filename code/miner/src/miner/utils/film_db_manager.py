@@ -3,11 +3,13 @@ import logging
 
 from typing import List, Dict, Tuple
 from sqlalchemy.sql import select, func
+from psycopg2.errors import CardinalityViolation
 from sqlalchemy import Update, update, and_, tuple_
 from sqlalchemy.dialects.postgresql import insert, Insert
 
 from common.db.manager import DBManager
 from common.call_parser import CallParser
+from common.helpers import deduplicate_list_dict
 from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo
 
 
@@ -44,19 +46,45 @@ class FilmDatabaseManager(DBManager):
             logging.warning("Performances list is None")
 
     def update_upcoming_films_table(self, upcoming_films_list: List[dict] | None) -> None:
-        """Updates the upcoming films table."""
+        # sourcery skip: extract-duplicate-method, extract-method
+        """Updates the upcoming films table.
+
+        exception:
+        ----------
+        CardinalityViolation:
+            Duplicate films found in Upcoming Films table.
+            Error: duplicate key value violates unique constraint "upcoming_films_pkey"
+            In this case, the upcoming films list will be deduplicated and execute the upsert statement again.
+        """
 
         if upcoming_films_list is not None:
 
-            logging.info("[ ] Updating Upcoming Films table!")
+            try:
+                logging.info("[ ] Updating Upcoming Films table!")
 
-            # Upsert statement
-            exclude_cols = ['title', 'is_released', 'is_trackable', 'upcoming_film_id', 'film_id']
-            upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols= exclude_cols)
+                # Upsert statement
+                exclude_cols = ['title', 'is_released', 'is_trackable', 'upcoming_film_id', 'film_id']
+                upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols= exclude_cols)
 
-            # Execute the upsert statement
-            self.execute_insert_stmt(upsert_stmt)
-            logging.info("[*] Updated Upcoming Films table!")
+                # Execute the upsert statement
+                self.execute_insert_stmt(upsert_stmt)
+                logging.info("[*] Updated Upcoming Films table!")
+
+            except CardinalityViolation as e:
+
+                logging.error(f"[!] Duplicate films found in Upcoming Films table. Error: {e}")
+                logging.warning("[!] Duplicate films found in Upcoming Films table. Deduplicating upcoming films!")
+
+                deduplicated_upcoming_films_list = deduplicate_list_dict(upcoming_films_list)
+
+                # Upsert statement
+                upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", deduplicated_upcoming_films_list, exclude_cols= exclude_cols)
+
+                # Execute the upsert statement
+                self.execute_insert_stmt(upsert_stmt)
+
+                logging.info("[*] Updated Upcoming Films table after deduplication!")
+
         else:
             logging.warning("Upcoming Films list is None")
 
