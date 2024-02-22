@@ -5,7 +5,7 @@
 Kino Tracker Bot is a Telegram bot that tracks the availability of movies in selected cinemas and notifies users when a movie becomes available. Also, it answers users question about upcoming and showing films in natural language and generates voice messages through the Eleven Labs Voice API.
 
 <p align="center">
-  <img src="./images/diagram.jpg" alt="Diagram" width="75%">
+  <img src="./images/diagram.jpg" alt="Diagram" width="100%">
 </p>
 
 With the addition of a GenAI feature, users can now inquire about upcoming and currently showing films in natural language, thanks to the integration with a Langchain SQL agent.
