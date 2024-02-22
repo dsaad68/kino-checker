@@ -88,6 +88,7 @@ class FilmDatabaseManager(DBManager):
         else:
             logging.warning("Upcoming Films list is None")
 
+    # TODO: Improve this function
     def update_released_films_in_upcoming_films_table(self) -> None:
         """Updates the released films in the upcoming films table.
         If a film is released then its film_id will be updated in the upcoming films table.
