@@ -1,7 +1,8 @@
 #%%
+from typing import List
 from sqlalchemy import MetaData
 from dataclasses import dataclass
-from datetime import datetime #,date
+from datetime import datetime, date, time
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey, Sequence
 
@@ -73,6 +74,24 @@ class Users(Base):
 
 
 @dataclass
+class PerformanceInfo:
+    """Dataclass for performance info"""
+    film_id: str
+    performance_id: str
+    date: date
+    time: time
+    is_imax: bool
+    is_ov: bool
+    is_3d: bool
+
+    def get_date(self) -> str:
+        return self.time.strftime('%Y-%m-%d')
+
+    def get_time(self) -> str:
+        return self.time.strftime('%H:%M:%S')
+
+
+@dataclass
 class UsersFilmInfo:
     """Dataclass for users film info"""
     user_id: int
@@ -82,12 +101,9 @@ class UsersFilmInfo:
     film_id: str
     title: str
     last_updated: datetime
-    is_imax: bool
-    is_ov: bool
-    is_3d: bool
     flags: str
     name:str
-    performance_id: str
+    performances: List[PerformanceInfo]
 
     def get_last_updated(self) -> str:
         return self.last_updated.strftime('%Y-%m-%d %H:%M:%S')
