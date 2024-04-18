@@ -1,13 +1,13 @@
 #%%
-import os
 import pytest
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 
 from integeration_db.docker_container import Docker
 from integeration_db.integration_db import IntegrationDb, EnvVar
 from integeration_db.utils import str_2_datetime, str_2_date, str_2_time
 
+from common.db.db_model import PerformanceInfo
 from miner.utils.film_db_manager import FilmDatabaseManager
 
 #%%
@@ -16,14 +16,7 @@ CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
 
-@pytest.fixture
-def schemas():
-    return ["tracker"]
-
-@pytest.fixture
-def init_scripts():
-    return [os.path.abspath("./code/init-db/init-db.sql"),
-            os.path.abspath("./code/init-db/sample-data.sql")]
+#%%
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
@@ -422,7 +415,37 @@ def test_update_users_table(schemas, init_scripts):
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
+def test_get_performance_based_on_versions(schemas, init_scripts):
+
+    perfomance_1 = PerformanceInfo(film_id='58E63000012BHGWDVI', performance_id='88D45000023UHQLKCP', date=date(2023, 11, 15), time=time(20, 0, 0), is_imax=True, is_ov=True, is_3d=True)
+    perfomance_2 = PerformanceInfo(film_id='58E63000012BHGWDVI', performance_id='99D45000023UHQLKCP', date=date(2023, 11, 16), time=time(17, 0, 0), is_imax=True, is_ov=True, is_3d=False)
+
+    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
+
+        versions = {"is_ov": True, "is_imax": True}
+
+        # Execute
+        film_db_manager = FilmDatabaseManager(CONNECTION_STRING) # type: ignore
+        performances = film_db_manager._get_performance_info_by_film_id("58E63000012BHGWDVI", versions)
+
+        # Verify
+        assert len(performances) > 0 # type: ignore
+
+        # sourcery skip: no-loop-in-tests
+        # sourcery skip: no-conditionals-in-tests
+        for performance in performances:
+            if performance.performance_id == perfomance_1.performance_id:
+                assert performance == perfomance_1
+            elif performance.performance_id == perfomance_2.performance_id:
+                assert performance == perfomance_2
+
+
+@pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
+@pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
 def test_get_users_to_notify(schemas,init_scripts):
+
+    perfomance_1 = PerformanceInfo(film_id='58E63000012BHGWDVI', performance_id='88D45000023UHQLAAA', date=date(2023, 11, 15), time=time(20, 0, 0), is_imax=True, is_ov=True, is_3d=True)
+    perfomance_2 = PerformanceInfo(film_id='58E63000012BHGWDVI', performance_id='99D45000023UHQLAAA', date=date(2023, 11, 16), time=time(17, 0, 0), is_imax=True, is_ov=True, is_3d=False)
 
     with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
 
@@ -432,22 +455,27 @@ def test_get_users_to_notify(schemas,init_scripts):
 
         # Verify
         assert len(user_list) > 0 # type: ignore
-        user = user_list[0]       # type: ignore
 
-        assert user.user_id == 2
-        assert user.chat_id == "222211111"
-        assert user.message_id == "1020"
-        assert user.title == "Wonka"
+        user_dict = {item.user_id: item for item in user_list}
+        user = user_dict.get(5)
+
+        assert user.user_id == 5
+        assert user.chat_id == "444411111"
+        assert user.message_id == "1050"
+        assert user.title == "Creator"
         assert user.notified is False
         assert user.film_id is not None
-        assert user.film_id == "A6D63000012BHGWDVI"
-        assert user.flags == "1,ov|2,imax|0,3d"
-        assert user.is_imax is False
-        assert user.is_3d is False
-        assert user.is_ov
-        assert user.name == "Wonka"
-        assert user.performance_id == "71D45000023UHQLKCP"
+        assert user.film_id == "58E63000012BHGWDVI"
+        assert user.flags == "1,ov|1,imax|2,3d"
+        assert user.name == "Creator"
         assert user.last_updated.strftime('%Y-%m-%d %H:%M:%S') == '2023-11-13 19:14:38'
+
+        performance_dict = {item.performance_id: item for item in user.performances}
+        actual_performance_1 = performance_dict.get("88D45000023UHQLAAA")
+        actual_performance_2 = performance_dict.get("99D45000023UHQLAAA")
+
+        assert actual_performance_1 == perfomance_1
+        assert actual_performance_2 == perfomance_2
 
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
 @pytest.mark.skipif(IntegrationDb.db_int_not_available(), reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL")
@@ -461,13 +489,15 @@ def test_update_notified_users_table(schemas,init_scripts):
         film_db_manager.update_notified_users_table(user_list)
 
         # Verify
-        user_id = user_list[0].user_id
-        user = film_db_manager._get_user_by_user_id(user_id)
+        # user_id = user_list[0].user_id
+        user_dict = {item.user_id: item for item in user_list}
+        user = user_dict.get(5)
+        user = film_db_manager._get_user_by_user_id(user.user_id)
 
-        assert user.user_id == 2
-        assert user.chat_id == "222211111"
-        assert user.message_id == "1020"
-        assert user.title == "Wonka"
+        assert user.user_id == 5
+        assert user.chat_id == "444411111"
+        assert user.message_id == "1050"
+        assert user.title == "Creator"
         assert user.notified is True
         assert user.film_id is not None
-        assert user.film_id == "A6D63000012BHGWDVI"
+        assert user.film_id == "58E63000012BHGWDVI"
