@@ -9,7 +9,7 @@ description = ""
 authors = [{name = "Daniel Saad", email = "me@dsaad.com"}]
 dependencies = [
     "common",
-    "aiohttp==3.8.5",
+    "aiohttp==3.9.4",
     "beautifulsoup4==4.12.2",
     "pyTelegramBotAPI==4.11.0",
     "requests==2.31.0",
