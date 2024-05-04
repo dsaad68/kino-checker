@@ -17,6 +17,11 @@ Features:
 - _**New**_: GenAI feature for asking about upcoming and showing films in natural language.
 - _**New**_: Voice-generated answers through Eleven Labs Voice API for a more immersive experience.
 
+## Video Demo
+
+https://github.com/dsaad68/kino-checker/assets/6844325/82ac5703-6aee-4a9b-97d4-9eacc92426f1
+
+
 ## How to Run the Bot
 
 1. *Set the environment variables*\n
