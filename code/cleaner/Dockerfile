@@ -8,17 +8,18 @@ RUN apt update && apt upgrade -y && apt install gcc -y && apt-get clean
 
 WORKDIR /app
 
-# Copy the directory contents into the container at /app/
-COPY ./cleaner .
-
 # Install requirements
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip
 
-# Install the custom logger
-COPY ./my_logger ./my_logger
+# Copy the directory contents into the container at /app/
+COPY ./code/my_logger ./my_logger
 RUN pip install --no-cache-dir ./my_logger
+COPY ./code/common ./common
+RUN pip install --no-cache-dir ./common
+COPY ./code/cleaner ./cleaner
+RUN pip install --no-cache-dir ./cleaner
 
 # Expose the port the app runs on
 EXPOSE 80
 
-CMD [ "python", "cleaner.py" ]
+CMD [ "python", "-m", "cleaner.main" ]
