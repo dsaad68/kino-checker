@@ -88,7 +88,6 @@ class FilmInfoExtractor:
         logging.warn("Film Fetcher Response is empty!")
         return None
 
-    # TODO: add 4K later
     def get_performances_list(self) -> List[dict] | None:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
@@ -105,6 +104,7 @@ class FilmInfoExtractor:
                     "is_imax": self._is_imax(performance.get("releaseTypeName")),
                     "is_ov": self._is_ov(performance.get("releaseTypeName")),
                     "is_3d": performance.get("is3D"),
+                    # INFO: there other versions like 4K
                     "auditorium_name": performance.get("auditoriumName"),
                     "auditorium_id": performance.get("auditoriumId"),
                     "last_updated": datetime.now(),

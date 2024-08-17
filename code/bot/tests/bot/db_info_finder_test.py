@@ -1,9 +1,6 @@
 #%%
-import os
 import pytest
 import logging
-
-from datetime import datetime, timedelta
 
 from integeration_db.docker_container import Docker
 from integeration_db.utils import str_2_date, str_2_time
@@ -15,20 +12,6 @@ from bot.utils.db_info_finder import FilmInfoFinder
 CONTAINER_NAME = "postgres:alpine3.18"
 
 dckr = Docker()
-
-@pytest.fixture
-def schemas():
-    return ["tracker"]
-
-@pytest.fixture
-def init_scripts():
-    return [os.path.abspath("./code/init-db/init-db.sql"),
-            os.path.abspath("./code/init-db/sample-data.sql")]
-
-@pytest.fixture
-def date_ten_days_in_future_date():
-    """ It returns a date 10 days in the future """
-    return datetime.now().date() + timedelta(days=10)
 
 #%%
 @pytest.mark.skipif(not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running.")
@@ -86,7 +69,7 @@ def test_upsert_users(schemas, init_scripts):
             }
 
         insert = {
-            'chat_id': '444411111',
+            'chat_id': '555511111',
             'message_id': '2222',
             'title': 'Wonka',
             'flags': '1,ov|1,imax|2,3d'
@@ -102,7 +85,7 @@ def test_upsert_users(schemas, init_scripts):
         assert insert_result
 
         uspert_user = film_info_finder._get_user_by_user_id(1)
-        insert_user = film_info_finder._get_user_by_user_id(5)
+        insert_user = film_info_finder._get_user_by_user_id(6)
 
         assert insert_user
         assert insert_user.chat_id == insert.get('chat_id') # type: ignore

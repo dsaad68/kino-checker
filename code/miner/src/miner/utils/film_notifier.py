@@ -6,7 +6,7 @@ import asyncio
 
 from telebot.async_telebot import AsyncTeleBot
 
-from common.db.db_model import UsersFilmInfo
+from common.db.db_model import UsersFilmInfo, PerformanceInfo
 
 # %%
 
@@ -33,14 +33,22 @@ class FilmReleaseNotification:
             logging.error(f"An error occurred while closing the bot session: {error}", exc_info=True)
 
     def _message(self, user: UsersFilmInfo) -> str:
-        """ Message to be sent to the user. """
-        return  f"""✅🎥 {user.title} became availabe! 🎥✅\n
-                \n
-                \n
-                🎟️🎟️🎟️link to buy tickets: 🎟️🎟️🎟️
-                \n
-                \n {self._create_url(user)}\n
-                """
+        """Generate a personalized message indicating the availability of a film in various formats."""
+
+        name = self._format_name_for_url(user.name)
+
+        performances_list = [
+                            f"📅 {performance.date} ⌚ {performance.time}{' 🎥 IMAX' if performance.is_imax else ''}{' 🕶️ 3D' if performance.is_3d else ''}{' 💂🏻 OV' if performance.is_ov else ''}:\n"
+                            f"{self._create_url(name, performance)}\n"
+                            for performance in user.performances
+                            ]
+
+        performances_text = "\n".join(performances_list)
+
+        # Compose the complete message
+        return (f"✅🎥 {user.title} is now available! 🎥✅\n\n"
+                "🎟️🎟️🎟️ Link to buy tickets: 🎟️🎟️🎟️\n\n"
+                f"{performances_text}")
 
     @staticmethod
     def _format_name_for_url(input_string: str) -> str:
@@ -62,9 +70,7 @@ class FilmReleaseNotification:
 
         return formatted_string
 
-    def _create_url(self, user: UsersFilmInfo) -> str:
-        """Create url"""
+    def _create_url(self, name:str, performance: PerformanceInfo) -> str:
+        """Create url based on name and performance"""
 
-        name = self._format_name_for_url(user.name)
-
-        return f"https://cineorder.filmpalast.net/zkm/movie/{'imax-' if user.is_imax else ''}{name}{'-ov' if user.is_ov else ''}{'-3d' if user.is_3d else ''}/{user.film_id}/performance/{user.performance_id}"
+        return f"https://cineorder.filmpalast.net/zkm/movie/{'imax-' if performance.is_imax else ''}{name}{'-ov' if performance.is_ov else ''}{'-3d' if performance.is_3d else ''}/{performance.film_id}/performance/{performance.performance_id}"

@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import insert, Insert
 from common.db.manager import DBManager
 from common.call_parser import CallParser
 from common.helpers import deduplicate_list_dict
-from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo
+from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo, PerformanceInfo
 
 
 # %%
@@ -241,6 +241,31 @@ class FilmDatabaseManager(DBManager):
         """Get an existing row in the users table given its user id."""
         return self.execute_fetch_one(Users, lambda user: user.user_id == user_id)
 
+    # TODO: Needs testing
+    def _get_performance_info_by_film_id(self, film_id:str, versions: Dict[str, bool]) -> List[PerformanceInfo]:
+        """Gets the perfomance of a film is based on the versions"""
+
+        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() ] # noqa: E712
+        stmt = select(
+                    Performances.film_id,
+                    Performances.performance_id,
+                    Performances.performance_date,
+                    Performances.performance_time,
+                    Performances.is_3d,
+                    Performances.is_ov,
+                    Performances.is_imax
+                    ).where( and_(Performances.film_id == film_id, *version_filter))
+        performances_list = self.execute_query_mapping_all(stmt)
+        return [PerformanceInfo(film_id= performance.get('film_id'),
+                                performance_id= performance.get('performance_id'),
+                                date= performance.get('performance_date'),
+                                time= performance.get('performance_time'),
+                                is_3d= performance.get('is_3d'),
+                                is_ov= performance.get('is_ov'),
+                                is_imax= performance.get('is_imax'))
+                for performance in performances_list]
+
+    # TODO: update test
     def get_users_to_notify(self) -> List[UsersFilmInfo]:
         """Get list of users to notify with information about first available performance based on user preferences.
 
@@ -254,9 +279,6 @@ class FilmDatabaseManager(DBManager):
             u.message_id,
             u.notified,
             u.flags,
-            p.is_3d,
-            p.is_ov,
-            p.is_imax,
             p.last_updated
         FROM
             tracker.users as u
@@ -292,6 +314,7 @@ class FilmDatabaseManager(DBManager):
             # Use a set to avoid duplicate users
             seen = set()
 
+            # TODO: Add better comments to the code and explain the logic
             # Filter users based on user's preferences
             unnotified_users = [user
                                 for user in unnotified_users
@@ -302,7 +325,11 @@ class FilmDatabaseManager(DBManager):
                                 if (user.user_id, user.film_id) not in seen and not seen.add((user.user_id, user.film_id))]
 
             for user in unnotified_users:
-                # create a UsersFilmInfo object with the user's data and performance data
+
+                # STEP 1: Get a list of performance for the user
+                performances_list = self._get_performance_info_by_film_id(user.get('film_id'), CallParser.parse(user.get('flags')))
+
+                # STEP 2: Create a UsersFilmInfo object with the user's data and performance data
                 user = UsersFilmInfo(
                     user_id=user.user_id,
                     chat_id=user.chat_id,
@@ -311,13 +338,9 @@ class FilmDatabaseManager(DBManager):
                     film_id=user.film_id,
                     title=user.title,
                     last_updated=user.last_updated,
-                    is_imax=user.is_imax,
-                    is_ov=user.is_ov,
-                    is_3d=user.is_3d,
                     flags=user.flags,
                     name=user.name,
-                    performance_id=user.performance_id
-                    )
+                    performances=performances_list)
 
                 users_list.append(user)
 
