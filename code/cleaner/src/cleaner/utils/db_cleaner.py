@@ -1,5 +1,7 @@
 import logging
+
 from sqlalchemy import update
+from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 
 from common.db.manager import DBManager
@@ -26,9 +28,13 @@ class DBCleaner(DBManager):
         threshold_date = datetime.now() - timedelta(days)
 
         # Create an update statement
-        update_stmt = update(UpcomingFilms).where(UpcomingFilms.release_date < threshold_date, UpcomingFilms.is_trackable == True).values(trackable=False)  # noqa: E712
+        update_stmt = update(UpcomingFilms).where(UpcomingFilms.release_date < threshold_date, UpcomingFilms.is_trackable == True, UpcomingFilms.is_released == True).values(is_trackable=False)  # noqa: E712
 
         # Execute the update statement
         logging.info("Cleaning outdated films ...")
         self.execute_insert_stmt(update_stmt)
         logging.info("Cleaned outdated films ...")
+
+    def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
+        """Get an existing row in the upcoming films table given its title."""
+        return self.execute_fetch_one(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
