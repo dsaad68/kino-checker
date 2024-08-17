@@ -17,10 +17,10 @@ dependencies = [
     "opencensus-ext-azure==1.1.9",
     "psycopg2-binary==2.9.6",
     "asyncio==3.4.3",
-    "openai",
-    "langchain",
-    "elevenlabs",
-    "langchain_openai"
+    "openai==1.11.1",
+    "langchain==0.1.5",
+    "elevenlabs==0.2.27",
+    "langchain_openai==0.0.5"
 ]
 
 [project.optional-dependencies]
