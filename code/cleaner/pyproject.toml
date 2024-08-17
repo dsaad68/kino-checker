@@ -3,12 +3,16 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "common"
+name = "cleaner"
 version = "0.1.0"
 description = ""
 authors = [{name = "Daniel Saad", email = "me@dsaad.com"}]
 dependencies = [
+    "common",
     "SQLAlchemy==2.0.12",
+    "opencensus==0.11.2",
+    "opencensus-context==0.1.3",
+    "opencensus-ext-azure==1.1.9",
     "psycopg2-binary==2.9.6",
 ]
 
