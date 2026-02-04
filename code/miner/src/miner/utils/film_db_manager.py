@@ -1,17 +1,15 @@
-# %%
 from __future__ import annotations
 
-from common.call_parser import CallParser
-from common.db.db_model import Films, PerformanceInfo, Performances, UpcomingFilms, Users, UsersFilmInfo
-from common.db.manager import DBManager
-from common.helpers import deduplicate_list_dict
 from loguru import logger
 from psycopg2.errors import CardinalityViolation
 from sqlalchemy import Update, and_, tuple_, update
 from sqlalchemy.dialects.postgresql import Insert, insert
 from sqlalchemy.sql import func, select
 
-# %%
+from common.call_parser import CallParser
+from common.db.db_model import Films, PerformanceInfo, Performances, UpcomingFilms, Users, UsersFilmInfo
+from common.db.manager import DBManager
+from common.helpers import deduplicate_list_dict
 
 
 class FilmDatabaseManager(DBManager):
@@ -45,7 +43,6 @@ class FilmDatabaseManager(DBManager):
             logger.warning("Performances list is None")
 
     def update_upcoming_films_table(self, upcoming_films_list: list[dict] | None) -> None:
-        # sourcery skip: extract-duplicate-method, extract-method
         """Updates the upcoming films table.
 
         exception:
@@ -165,8 +162,6 @@ class FilmDatabaseManager(DBManager):
             AND tracker.upcoming_films.is_trackable = TRUE;
         ```
         """
-        # sourcery skip: inline-immediately-returned-variable
-
         # Define the subquery with case-insensitive comparison
         film_id_subquery = (
             select(Films.film_id)

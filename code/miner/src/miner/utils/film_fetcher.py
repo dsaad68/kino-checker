@@ -1,11 +1,7 @@
-# %%
-
 from datetime import date, datetime, time
 
 import requests
 from loguru import logger
-
-# %%
 
 CENTER_OID = "6F000000014BHGWDVI"
 HEADERS = {
@@ -24,7 +20,6 @@ HEADERS = {
 }
 
 
-# %%
 class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
         self.center_oid = center_oid
@@ -37,7 +32,7 @@ class FilmFetcher:
         headers = self.headers | {"center-oid": self.center_oid}
 
         try:
-            response = requests.request("GET", url, headers=headers)
+            response = requests.request("GET", url, headers=headers, timeout=30)
             return response.json().get("sessionId", None)
 
         except requests.RequestException as e:
@@ -51,7 +46,7 @@ class FilmFetcher:
         headers = self.headers | {"center-oid": self.center_oid, "session-id": self.session_id}
 
         try:
-            response = requests.request("GET", url, headers=headers, data=payload)
+            response = requests.request("GET", url, headers=headers, data=payload, timeout=30)
             return response.json()
 
         except requests.RequestException as e:
@@ -128,19 +123,19 @@ class FilmInfoExtractor:
         return ("OV" in release_type or "englisch" in release_type) if release_type is not None else False
 
     @staticmethod
-    def _extract_time(performanceDateTime: str) -> time | None:
-        """This function extracts the time from the performanceDateTime"""
-        if performanceDateTime is None:
+    def _extract_time(performance_date_time: str) -> time | None:
+        """This function extracts the time from the performance_date_time."""
+        if performance_date_time is None:
             return None
-        dt = datetime.fromisoformat(performanceDateTime)
+        dt = datetime.fromisoformat(performance_date_time)
         return dt.time()
 
     @staticmethod
-    def _extract_date(performanceDateTime: str) -> date | None:
-        """This function extracts the date from the performanceDateTime"""
-        if performanceDateTime is None:
+    def _extract_date(performance_date_time: str) -> date | None:
+        """This function extracts the date from the performance_date_time."""
+        if performance_date_time is None:
             return None
-        dt = datetime.fromisoformat(performanceDateTime)
+        dt = datetime.fromisoformat(performance_date_time)
         return dt.date()
 
     @staticmethod

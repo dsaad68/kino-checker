@@ -5,6 +5,7 @@ from __future__ import annotations
 # Service intervals (seconds)
 MINER_POLL_INTERVAL = 600  # 10 minutes
 CLEANER_POLL_INTERVAL = 10800  # 3 hours
+CLEANER_TRACKABLE_DAYS = 120  # days to keep released films trackable
 
 # Rate limiting
 RATE_LIMIT_COMMANDS = 10  # requests per minute

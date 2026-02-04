@@ -1,37 +1,36 @@
-# %%
+from __future__ import annotations
 
 import asyncio
 import time
 from pathlib import Path
 
-from common.constants import MINER_POLL_INTERVAL
-from common.helpers import get_or_raise
-from common.logging_config import setup_logger
 from loguru import logger
+
+from common.config import DatabaseConfig, TelegramConfig
+from common.constants import MINER_POLL_INTERVAL
+from common.logging_config import setup_logger
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_fetcher import CENTER_OID, HEADERS, FilmFetcher, FilmInfoExtractor
 from miner.utils.film_notifier import FilmReleaseNotification
 from miner.utils.scrapper import Scraper
 
-# %%
-# sourcery skip: use-named-expression
-if __name__ == "__main__":
+
+def main() -> None:
+    """Main entry point for the miner service."""
     setup_logger(
         service_name="miner",
         log_level="INFO",
         log_file=Path("logs/miner.log"),
     )
 
-    # create a function that gets the environment variables or raise an error
-
-    SQL_CONNECTION_URI = get_or_raise(env_name="POSTGRES_DB_CONNECTION_URI")
-    BOT_TOKEN = get_or_raise(env_name="TELEGRAM_BOT_TOKEN")
-
-    url = "https://www.filmpalast.net/vorschau.html"
+    db_config = DatabaseConfig()
+    telegram_config = TelegramConfig()
+    sql_connection_uri = db_config.connection_uri
+    bot_token = telegram_config.bot_token
 
     logger.info("Main starts!")
 
-    film_db_manager = FilmDatabaseManager(SQL_CONNECTION_URI)
+    film_db_manager = FilmDatabaseManager(sql_connection_uri)
 
     while True:
         logger.info("----- Mining session starts! -----")
@@ -82,9 +81,13 @@ if __name__ == "__main__":
 
             logger.info("Sending notification to users!")
             try:
-                film_notifier = FilmReleaseNotification(BOT_TOKEN)
-                asyncio.run(film_notifier.send_notification(users_list))
-                asyncio.run(film_notifier.shutdown())
+
+                async def notify_and_shutdown(users: list) -> None:
+                    notifier = FilmReleaseNotification(bot_token)
+                    await notifier.send_notification(users)
+                    await notifier.shutdown()
+
+                asyncio.run(notify_and_shutdown(users_list))
                 logger.info(f"Number of users has been notified: {len(users_list)}")
             except Exception as error:
                 logger.error(f"An error occurred while sending notifications: {error}", exc_info=True)
@@ -101,3 +104,7 @@ if __name__ == "__main__":
         # Sleep for 10 Min
         logger.info(f"==+== Sleeping for {MINER_POLL_INTERVAL / 60} Min! ==+==")
         time.sleep(MINER_POLL_INTERVAL)
+
+
+if __name__ == "__main__":
+    main()

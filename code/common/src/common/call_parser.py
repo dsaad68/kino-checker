@@ -1,10 +1,7 @@
-# %%
 from __future__ import annotations
 
 import re
 from typing import Any
-
-# %%
 
 
 class CallParser:
@@ -21,7 +18,7 @@ class CallParser:
     TIME_PATTERN_ENDING: re.Pattern[str] = re.compile(r"(\d{2}:\d{2})$")
 
     FLAG_PATTERN: re.Pattern[str] = re.compile(r"([1,2,0]),(\w+)")
-    FLAG_VALUES: dict[str, bool | None] = {"1": True, "0": False, "2": None}
+    FLAG_VALUES: dict[str, bool | None] = {"1": True, "0": False, "2": None}  # noqa: RUF012
 
     @staticmethod
     def parse(input_string: str) -> dict[str, Any]:

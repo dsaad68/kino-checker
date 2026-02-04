@@ -1,4 +1,3 @@
-# %%
 """Database tools for the cinema agent. Build tools with build_db_tools(connection_uri)."""
 
 from __future__ import annotations
@@ -9,7 +8,6 @@ from datetime import date, datetime
 from langchain_core.tools import tool
 
 # Lazy imports inside build_db_tools to avoid circular imports and heavy deps at module load
-# %%
 
 
 _FORBIDDEN_SQL = re.compile(

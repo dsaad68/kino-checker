@@ -1,7 +1,8 @@
 # %%
-from bot.utils.db_info_finder import FilmInfoFinder
 from loguru import logger
 from testing.utils import str_2_date, str_2_time
+
+from bot.utils.db_info_finder import FilmInfoFinder
 
 
 # %%

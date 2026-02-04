@@ -1,4 +1,3 @@
-# %%
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -13,8 +12,6 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import select
 
 T = TypeVar("T")
-
-# %%
 
 
 class DBManager:
@@ -46,61 +43,45 @@ class DBManager:
             # Check if the original error is a CardinalityViolation
             if isinstance(error.orig, CardinalityViolation):
                 logger.error("CardinalityViolation error occurred", exc_info=True)
-                session.rollback()
                 raise CardinalityViolation from error
             else:
                 logger.error(f"ProgrammingError: {error}", exc_info=True)
-            # Rollback the transaction
-            session.rollback()
         except Exception as error:
             logger.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
 
     # INFO: old name: execute_query
     def execute_fetch_one(self, model: type[T], filter_condition: Callable[[type[T]], bool]) -> T | None:
         """Execute a query with a given a statement."""
-
-        # sourcery skip: class-extract-method, extract-duplicate-method
         try:
             with self.session_maker() as session:
                 return session.execute(select(model).where(filter_condition(model))).scalars().first()
         except SQLAlchemyError as error:
             logger.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()
             return None
         except Exception as error:
             logger.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()
             return None
 
     def execute_query_mapping_all(self, stmt: select) -> list[dict] | None:
         """Execute a query with a given a statement."""
-
-        # sourcery skip: class-extract-method, extract-duplicate-method
         try:
             with self.session_maker() as session:
                 return session.execute(stmt).mappings().all()
         except SQLAlchemyError as error:
             logger.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()
             return None
         except Exception as error:
             logger.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()
             return None
 
     def execute_query_all(self, stmt: select[tuple[T]]) -> list[T] | None:
         """Execute a query with a given a statement."""
-
-        # sourcery skip: class-extract-method, extract-duplicate-method
         try:
             with self.session_maker() as session:
                 return session.execute(stmt).scalars().all()
         except SQLAlchemyError as error:
             logger.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()
             return None
         except Exception as error:
             logger.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()
             return None

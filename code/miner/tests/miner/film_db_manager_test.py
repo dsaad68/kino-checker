@@ -1,9 +1,10 @@
 # %%
 from datetime import date, datetime, time, timedelta
 
+from testing.utils import str_2_date, str_2_datetime, str_2_time
+
 from common.db.db_model import PerformanceInfo
 from miner.utils.film_db_manager import FilmDatabaseManager
-from testing.utils import str_2_date, str_2_datetime, str_2_time
 
 # %%
 

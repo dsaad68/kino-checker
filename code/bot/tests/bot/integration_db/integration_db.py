@@ -32,14 +32,14 @@ class IntegrationDb:
             connection.commit()
         return url
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         self._drop_schemas()
 
         try:
             del os.environ[EnvVar.INT_DB_URL.name]
         except Exception as e:
-            logging.error(e)
-            raise e
+            logger.error("%s", e)
+            raise
 
     def _create_schemas(self, connection):
         for schema in self.schemas:

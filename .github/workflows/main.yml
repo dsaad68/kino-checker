@@ -55,7 +55,7 @@ jobs:
     - name: Run tests with coverage
       run: uv run pytest --cov --cov-report=xml
       env:
-        DATABASE_URL: postgresql://postgres:ANoTHer2233Test@localhost:5432/postgres
+        POSTGRES_DB_CONNECTION_URI: postgresql://postgres:ANoTHer2233Test@localhost:5432/postgres
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

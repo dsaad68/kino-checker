@@ -55,8 +55,8 @@ class Docker:
             try:
                 img = self.client.images.get(list_image)
                 return image_name in (getattr(img, "tags", None) or [])
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Could not resolve image tags for %s: %s", list_image, e)
         return False
 
     def containers_with_image(self, image_name: str) -> list[str]:
@@ -94,4 +94,4 @@ if __name__ == "__main__":
     dckr = Docker()
     container_name = "postgres:16-bookworm"
     result = dckr.is_image_running(container_name)
-    print(result)
+    logger.info("%s", result)

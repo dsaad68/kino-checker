@@ -36,7 +36,7 @@ class IntegrationDb:
             connection.commit()
         return url
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exc_type, value, traceback):
         self._drop_schemas()
 
         try:

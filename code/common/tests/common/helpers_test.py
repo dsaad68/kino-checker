@@ -19,8 +19,6 @@ def test_reverse_dict_search():
     # Test 5: Non-string keys
     assert reverse_dict_search({1: "a", 2: "b", 3: "c"}, "b") == 2
 
-    print("All tests passed!")
-
 
 def test_deduplicate_list_dict():
 
@@ -38,7 +36,6 @@ def test_deduplicate_list_dict():
     ]
 
     deduplicated_list = deduplicate_list_dict(list_of_dicts, "title")
-    print(deduplicated_list)
     assert deduplicated_list == expected_output
 
 

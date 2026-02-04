@@ -90,4 +90,4 @@ if __name__ == "__main__":
     dckr = Docker()
     container_name = "postgres:16-bookworm"
     result = dckr.is_image_running(container_name)
-    print(result)
+    logger.info("%s", result)

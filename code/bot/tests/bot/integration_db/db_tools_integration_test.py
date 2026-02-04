@@ -38,7 +38,7 @@ def agent_with_test_db(db_connection_uri_with_sample_data: str):
         pytest.skip("OPENAI_API_KEY not set or placeholder; agent tests require a real key")
     logger.info("Building AnswerWithVoice agent for integration DB")
     return AnswerWithVoice(
-        db_dilect_connection_uri=db_connection_uri_with_sample_data,
+        db_dialect_connection_uri=db_connection_uri_with_sample_data,
         open_ai_api_key=os.environ["OPENAI_API_KEY"],
         eleven_api_key=os.environ.get("ELEVEN_API_KEY", "dummy-for-agent-query-tests"),
     )

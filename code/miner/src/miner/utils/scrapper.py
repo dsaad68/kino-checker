@@ -22,12 +22,12 @@ class Scraper:
     def run(self) -> list[dict]:
         """Runs the scraper and returns a list of results."""
 
-        MAX_ITERATIONS = 100  # Set a reasonable limit to prevent infinite loops
+        max_iterations = 100  # Set a reasonable limit to prevent infinite loops
 
         i = 1
         results: list[dict] = []
 
-        while i <= MAX_ITERATIONS:
+        while i <= max_iterations:
             url = f"{self.base_url}{i}/"
             soup, status_code = self._get_website(url)
 
@@ -39,10 +39,8 @@ class Scraper:
             # extract data if status code is not 999
             if status_code != 999:
                 data = self._extractor(soup)
-                # sourcery skip: merge-nested-ifs
-                if data is not None:
-                    if len(data) > 0:
-                        results.extend(data)
+                if data is not None and len(data) > 0:
+                    results.extend(data)
 
             i += 1
 
@@ -52,7 +50,7 @@ class Scraper:
         """Retrieves a website and returns its BeautifulSoup object and status code."""
 
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=30)
             return BeautifulSoup(response.text, "html.parser"), response.status_code
         except RequestException as e:
             logger.error(f"An error occurred with request: {e}")
@@ -89,14 +87,13 @@ class Scraper:
             logger.error(f"An error occurred: {e}")
             return None
 
-    def _get_date(self, input) -> date | None:
-        """Returns the current date in the format 'YYYY-MM-DD' if input is not None."""
-
-        if input is None:
+    def _get_date(self, date_str: str | None) -> date | None:
+        """Returns the current date in the format 'YYYY-MM-DD' if date_str is not None."""
+        if date_str is None:
             return None
 
-        match = self.date_pattern.search(input)
+        match = self.date_pattern.search(date_str)
         if match is None:
             return None
-        date_str = match.group(0)
-        return datetime.strptime(date_str, "%d.%m.%Y").date()
+        matched = match.group(0)
+        return datetime.strptime(matched, "%d.%m.%Y").date()

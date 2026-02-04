@@ -1,25 +1,26 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 
-from common.db.db_model import UpcomingFilms
-from common.db.manager import DBManager
 from loguru import logger
 from sqlalchemy import update
-from sqlalchemy.sql import func
+
+from common.constants import CLEANER_TRACKABLE_DAYS
+from common.db.db_model import UpcomingFilms
+from common.db.manager import DBManager
 
 
 class DBCleaner(DBManager):
-    def __init__(self, connection_uri: str):
+    def __init__(self, connection_uri: str) -> None:
         super().__init__(connection_uri)
 
-    def update_trackable_rows(self, days: int = 120) -> None:
-        """this function updates the trackable atritbute to false for the films that are older than the threshold days (default 120 days)
+    def update_trackable_rows(self, days: int = CLEANER_TRACKABLE_DAYS) -> None:
+        """Update the trackable attribute to false for films older than the threshold.
 
         Parameters
         ----------
         days : int
-            number of days to keep the rows trackable after their entry date
-        Session_Maker : sqlalchemy.orm.session.sessionmaker
-            sqlalchemy session maker
+            Number of days to keep rows trackable after their release date.
         """
 
         # First, mark films as released if their release date has passed
@@ -28,7 +29,7 @@ class DBCleaner(DBManager):
             update(UpcomingFilms)
             .where(
                 UpcomingFilms.release_date < now,
-                UpcomingFilms.is_released == False,
+                UpcomingFilms.is_released.is_(False),
             )
             .values(is_released=True)
         )
@@ -45,8 +46,8 @@ class DBCleaner(DBManager):
             update(UpcomingFilms)
             .where(
                 UpcomingFilms.release_date < threshold_date,
-                UpcomingFilms.is_trackable == True,
-                UpcomingFilms.is_released == True,
+                UpcomingFilms.is_trackable.is_(True),
+                UpcomingFilms.is_released.is_(True),
             )
             .values(is_trackable=False)
         )
@@ -55,9 +56,3 @@ class DBCleaner(DBManager):
         logger.info("Cleaning outdated films ...")
         self.execute_insert_stmt(update_stmt)
         logger.info("Cleaned outdated films ...")
-
-    def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
-        """Get an existing row in the upcoming films table given its title."""
-        return self.execute_fetch_one(
-            UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower()
-        )

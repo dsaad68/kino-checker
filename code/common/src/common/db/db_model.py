@@ -1,11 +1,9 @@
-# %%
 from dataclasses import dataclass
 from datetime import date, datetime, time
 
 from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, MetaData, Sequence, String, Time
 from sqlalchemy.orm import declarative_base
 
-# %%
 # Define the schema for the tracker database
 metadata_obj = MetaData(schema="tracker")
 

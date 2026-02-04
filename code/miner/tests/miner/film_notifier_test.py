@@ -38,8 +38,8 @@ def test_format_name_for_url():
     assert film_notifier._format_name_for_url(input_string) == expected_output
 
     # Test case 6
-    input_string = "Peppa´s Kino Party"
-    expected_output = "peppa´s-kino-party"
+    input_string = "Peppa´s Kino Party"  # noqa: RUF001
+    expected_output = "peppa´s-kino-party"  # noqa: RUF001
     assert film_notifier._format_name_for_url(input_string) == expected_output
 
     # Test case 7

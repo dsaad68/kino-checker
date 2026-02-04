@@ -1,18 +1,19 @@
-# %%
 from __future__ import annotations
 
 from pathlib import Path
 
 import telebot
+from loguru import logger
+from telebot import custom_filters, types
+from telebot.handler_backends import State, StatesGroup  # States
+
 from bot.context import BotContext
 from bot.genai.agent import AnswerWithVoice
 from bot.utils.filters import filter_upcoming_films  # , filter_showing_films
 from common.call_parser import CallParser
-from common.helpers import get_or_raise, reverse_dict_search
+from common.config import AppConfig
+from common.helpers import reverse_dict_search
 from common.logging_config import setup_logger
-from loguru import logger
-from telebot import custom_filters, types
-from telebot.handler_backends import State, StatesGroup  # States
 
 
 class MyStates(StatesGroup):
@@ -54,7 +55,7 @@ def setup_handlers(ctx: BotContext) -> None:
     @bot.message_handler(state=MyStates.answer)
     def process_question(message: types.Message) -> None:
         agent = AnswerWithVoice(
-            db_dilect_connection_uri=ctx.db_dialect_connection_uri,
+            db_dialect_connection_uri=ctx.db_dialect_connection_uri,
             open_ai_api_key=ctx.openai_api_key,
             eleven_api_key=ctx.eleven_api_key,
         )
@@ -178,13 +179,13 @@ def main() -> None:
         log_file=Path("logs/bot.log"),
     )
 
-    # Create bot context with all dependencies
+    config = AppConfig()
     ctx = BotContext.create(
-        token=get_or_raise("TELEGRAM_BOT_TOKEN"),
-        sql_connection_uri=get_or_raise("POSTGRES_DB_CONNECTION_URI"),
-        db_dialect_connection_uri=get_or_raise("POSTGRES_DB_CONNECTION_URI"),
-        openai_api_key=get_or_raise("OPENAI_API_KEY"),
-        eleven_api_key=get_or_raise("ELEVEN_API_KEY"),
+        token=config.telegram.bot_token,
+        sql_connection_uri=config.database.connection_uri,
+        db_dialect_connection_uri=config.database.connection_uri,
+        openai_api_key=config.openai.api_key,
+        eleven_api_key=config.elevenlabs.api_key,
     )
 
     # Setup all handlers with context

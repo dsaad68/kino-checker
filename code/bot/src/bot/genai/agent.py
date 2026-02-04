@@ -1,4 +1,3 @@
-# %%
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,8 +15,6 @@ if TYPE_CHECKING:
     import telebot
     from telebot import types
 
-# %%
-
 
 def _last_ai_content(messages: list) -> str:
     """Extract the final assistant answer from agent result messages."""
@@ -28,14 +25,14 @@ def _last_ai_content(messages: list) -> str:
 
 
 class AnswerWithVoice:
-    def __init__(self, db_dilect_connection_uri: str, open_ai_api_key: str, eleven_api_key: str) -> None:
+    def __init__(self, db_dialect_connection_uri: str, open_ai_api_key: str, eleven_api_key: str) -> None:
         self._chat_openai = ChatOpenAI(
             model="gpt-4o-mini",
             temperature=0,
             openai_api_key=open_ai_api_key,
         )
         self._eleven_api_key = eleven_api_key
-        tools = build_db_tools(db_dilect_connection_uri)
+        tools = build_db_tools(db_dialect_connection_uri)
         self._agent = create_agent(
             self._chat_openai,
             tools=tools,
@@ -57,7 +54,7 @@ class AnswerWithVoice:
                             Do not use emojis.
                             Remove the bold and italic from the text too.
                             user name: ```{user_name}```
-                            text: ```{sql_answer}```"""  # noqa: RUF027
+                            text: ```{sql_answer}```"""
         prompt_template = ChatPromptTemplate.from_template(template_string)
         styled_messages = prompt_template.format_messages(sql_answer=sql_answer, user_name=user_name)
         response = self._chat_openai.invoke(styled_messages)

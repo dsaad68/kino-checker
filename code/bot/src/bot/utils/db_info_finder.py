@@ -1,17 +1,15 @@
-# %%
 from __future__ import annotations
 
 from datetime import date, time
 from typing import Any
 
-from common.db.db_model import Films, Performances, UpcomingFilms, Users
-from common.db.manager import DBManager
 from loguru import logger
 from sqlalchemy import and_, distinct, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import func, select
 
-# %%
+from common.db.db_model import Films, Performances, UpcomingFilms, Users
+from common.db.manager import DBManager
 
 
 class FilmInfoFinder(DBManager):
@@ -79,8 +77,6 @@ class FilmInfoFinder(DBManager):
         """Insert a user info to the database for notification.
         If the row with the same chat_id and title already exists, it just updates the message_id.
         Returns True if the upsert is successful, False otherwise."""
-
-        # sourcery skip: extract-duplicate-method, use-named-expression
         try:
             with self.session_maker() as session:
                 # Check if a row with the same chat_id and title already exists

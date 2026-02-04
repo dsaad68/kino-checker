@@ -1,20 +1,17 @@
-# %%
-
 import asyncio
 import re
 
-from common.db.db_model import PerformanceInfo, UsersFilmInfo
 from loguru import logger
 from telebot.async_telebot import AsyncTeleBot
 
-# %%
+from common.db.db_model import PerformanceInfo, UsersFilmInfo
 
 
 class FilmReleaseNotification:
     """This class sends a notification about a release of a film to all the users in the list"""
 
-    def __init__(self, BOT_TOKEN: str):
-        self.bot = AsyncTeleBot(BOT_TOKEN)
+    def __init__(self, bot_token: str):
+        self.bot = AsyncTeleBot(bot_token)
 
     async def send_notification(self, users_list: list[UsersFilmInfo]):
         """Sends a notification about a release of a film to all the users in the list"""
@@ -63,7 +60,7 @@ class FilmReleaseNotification:
 
         # Replace sequences of characters not in the allowed set with a single hyphen
         # Allowed characters are letters, numbers, hyphens, percent signs, exclamation marks, and parentheses
-        formatted_string = re.sub(r"[^a-z0-9-%!()´.üäöß]+", "-", formatted_string)
+        formatted_string = re.sub(r"[^a-z0-9-%!()´.üäöß]+", "-", formatted_string)  # noqa: RUF001
 
         # Remove potential leading or trailing hyphens
         formatted_string = formatted_string.strip("-")
