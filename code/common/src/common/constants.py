@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 # Service intervals (seconds)
-MINER_POLL_INTERVAL = 600  # 10 minutes
-CLEANER_POLL_INTERVAL = 10800  # 3 hours
+MINER_POLL_INTERVAL = 1200  # 20 minutes
+CLEANER_POLL_INTERVAL = 43200  # 12 hours
 CLEANER_TRACKABLE_DAYS = 120  # days to keep released films trackable
 
 # Rate limiting
