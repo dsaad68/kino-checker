@@ -49,13 +49,28 @@ class Docker:
             logging.warning("Docker client not initialized")
             return []
 
+        result = []
         try:
-            # get all containers including the ones not running
-            containers = self.client.containers.list(all=True)
-            return [container.name for container in containers if container.attrs["Config"]["Image"] == image_name]
+            # Use the low-level API to avoid issues with stale container references
+            containers = self.client.api.containers(all=True)
+            for c in containers:
+                try:
+                    # Get image from the list API (doesn't require fetching container details)
+                    container_image = c.get("Image", "")
+                    if container_image == image_name:
+                        # Get container name from Names field
+                        names = c.get("Names", [])
+                        if names:
+                            # Remove leading slash from name
+                            result.append(names[0].lstrip("/"))
+                except Exception as e:
+                    # Skip containers that cause errors
+                    logging.debug(f"Skipping container due to error: {e}")
+                    continue
         except Exception as e:
-            logging.error(f"Unexpected error: {e}")
-            return []
+            logging.error(f"Unexpected error listing containers: {e}")
+
+        return result
 
     def _get_client(self) -> docker.client.DockerClient:
         try:

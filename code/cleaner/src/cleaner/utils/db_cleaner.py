@@ -23,10 +23,25 @@ class DBCleaner(DBManager):
             sqlalchemy session maker
         """
 
-        # Calculate the date threshold (Default 120 days ago from today)
-        threshold_date = datetime.now() - timedelta(days)
+        # First, mark films as released if their release date has passed
+        now = datetime.now()
+        mark_released_stmt = (
+            update(UpcomingFilms)
+            .where(
+                UpcomingFilms.release_date < now,
+                UpcomingFilms.is_released == False,
+            )
+            .values(is_released=True)
+        )
 
-        # Create an update statement
+        logging.info("Marking films as released...")
+        self.execute_insert_stmt(mark_released_stmt)
+        logging.info("Marked films as released...")
+
+        # Calculate the date threshold (Default 120 days ago from today)
+        threshold_date = now - timedelta(days)
+
+        # Create an update statement to mark old films as not trackable
         update_stmt = (
             update(UpcomingFilms)
             .where(

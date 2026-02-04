@@ -8,11 +8,12 @@ INSERT INTO tracker.films ("film_id", "title", "name", "production_year", "lengt
 ('FCE63000012BHGWDVI', 'Saw X', 'Saw X', 2022, 119, '2023-11-30', 'https://contentservice.cineorder.shop/contents/img?q=683jXDH0IV9SmgAABHGWJjb', '2023-11-13 19:14:38.574222');
 
 -- Sample data for upcoming_films table
+-- Using dynamic dates relative to CURRENT_DATE for test stability
 INSERT INTO tracker.upcoming_films ("title", "release_date", "film_id", "last_updated", "is_released", "is_trackable") VALUES
-('Napoleon', '2023-11-23', NULL, NULL, 'f', 't'),
-('SAW X', '2023-11-30', NULL, NULL, 'f', 't'),
-('Wish', '2023-11-30', NULL, NULL, 'f', 't'),
-('Raus aus dem Teich', '2023-12-21', NULL, NULL, 'f', 't');
+('Napoleon', CURRENT_DATE - INTERVAL '150 days', NULL, NULL, 'f', 't'),
+('SAW X', CURRENT_DATE - INTERVAL '150 days', NULL, NULL, 'f', 't'),
+('Wish', CURRENT_DATE - INTERVAL '60 days', NULL, NULL, 'f', 't'),
+('Raus aus dem Teich', CURRENT_DATE + INTERVAL '30 days', NULL, NULL, 'f', 't');
 
 -- Sample data for performances table
 -- INFO: performance_datetime performance_datetime is always 10 days from current date

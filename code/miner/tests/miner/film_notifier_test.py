@@ -88,7 +88,7 @@ def test_message(schemas, init_scripts):
         user_dict = {item.user_id: item for item in user_list}
         user = user_dict.get(5)
 
-        film_release_notification = FilmReleaseNotification("YOUR_BOT_TOKEN_HERE")
+        film_release_notification = FilmReleaseNotification("123456789:ABCdefGHIjklMNOpqrsTUVwxyz-1234567890")
         test_message = film_release_notification._message(user)
 
         # Verify

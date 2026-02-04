@@ -34,12 +34,30 @@ class Docker:
             return False
 
     def is_image_running(self, image_name: str) -> bool:
+        """True if any running container uses the given image (name:tag). Uses list API only."""
         try:
-            container_list = self.containers_with_image(image_name)
-            return any(self.is_container_running(container) for container in container_list)
+            return any(
+                self._container_list_image_matches(c, image_name) and (c.get("State") == STATUS.RUNNING.value)
+                for c in (self.client.api.containers(all=True) if self.client else [])
+            )
         except Exception as e:
             logging.error(f"Unexpected error: {e}")
             return False
+
+    def _container_list_image_matches(self, list_item: dict, image_name: str) -> bool:
+        """Return True if a container list item (from API) uses the given image."""
+        # List API returns "Image" as name:tag (e.g. postgres:alpine3.18) or image ID
+        list_image = (list_item.get("Image") or "").strip()
+        if list_image == image_name:
+            return True
+        # If Image is a sha, resolve tags (skip if we can't to avoid 404s on stale refs)
+        if list_image.startswith("sha256:") and self.client:
+            try:
+                img = self.client.images.get(list_image)
+                return image_name in (getattr(img, "tags", None) or [])
+            except Exception:
+                pass
+        return False
 
     def containers_with_image(self, image_name: str) -> list[str]:
         if not self.client:
@@ -47,9 +65,13 @@ class Docker:
             return []
 
         try:
-            # get all containers including the ones not running
-            containers = self.client.containers.list(all=True)
-            return [container.name for container in containers if container.attrs["Config"]["Image"] == image_name]
+            # Use low-level API to avoid container.get() 404s on stale/other-context containers
+            raw = self.client.api.containers(all=True)
+            return [
+                (c["Names"][0].lstrip("/") if c.get("Names") else c["Id"][:12])
+                for c in raw
+                if self._container_list_image_matches(c, image_name)
+            ]
         except Exception as e:
             logging.error(f"Unexpected error: {e}")
             return []
