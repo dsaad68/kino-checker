@@ -34,17 +34,22 @@ def setup_logger(
         colorize=True,
     )
 
-    # File handler (if specified)
+    # File handler (if specified and writable; e.g. in Docker the volume may be read-only)
     if log_file:
-        logger.add(
-            log_file,
-            format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}",
-            level=log_level,
-            rotation="10 MB",
-            retention="7 days",
-            compression="zip",
-            serialize=enable_json,
-        )
+        try:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            logger.add(
+                log_file,
+                format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} | {message}",
+                level=log_level,
+                rotation="10 MB",
+                retention="7 days",
+                compression="zip",
+                serialize=enable_json,
+            )
+        except OSError:
+            # Permission denied or read-only filesystem: log to stderr only
+            pass
 
     # Add service context
     logger.configure(extra={"service": service_name})
