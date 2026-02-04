@@ -21,6 +21,26 @@ docker-up-d:
     @echo "Starting docker compose services (detached)..."
     docker compose up -d
 
+# Development: compose with dev overrides (source mounts, dev build target)
+dev:
+    @echo "Starting development environment (dev compose + source mounts)..."
+    docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+# Production: compose with prod overrides (production build, resource limits)
+prod:
+    @echo "Starting production environment..."
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+# Clean build artifacts and caches
+clean:
+    @echo "Cleaning build artifacts..."
+    find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+    find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
+    find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+    find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
+    rm -rf htmlcov .coverage 2>/dev/null || true
+    @echo "Done."
+
 # Stop docker compose services
 docker-down:
     @echo "Stopping docker compose services..."
@@ -86,43 +106,10 @@ test:
     @echo "Running all tests with coverage..."
     uv run pytest
 
-# Run all tests including integration tests (ensures test DB is running)
-test-all: test-db-start
-    @echo "========================================="
-    @echo "Running comprehensive test suite"
-    @echo "========================================="
-    @echo ""
-    @echo "[1/5] Running unit tests..."
-    uv run pytest -m "not integration" --no-cov || true
-    @echo ""
-    @echo "[2/5] Running bot integration tests..."
-    INT_DB_URL='postgresql://postgres:ANoTHer2233Test@localhost:5433/postgres' \
-        uv run pytest code/bot/tests/bot/db_info_finder_test.py -v --no-cov
-    @echo ""
-    @echo "[3/5] Running cleaner integration tests..."
-    INT_DB_URL='postgresql://postgres:ANoTHer2233Test@localhost:5433/postgres' \
-        uv run pytest code/cleaner/tests/cleaner/cleaner_test.py -v --no-cov || true
-    @echo ""
-    @echo "[4/5] Running miner DB manager integration tests..."
-    INT_DB_URL='postgresql://postgres:ANoTHer2233Test@localhost:5433/postgres' \
-        uv run pytest code/miner/tests/miner/film_db_manager_test.py -v --no-cov || true
-    @echo ""
-    @echo "[5/5] Running miner notifier integration tests..."
-    INT_DB_URL='postgresql://postgres:ANoTHer2233Test@localhost:5433/postgres' \
-        uv run pytest code/miner/tests/miner/film_notifier_test.py -v --no-cov || true
-    @echo ""
-    @echo "========================================="
-    @echo "✓ All test suites completed!"
-    @echo "========================================="
-    @echo ""
-    @echo "Summary:"
-    @echo "  - Unit tests: code/common, code/bot (non-integration)"
-    @echo "  - Bot integration tests: 8 tests"
-    @echo "  - Cleaner integration tests: 1 test"
-    @echo "  - Miner integration tests: 10 tests"
-    @echo ""
-    @echo "For detailed coverage report, run: just test"
-    @echo "========================================="
+# Run all tests (unit + integration via testcontainers; no external DB needed)
+test-all:
+    @echo "Running full test suite (testcontainers spin up DB automatically)..."
+    uv run pytest -v --no-cov
 
 # Run tests without coverage (fast)
 test-fast:
@@ -134,16 +121,15 @@ test-unit:
     @echo "Running unit tests..."
     uv run pytest -m "not integration" --no-cov
 
-# Run integration tests only
-test-integration: test-db-start
+# Run integration tests only (uses testcontainers)
+test-integration:
     @echo "Running integration tests..."
-    uv run pytest -m integration
+    uv run pytest -m integration --no-cov
 
 # Run bot DB integration tests (db_info_finder_test.py)
-test-db-info-finder: test-db-start
+test-db-info-finder:
     @echo "Running bot DB info finder integration tests..."
-    INT_DB_URL='postgresql://postgres:ANoTHer2233Test@localhost:5433/postgres' \
-        uv run pytest code/bot/tests/bot/db_info_finder_test.py -v --no-cov
+    uv run pytest code/bot/tests/bot/db_info_finder_test.py -v --no-cov
 
 # Run bot tests
 test-bot:

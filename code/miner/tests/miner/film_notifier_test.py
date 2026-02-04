@@ -1,16 +1,7 @@
 # %%
-import pytest
-from integration_db.docker_container import Docker
-from integration_db.integration_db import EnvVar, IntegrationDb
 
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_notifier import FilmReleaseNotification
-
-# %%
-
-CONTAINER_NAME = "postgres:alpine3.18"
-
-dckr = Docker()
 
 # %%
 
@@ -62,15 +53,7 @@ def test_format_name_for_url():
     assert film_notifier._format_name_for_url(input_string) == expected_output
 
 
-@pytest.mark.skipif(
-    not dckr.is_image_running(CONTAINER_NAME), reason=f"There is no container based on the {CONTAINER_NAME} is running."
-)
-@pytest.mark.skipif(
-    IntegrationDb.db_int_not_available(),
-    reason=f"Missing environment variable {EnvVar.INT_DB_URL.name} containing the database URL",
-)
-def test_message(schemas, init_scripts):
-
+def test_message(db_connection_uri_with_sample_data):
     expected_message = (
         "✅🎥 Creator is now available! 🎥✅\n\n"
         "🎟️🎟️🎟️ Link to buy tickets: 🎟️🎟️🎟️\n\n"
@@ -80,16 +63,15 @@ def test_message(schemas, init_scripts):
         "https://cineorder.filmpalast.net/zkm/movie/imax-creator-ov/58E63000012BHGWDVI/performance/99D45000023UHQLAAA\n"
     )
 
-    with IntegrationDb(schemas, init_scripts) as CONNECTION_STRING:
-        # Execute
-        film_db_manager = FilmDatabaseManager(CONNECTION_STRING)  # type: ignore
-        user_list = film_db_manager.get_users_to_notify()
+    # Execute
+    film_db_manager = FilmDatabaseManager(db_connection_uri_with_sample_data)  # type: ignore
+    user_list = film_db_manager.get_users_to_notify()
 
-        user_dict = {item.user_id: item for item in user_list}
-        user = user_dict.get(5)
+    user_dict = {item.user_id: item for item in user_list}
+    user = user_dict.get(5)
 
-        film_release_notification = FilmReleaseNotification("123456789:ABCdefGHIjklMNOpqrsTUVwxyz-1234567890")
-        test_message = film_release_notification._message(user)
+    film_release_notification = FilmReleaseNotification("123456789:ABCdefGHIjklMNOpqrsTUVwxyz-1234567890")
+    test_message = film_release_notification._message(user)
 
-        # Verify
-        assert test_message == expected_message
+    # Verify
+    assert test_message == expected_message

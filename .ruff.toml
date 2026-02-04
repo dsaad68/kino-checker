@@ -27,4 +27,4 @@ ignore = [
 "tests/**/*.py" = ["S101", "T20"]
 
 [lint.isort]
-known-first-party = ["bot", "miner", "cleaner", "common", "my_logger"]
+known-first-party = ["bot", "miner", "cleaner", "common"]

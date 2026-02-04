@@ -1,8 +1,8 @@
 # %%
 import enum
-import logging
 
 import docker
+from loguru import logger
 
 # %%
 
@@ -23,17 +23,17 @@ class Docker:
         """
 
         if not self.client:
-            logging.warning("Docker client not initialized")
+            logger.warning("Docker client not initialized")
             return False
 
         try:
             container = self.client.containers.get(container_name)
             return container.status == STATUS.RUNNING.value
         except docker.errors.NotFound:
-            logging.info(f"Container '{container_name}' not found.")
+            logger.info(f"Container '{container_name}' not found.")
             return False
         except Exception as e:
-            logging.error(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}")
             return False
 
     def is_image_running(self, image_name: str) -> bool:
@@ -41,12 +41,12 @@ class Docker:
             container_list = self.containers_with_image(image_name)
             return any(self.is_container_running(container) for container in container_list)
         except Exception as e:
-            logging.error(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}")
             return False
 
     def containers_with_image(self, image_name: str) -> list[str]:
         if not self.client:
-            logging.warning("Docker client not initialized")
+            logger.warning("Docker client not initialized")
             return []
 
         result = []
@@ -65,10 +65,10 @@ class Docker:
                             result.append(names[0].lstrip("/"))
                 except Exception as e:
                     # Skip containers that cause errors
-                    logging.debug(f"Skipping container due to error: {e}")
+                    logger.debug(f"Skipping container due to error: {e}")
                     continue
         except Exception as e:
-            logging.error(f"Unexpected error listing containers: {e}")
+            logger.error(f"Unexpected error listing containers: {e}")
 
         return result
 
@@ -81,8 +81,8 @@ class Docker:
             client.ping()  # Validates if Docker daemon is responsive
             return client
         except Exception as e:
-            logging.warning("Docker daemon is not responsive.")
-            logging.error(f"Error: {e}")
+            logger.warning("Docker daemon is not responsive.")
+            logger.error(f"Error: {e}")
             return None
 
 

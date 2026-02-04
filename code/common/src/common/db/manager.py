@@ -1,10 +1,10 @@
 # %%
 from __future__ import annotations
 
-import logging
 from collections.abc import Callable
 from typing import TypeVar
 
+from loguru import logger
 from psycopg2.errors import CardinalityViolation
 from sqlalchemy import Update, create_engine
 from sqlalchemy.dialects.postgresql import Insert
@@ -45,15 +45,15 @@ class DBManager:
         except ProgrammingError as error:
             # Check if the original error is a CardinalityViolation
             if isinstance(error.orig, CardinalityViolation):
-                logging.error("CardinalityViolation error occurred", exc_info=True)
+                logger.error("CardinalityViolation error occurred", exc_info=True)
                 session.rollback()
                 raise CardinalityViolation from error
             else:
-                logging.error(f"ProgrammingError: {error}", exc_info=True)
+                logger.error(f"ProgrammingError: {error}", exc_info=True)
             # Rollback the transaction
             session.rollback()
         except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
+            logger.error(f"ERROR : {error}", exc_info=True)
             session.rollback()  # type: ignore
 
     # INFO: old name: execute_query
@@ -65,11 +65,11 @@ class DBManager:
             with self.session_maker() as session:
                 return session.execute(select(model).where(filter_condition(model))).scalars().first()
         except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
+            logger.error(f"Database Error: {error}", exc_info=True)
             session.rollback()
             return None
         except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
+            logger.error(f"ERROR : {error}", exc_info=True)
             session.rollback()
             return None
 
@@ -81,11 +81,11 @@ class DBManager:
             with self.session_maker() as session:
                 return session.execute(stmt).mappings().all()
         except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
+            logger.error(f"Database Error: {error}", exc_info=True)
             session.rollback()
             return None
         except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
+            logger.error(f"ERROR : {error}", exc_info=True)
             session.rollback()
             return None
 
@@ -97,10 +97,10 @@ class DBManager:
             with self.session_maker() as session:
                 return session.execute(stmt).scalars().all()
         except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
+            logger.error(f"Database Error: {error}", exc_info=True)
             session.rollback()
             return None
         except Exception as error:
-            logging.error(f"ERROR : {error}", exc_info=True)
+            logger.error(f"ERROR : {error}", exc_info=True)
             session.rollback()
             return None

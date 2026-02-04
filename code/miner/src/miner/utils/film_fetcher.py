@@ -1,9 +1,9 @@
 # %%
 
-import logging
 from datetime import date, datetime, time
 
 import requests
+from loguru import logger
 
 # %%
 
@@ -41,7 +41,7 @@ class FilmFetcher:
             return response.json().get("sessionId", None)
 
         except requests.RequestException as e:
-            logging.error(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def get_film_list(self, date_from: str, date_to: str) -> list | None:
@@ -55,7 +55,7 @@ class FilmFetcher:
             return response.json()
 
         except requests.RequestException as e:
-            logging.error(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
 
@@ -66,7 +66,7 @@ class FilmInfoExtractor:
         if film_fetcher_response is not None:
             self.film_fetcher_response = film_fetcher_response
         else:
-            logging.warning("API Response is empty!")
+            logger.warning("API Response is empty!")
             self.film_fetcher_response = None
 
     def get_films_info_list(self) -> list[dict] | None:
@@ -86,7 +86,7 @@ class FilmInfoExtractor:
                 }
                 for film in film_list  # type: ignore
             ]
-        logging.warn("Film Fetcher Response is empty!")
+        logger.warning("Film Fetcher Response is empty!")
         return None
 
     def get_performances_list(self) -> list[dict] | None:
@@ -114,7 +114,7 @@ class FilmInfoExtractor:
                 for film in film_list  # type: ignore
                 for performance in film.get("performances")
             ]
-        logging.warn("Film Fetcher Response is empty!")
+        logger.warning("Film Fetcher Response is empty!")
         return None
 
     @staticmethod

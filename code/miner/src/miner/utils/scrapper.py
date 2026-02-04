@@ -1,9 +1,9 @@
-import logging
 import re
 from datetime import date, datetime
 
 import requests
 from bs4 import BeautifulSoup
+from loguru import logger
 from requests import RequestException
 
 
@@ -35,7 +35,7 @@ class Scraper:
             if status_code == 404:
                 break
 
-            logging.info(f"Scrapper run for page {i}, Status code: {status_code}")
+            logger.info(f"Scrapper run for page {i}, Status code: {status_code}")
             # extract data if status code is not 999
             if status_code != 999:
                 data = self._extractor(soup)
@@ -55,10 +55,10 @@ class Scraper:
             response = requests.get(url)
             return BeautifulSoup(response.text, "html.parser"), response.status_code
         except RequestException as e:
-            logging.error(f"An error occurred with request: {e}")
+            logger.error(f"An error occurred with request: {e}")
             return None, 999
         except Exception as e:
-            logging.error(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None, 999
 
     # IDEA: if it works with upcoming film object instead of dict
@@ -86,7 +86,7 @@ class Scraper:
                     )
             return results
         except Exception as e:
-            logging.error(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _get_date(self, input) -> date | None:

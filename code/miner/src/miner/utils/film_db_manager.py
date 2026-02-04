@@ -1,17 +1,15 @@
 # %%
 from __future__ import annotations
 
-import logging
-
-from psycopg2.errors import CardinalityViolation
-from sqlalchemy import Update, and_, tuple_, update
-from sqlalchemy.dialects.postgresql import Insert, insert
-from sqlalchemy.sql import func, select
-
 from common.call_parser import CallParser
 from common.db.db_model import Films, PerformanceInfo, Performances, UpcomingFilms, Users, UsersFilmInfo
 from common.db.manager import DBManager
 from common.helpers import deduplicate_list_dict
+from loguru import logger
+from psycopg2.errors import CardinalityViolation
+from sqlalchemy import Update, and_, tuple_, update
+from sqlalchemy.dialects.postgresql import Insert, insert
+from sqlalchemy.sql import func, select
 
 # %%
 
@@ -25,26 +23,26 @@ class FilmDatabaseManager(DBManager):
     def update_films_table(self, films_list: list[dict] | None) -> None:
         """Updates the films table."""
         if films_list is not None:
-            logging.info("[ ] Updating Films table!")
+            logger.info("[ ] Updating Films table!")
             # Upsert statement
             upsert_stmt = self._create_upsert_stmt(Films, "film_id", films_list)
             # Execute the upsert statement
             self.execute_insert_stmt(upsert_stmt)
-            logging.info("[*] Updated Films table!")
+            logger.info("[*] Updated Films table!")
         else:
-            logging.warning("Films list is None")
+            logger.warning("Films list is None")
 
     def update_performances_table(self, performances_list: list[dict] | None) -> None:
         """Updates the performances table."""
         if performances_list is not None:
-            logging.info("[ ] Updating Performances table!")
+            logger.info("[ ] Updating Performances table!")
             # Upsert statement
             upsert_stmt = self._create_upsert_stmt(Performances, "performance_id", performances_list)
             # Execute the upsert statement
             self.execute_insert_stmt(upsert_stmt)
-            logging.info("[*] Updated Performances table!")
+            logger.info("[*] Updated Performances table!")
         else:
-            logging.warning("Performances list is None")
+            logger.warning("Performances list is None")
 
     def update_upcoming_films_table(self, upcoming_films_list: list[dict] | None) -> None:
         # sourcery skip: extract-duplicate-method, extract-method
@@ -60,7 +58,7 @@ class FilmDatabaseManager(DBManager):
 
         if upcoming_films_list is not None:
             try:
-                logging.info("[ ] Updating Upcoming Films table!")
+                logger.info("[ ] Updating Upcoming Films table!")
 
                 # Upsert statement
                 exclude_cols = ["title", "is_released", "is_trackable", "upcoming_film_id", "film_id"]
@@ -70,11 +68,11 @@ class FilmDatabaseManager(DBManager):
 
                 # Execute the upsert statement
                 self.execute_insert_stmt(upsert_stmt)
-                logging.info("[*] Updated Upcoming Films table!")
+                logger.info("[*] Updated Upcoming Films table!")
 
             except CardinalityViolation as e:
-                logging.error(f"[!] Duplicate films found in Upcoming Films table. Error: {e}")
-                logging.warning("[!] Duplicate films found in Upcoming Films table. Deduplicating upcoming films!")
+                logger.error(f"[!] Duplicate films found in Upcoming Films table. Error: {e}")
+                logger.warning("[!] Duplicate films found in Upcoming Films table. Deduplicating upcoming films!")
 
                 deduplicated_upcoming_films_list = deduplicate_list_dict(upcoming_films_list, key="title")
 
@@ -86,10 +84,10 @@ class FilmDatabaseManager(DBManager):
                 # Execute the upsert statement
                 self.execute_insert_stmt(upsert_stmt)
 
-                logging.info("[*] Updated Upcoming Films table after deduplication!")
+                logger.info("[*] Updated Upcoming Films table after deduplication!")
 
         else:
-            logging.warning("Upcoming Films list is None")
+            logger.warning("Upcoming Films list is None")
 
     # TODO: Improve this function
     def update_released_films_in_upcoming_films_table(self) -> None:
@@ -98,29 +96,29 @@ class FilmDatabaseManager(DBManager):
         It is used to trigger to notification that a film has been released.
         """
 
-        logging.info("[ ] Updating released films in Upcoming Films table!")
+        logger.info("[ ] Updating released films in Upcoming Films table!")
         # Update statement
         update_stmt = self._create_update_released_film_stmt()
-        logging.info("[*] Updated released films in Upcoming Films table!")
+        logger.info("[*] Updated released films in Upcoming Films table!")
         # Execute the upsert statement
         self.execute_insert_stmt(update_stmt)
 
     def update_users_table(self) -> None:
 
-        logging.info("[ ] Updating Users table!")
+        logger.info("[ ] Updating Users table!")
         # Update statement
         update_stmt = self._create_users_table_film_id_update_stmt()
-        logging.info("[*] Updated Users table!")
+        logger.info("[*] Updated Users table!")
         # Execute the update statement
         self.execute_insert_stmt(update_stmt)
 
     def update_notified_users_table(self, users_list: list[UsersFilmInfo]) -> None:
 
-        logging.info("[ ] Updating notified users' status Users table!")
+        logger.info("[ ] Updating notified users' status Users table!")
         # Update statement
         user_film_pair = [(ufi.user_id, ufi.film_id) for ufi in users_list]
         update_stmt = self._create_notfied_users_update_stmt(user_film_pair)
-        logging.info("[*] Updated notified users' status Users table!")
+        logger.info("[*] Updated notified users' status Users table!")
         # Execute the update statement
         self.execute_insert_stmt(update_stmt)
 

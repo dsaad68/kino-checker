@@ -1,16 +1,15 @@
 # %%
 from __future__ import annotations
 
-import logging
 from datetime import date, time
 from typing import Any
 
+from common.db.db_model import Films, Performances, UpcomingFilms, Users
+from common.db.manager import DBManager
+from loguru import logger
 from sqlalchemy import and_, distinct, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.sql import func, select
-
-from common.db.db_model import Films, Performances, UpcomingFilms, Users
-from common.db.manager import DBManager
 
 # %%
 
@@ -105,11 +104,11 @@ class FilmInfoFinder(DBManager):
             return True
 
         except SQLAlchemyError as error:
-            logging.error(f"Database Error: {error}", exc_info=True)
+            logger.error(f"Database Error: {error}", exc_info=True)
             session.rollback()
             return False
         except Exception as error:  # Consider more specific exceptions
-            logging.error(f"Error: {error}", exc_info=True)
+            logger.error(f"Error: {error}", exc_info=True)
             session.rollback()
             return False
 

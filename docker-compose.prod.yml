@@ -1,0 +1,71 @@
+# Production overrides: build with production target, resource limits
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+  db:
+    container_name: kino-db-prod
+    volumes:
+      - db-prod:/var/lib/postgresql/data
+      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits: { cpus: "2", memory: 2G }
+        reservations: { cpus: "1", memory: 1G }
+
+  miner:
+    build:
+      context: .
+      dockerfile: ./code/miner/Dockerfile
+      target: production
+    container_name: kino-miner-prod
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 512M }
+        reservations: { cpus: "0.5", memory: 256M }
+
+  bot:
+    build:
+      context: .
+      dockerfile: ./code/bot/Dockerfile
+      target: production
+    container_name: kino-bot-prod
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 512M }
+        reservations: { cpus: "0.5", memory: 256M }
+
+  cleaner:
+    build:
+      context: .
+      dockerfile: ./code/cleaner/Dockerfile
+      target: production
+    container_name: kino-cleaner-prod
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    deploy:
+      resources:
+        limits: { cpus: "0.5", memory: 256M }
+        reservations: { cpus: "0.25", memory: 128M }
+
+volumes:
+  db-prod:
+    driver: local

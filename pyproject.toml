@@ -1,5 +1,5 @@
 [tool.uv.workspace]
-members = ["code/bot", "code/miner", "code/cleaner", "code/common", "code/my_logger"]
+members = ["code/bot", "code/miner", "code/cleaner", "code/common"]
 
 [dependency-groups]
 dev = [
@@ -18,6 +18,7 @@ dev = [
 [tool.pytest.ini_options]
 minversion = "8.0"
 testpaths = ["code/*/tests"]
+pythonpath = ["code"]
 python_files = ["*_test.py", "test_*.py"]
 addopts = [
     "-ra",
@@ -52,7 +53,6 @@ strict_equality = true
 module = [
     "telebot.*",
     "elevenlabs.*",
-    "opencensus.*",
     "langchain.*",
     "langchain_openai.*",
     "alive_progress.*",

@@ -135,9 +135,9 @@ def rate_limit(
                                 break
                 except Exception as e:
                     # If we can't send a message, log and skip
-                    import logging
+                    from loguru import logger
 
-                    logging.warning(f"Failed to send rate limit warning: {e}")
+                    logger.warning(f"Failed to send rate limit warning: {e}")
 
                 return None
 

@@ -1,7 +1,8 @@
-# %%
-from datetime import date, datetime, time
+"""Shared test helper functions."""
 
-# %%
+from __future__ import annotations
+
+from datetime import date, datetime, time
 
 
 def str_2_datetime(datetime_string: str) -> datetime:

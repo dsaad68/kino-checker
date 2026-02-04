@@ -1,7 +1,6 @@
 # %%
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
 from elevenlabs import generate
@@ -9,6 +8,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.sql_database import SQLDatabase
 from langchain_community.agent_toolkits import create_sql_agent
 from langchain_openai import ChatOpenAI
+from loguru import logger
 
 if TYPE_CHECKING:
     import telebot
@@ -77,17 +77,17 @@ class AnswerWithVoice:
         question = message.text
 
         sql_answer = self._query_db(question)
-        logging.info(f"SQL Answer: {sql_answer}")
+        logger.info(f"SQL Answer: {sql_answer}")
 
         styled_answer = self._style_answer(sql_answer, user_name)
-        logging.info(f"Styled Answer: {styled_answer}")
+        logger.info(f"Styled Answer: {styled_answer}")
 
-        logging.info("Generating voice message ...")
+        logger.info("Generating voice message ...")
         generate_voice = self._generate_voice(styled_answer)
-        logging.info("Generated voice message!")
+        logger.info("Generated voice message!")
 
-        logging.info(f"Sending the voice message to {message.chat.id}!")
+        logger.info(f"Sending the voice message to {message.chat.id}!")
         bot.send_voice(message.chat.id, generate_voice)
-        logging.info(f"Voice message sent to {message.chat.id}!")
+        logger.info(f"Voice message sent to {message.chat.id}!")
 
         del generate_voice

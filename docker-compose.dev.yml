@@ -1,0 +1,75 @@
+# Development overrides: build with dev target, mount source, optional pgAdmin
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+
+services:
+  db:
+    container_name: kino-db-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-kino_tracker}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-dev:/var/lib/postgresql/data
+      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  miner:
+    build:
+      context: .
+      dockerfile: ./code/miner/Dockerfile
+      target: development
+    container_name: kino-miner-dev
+    env_file: [./.env]
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./code/miner/src:/app/code/miner/src:ro
+      - ./code/common/src:/app/code/common/src:ro
+      - ./logs:/app/logs
+    networks: [app-network]
+    restart: unless-stopped
+
+  bot:
+    build:
+      context: .
+      dockerfile: ./code/bot/Dockerfile
+      target: development
+    container_name: kino-bot-dev
+    env_file: [./.env]
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./code/bot/src:/app/code/bot/src:ro
+      - ./code/common/src:/app/code/common/src:ro
+      - ./logs:/app/logs
+    networks: [app-network]
+    restart: unless-stopped
+
+  cleaner:
+    build:
+      context: .
+      dockerfile: ./code/cleaner/Dockerfile
+      target: development
+    container_name: kino-cleaner-dev
+    env_file: [./.env]
+    depends_on:
+      db: { condition: service_healthy }
+    volumes:
+      - ./code/cleaner/src:/app/code/cleaner/src:ro
+      - ./code/common/src:/app/code/common/src:ro
+      - ./logs:/app/logs
+    networks: [app-network]
+    restart: unless-stopped
+
+volumes:
+  db-dev:
+    driver: local

@@ -1,18 +1,18 @@
 # %%
 from __future__ import annotations
 
-import logging
+from pathlib import Path
 
 import telebot
-from telebot import custom_filters, types
-from telebot.handler_backends import State, StatesGroup  # States
-
 from bot.context import BotContext
 from bot.genai.agent import AnswerWithVoice
 from bot.utils.filters import filter_upcoming_films  # , filter_showing_films
 from common.call_parser import CallParser
 from common.helpers import get_or_raise, reverse_dict_search
-from my_logger import Logger
+from common.logging_config import setup_logger
+from loguru import logger
+from telebot import custom_filters, types
+from telebot.handler_backends import State, StatesGroup  # States
 
 
 class MyStates(StatesGroup):
@@ -94,11 +94,11 @@ def setup_handlers(ctx: BotContext) -> None:
     @bot.message_handler(func=lambda message: filter_upcoming_films(message, ctx.get_upcoming_films_list()))
     def upcoming_films_ov_filter(message: types.Message) -> None:
         """Inline keyboard for filtering upcoming films based on OV availability."""
-        logging.info(f"Message: {message.text}")
+        logger.info(f"Message: {message.text}")
 
         film_id = reverse_dict_search(ctx.get_upcoming_films_dict(), message.text)
 
-        logging.info(f"film_id: {film_id}")
+        logger.info(f"film_id: {film_id}")
 
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(types.InlineKeyboardButton(text="✅ Yes", callback_data=f"{film_id},uf|1,ov"))
@@ -112,7 +112,7 @@ def setup_handlers(ctx: BotContext) -> None:
     @bot.callback_query_handler(func=lambda call: call.data.endswith("ov"))
     def upcoming_films_imax_filter_callback(call: types.CallbackQuery) -> None:
         """Inline keyboard for filtering upcoming films based on IMAX availability."""
-        logging.info(f"Call Data: {call.data}")
+        logger.info(f"Call Data: {call.data}")
 
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(types.InlineKeyboardButton(text="✅ Yes", callback_data=f"{call.data}|1,imax"))
@@ -130,7 +130,7 @@ def setup_handlers(ctx: BotContext) -> None:
     @bot.callback_query_handler(func=lambda call: call.data.endswith("imax"))
     def upcoming_films_3d_filter_callback(call: types.CallbackQuery) -> None:
         """Inline keyboard for filtering upcoming films based on 3D availability."""
-        logging.info(f"Call Data: {call.data}")
+        logger.info(f"Call Data: {call.data}")
 
         keyboard = types.InlineKeyboardMarkup()
         keyboard.add(types.InlineKeyboardButton(text="✅ Yes", callback_data=f"{call.data}|1,3d"))
@@ -148,7 +148,7 @@ def setup_handlers(ctx: BotContext) -> None:
     @bot.callback_query_handler(func=lambda call: call.data.endswith("3d"))
     def track_upcommings_films(call: types.CallbackQuery) -> None:
         """Tracks the availability of upcoming films."""
-        logging.info(f"Call Data: {call.data}")
+        logger.info(f"Call Data: {call.data}")
 
         input_dict = CallParser.parse_for_input(call.data)
 
@@ -172,8 +172,11 @@ def setup_handlers(ctx: BotContext) -> None:
 
 def main() -> None:
     """Main entry point for the bot."""
-    logger = Logger(file_handler=True)
-    logger.get_logger()
+    setup_logger(
+        service_name="bot",
+        log_level="INFO",
+        log_file=Path("logs/bot.log"),
+    )
 
     # Create bot context with all dependencies
     ctx = BotContext.create(
@@ -187,7 +190,7 @@ def main() -> None:
     # Setup all handlers with context
     setup_handlers(ctx)
 
-    logging.info("----- Bot starts to run! -----")
+    logger.info("----- Bot starts to run! -----")
     ctx.bot.infinity_polling()
 
 

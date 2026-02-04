@@ -1,10 +1,10 @@
 # %%
 
 import enum
-import logging
 import os
 
 from dotenv import load_dotenv
+from loguru import logger
 from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 
@@ -31,7 +31,7 @@ class IntegrationDb:
                 self._execute_init_scripts(connection)
             except Exception as e:
                 self._drop_schemas()
-                logging.error(e)
+                logger.error(e)
                 raise e
             connection.commit()
         return url
@@ -42,30 +42,30 @@ class IntegrationDb:
         try:
             del os.environ[EnvVar.INT_DB_URL.name]
         except Exception as e:
-            logging.error(e)
+            logger.error(e)
             raise e
 
     def _create_schemas(self, connection):
         for schema in self.schemas:
             connection.execute(text(f"CREATE SCHEMA {schema}"))
-            logging.info(f"--- Schema with name {schema} was created! ---")
+            logger.info(f"--- Schema with name {schema} was created! ---")
 
     def _execute_init_scripts(self, connection):
         for init_script in self.init_scripts:
             with open(init_script) as file:
                 script_sql = file.read()
                 connection.execute(text(script_sql))
-                logging.info(f"--- Init script with name {init_script} was successfully executed! ---")
+                logger.info(f"--- Init script with name {init_script} was successfully executed! ---")
 
     def _drop_schemas(self):
         try:
             with self.engine.connect() as connection:
                 for schema in self.schemas:
                     connection.execute(text(f"DROP SCHEMA {schema} CASCADE;"))
-                    logging.info(f"--- Cleaned up schema {schema} ----")
+                    logger.info(f"--- Cleaned up schema {schema} ----")
                 connection.commit()
         except Exception as e:
-            logging.warning(e)
+            logger.warning(e)
 
     @staticmethod
     def _get_db_url():

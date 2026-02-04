@@ -1,11 +1,10 @@
-import logging
 from datetime import datetime, timedelta
-
-from sqlalchemy import update
-from sqlalchemy.sql import func
 
 from common.db.db_model import UpcomingFilms
 from common.db.manager import DBManager
+from loguru import logger
+from sqlalchemy import update
+from sqlalchemy.sql import func
 
 
 class DBCleaner(DBManager):
@@ -34,9 +33,9 @@ class DBCleaner(DBManager):
             .values(is_released=True)
         )
 
-        logging.info("Marking films as released...")
+        logger.info("Marking films as released...")
         self.execute_insert_stmt(mark_released_stmt)
-        logging.info("Marked films as released...")
+        logger.info("Marked films as released...")
 
         # Calculate the date threshold (Default 120 days ago from today)
         threshold_date = now - timedelta(days)
@@ -53,9 +52,9 @@ class DBCleaner(DBManager):
         )
 
         # Execute the update statement
-        logging.info("Cleaning outdated films ...")
+        logger.info("Cleaning outdated films ...")
         self.execute_insert_stmt(update_stmt)
-        logging.info("Cleaned outdated films ...")
+        logger.info("Cleaned outdated films ...")
 
     def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing row in the upcoming films table given its title."""

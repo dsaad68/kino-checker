@@ -1,12 +1,11 @@
 # %%
 
 import asyncio
-import logging
 import re
 
-from telebot.async_telebot import AsyncTeleBot
-
 from common.db.db_model import PerformanceInfo, UsersFilmInfo
+from loguru import logger
+from telebot.async_telebot import AsyncTeleBot
 
 # %%
 
@@ -29,11 +28,11 @@ class FilmReleaseNotification:
 
     async def shutdown(self):
         try:
-            logging.info("Bot session is closing.")
+            logger.info("Bot session is closing.")
             await self.bot.close_session()
-            logging.info("Bot session is closed.")
+            logger.info("Bot session is closed.")
         except Exception as error:
-            logging.error(f"An error occurred while closing the bot session: {error}", exc_info=True)
+            logger.error(f"An error occurred while closing the bot session: {error}", exc_info=True)
 
     def _message(self, user: UsersFilmInfo) -> str:
         """Generate a personalized message indicating the availability of a film in various formats."""
