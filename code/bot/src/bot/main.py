@@ -81,12 +81,16 @@ def setup_handlers(ctx: BotContext) -> None:
             return
 
         films_list = ctx.db_info_finder.get_upcomings_films_list()
-        films_dict = {film["upcoming_film_id"]: film["title"].lower() for film in films_list}
+        if films_list is None:
+            bot.reply_to(message, "Could not load upcoming films. Please try again later.")
+            return
 
+        films_dict = {film["upcoming_film_id"]: film["title"].lower() for film in films_list}
         ctx.set_upcoming_films(films_dict)
 
         markup_films = telebot.types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
-        for film in ctx.get_upcoming_films_list():
+        upcoming_list = ctx.get_upcoming_films_list() or []
+        for film in upcoming_list:
             markup_films.add(telebot.types.KeyboardButton(film))
 
         bot.send_message(message.chat.id, "Choose a film:", reply_markup=markup_films)
@@ -97,7 +101,11 @@ def setup_handlers(ctx: BotContext) -> None:
         """Inline keyboard for filtering upcoming films based on OV availability."""
         logger.info(f"Message: {message.text}")
 
-        film_id = reverse_dict_search(ctx.get_upcoming_films_dict(), message.text)
+        films_dict = ctx.get_upcoming_films_dict()
+        if films_dict is None:
+            bot.reply_to(message, "Please choose a film from the list first.")
+            return
+        film_id = reverse_dict_search(films_dict, message.text)
 
         logger.info(f"film_id: {film_id}")
 
@@ -153,7 +161,11 @@ def setup_handlers(ctx: BotContext) -> None:
 
         input_dict = CallParser.parse_for_input(call.data)
 
-        film_title = ctx.get_upcoming_films_dict().get(input_dict.get("uf"))
+        films_dict = ctx.get_upcoming_films_dict()
+        if films_dict is None:
+            bot.send_message(call.message.chat.id, "Session expired. Please choose a film from the list again.")
+            return
+        film_title = films_dict.get(input_dict.get("uf"))
 
         ctx.db_info_finder.upsert_users(
             message_id=str(call.message.message_id),
