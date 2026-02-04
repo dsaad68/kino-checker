@@ -54,6 +54,8 @@ module = [
     "telebot.*",
     "elevenlabs.*",
     "langchain.*",
+    "langchain_community.*",
+    "langchain_core.*",
     "langchain_openai.*",
     "alive_progress.*",
 ]

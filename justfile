@@ -106,10 +106,10 @@ test:
     @echo "Running all tests with coverage..."
     uv run pytest
 
-# Run all tests (unit + integration via testcontainers; no external DB needed)
+# Run all tests (unit + integration via testcontainers; no external DB needed; -s shows logger in integration tests)
 test-all:
     @echo "Running full test suite (testcontainers spin up DB automatically)..."
-    uv run pytest -v --no-cov
+    uv run pytest -v --no-cov -s
 
 # Run tests without coverage (fast)
 test-fast:
@@ -130,6 +130,11 @@ test-integration:
 test-db-info-finder:
     @echo "Running bot DB info finder integration tests..."
     uv run pytest code/bot/tests/bot/db_info_finder_test.py -v --no-cov
+
+# Run bot agent + db tools integration tests (testcontainers; agent tests need OPENAI_API_KEY; -s shows logger output)
+test-bot-integration:
+    @echo "Running bot integration tests (db tools + agent)..."
+    uv run pytest code/bot/tests/bot/integration_db/db_tools_integration_test.py -v --no-cov -s
 
 # Run bot tests
 test-bot:
