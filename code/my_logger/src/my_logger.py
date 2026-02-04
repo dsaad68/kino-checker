@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 
 from opencensus.ext.azure.log_exporter import AzureLogHandler
 
@@ -80,7 +80,15 @@ class Logger:
     DEFAULT_BASE_FORMAT = "[%(asctime)s] - [%(levelname)s] - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
     DEFAULT_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
-    def __init__(self, azure_connection_string=None, stream_handler=True, file_handler=False, azure_handler=False, log_lvl=logging.INFO, **kwargs) -> None:
+    def __init__(
+        self,
+        azure_connection_string=None,
+        stream_handler=True,
+        file_handler=False,
+        azure_handler=False,
+        log_lvl=logging.INFO,
+        **kwargs,
+    ) -> None:
         self.kwargs = kwargs
         self._stream_handler = stream_handler
         self._file_handler = file_handler
@@ -102,7 +110,9 @@ class Logger:
 
     def _add_azure_handler(self):
         """Checks if azure app insight handler should be added or not."""
-        return (self.azure_connection_string or os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")) and (self._azure_handler)
+        return (self.azure_connection_string or os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")) and (
+            self._azure_handler
+        )
 
     def get_file_handler(self):
         """Gets file handler with log level and formatter added.

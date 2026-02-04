@@ -1,0 +1,22 @@
+---
+globs: *.py
+alwaysApply: false
+---
+
+# TESTING FOR PYTHON 3.12
+
+- Use `pytest` for testing with its powerful fixture system and assertion introspection.
+- Write test functions, not test classes, unless you need to group related tests with shared setup logic.
+- Create fixtures with `@pytest.fixture` for reusable test dependencies and use function scope by default.
+- Place shared fixtures in `conftest.py` files to make them available across multiple test modules without imports.
+- Structure tests with `tests/` directory mirroring your source structure (e.g., `src/myapp/module.py` → `tests/test_module.py`).
+- Use `tests/conftest.py` for project-wide fixtures and nested `conftest.py` in subdirectories for domain-specific fixtures.
+- Leverage fixture scopes (`function`, `class`, `module`, `session`) to control setup/teardown frequency and resource sharing.
+- Use `pytest.mark.parametrize` for testing multiple input combinations without duplicating test code.
+- Prefer `pytest.raises()` context manager for testing expected exceptions with specific error messages.
+- Use `hypothesis` for property-based testing where input space is large or parsing is complex.
+- Design tests for determinism and avoid time- and network-dependent flakiness by mocking external dependencies.
+- Use `pytest.mark` decorators to categorize tests (e.g., `@pytest.mark.slow`, `@pytest.mark.integration`) for selective test execution.
+- Leverage `breakpoint()` for debugging tests instead of print statements.
+- Use type checkers (mypy, pyright) in CI/CD to catch type errors before runtime.
+- Mock external dependencies with `pytest-mock` or `unittest.mock` to isolate unit tests from I/O and network calls.

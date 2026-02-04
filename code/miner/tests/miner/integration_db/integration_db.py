@@ -1,10 +1,14 @@
-import os
+# %%
+
 import enum
 import logging
+import os
 
 from dotenv import load_dotenv
 from sqlalchemy import text
 from sqlalchemy.engine import create_engine
+
+# %%
 
 
 class EnvVar(enum.Enum):

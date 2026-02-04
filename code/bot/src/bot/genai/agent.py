@@ -1,23 +1,31 @@
-#%%
+# %%
+from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from elevenlabs import generate
-from langchain_openai import ChatOpenAI
-from langchain.sql_database import SQLDatabase
 from langchain.prompts import ChatPromptTemplate
+from langchain.sql_database import SQLDatabase
 from langchain_community.agent_toolkits import create_sql_agent
+from langchain_openai import ChatOpenAI
 
-#%%
+if TYPE_CHECKING:
+    import telebot
+    from telebot import types
+
+# %%
+
 
 class AnswerWithVoice:
+    def __init__(self, db_dilect_connection_uri: str, open_ai_api_key: str, eleven_api_key: str) -> None:
+        self._chat_openai: ChatOpenAI = ChatOpenAI(
+            model="gpt-4-0125-preview", temperature=0, openai_api_key=open_ai_api_key
+        )
+        self._db: SQLDatabase = SQLDatabase.from_uri(db_dilect_connection_uri)
+        self._eleven_api_key: str = eleven_api_key
 
-    def __init__(self, db_dilect_connection_uri:str, open_ai_api_key:str, eleven_api_key:str):
-        self._chat_openai = ChatOpenAI(model="gpt-4-0125-preview", temperature=0, openai_api_key=open_ai_api_key)
-        self._db = SQLDatabase.from_uri(db_dilect_connection_uri)
-        self._eleven_api_key = eleven_api_key
-
-    def _query_db(self, question:str) -> str:
+    def _query_db(self, question: str) -> str:
 
         prefix = """Using the Postgres dialect, "performances", "films" and "upcoming_films" tables.
                     Join on "performances.film_id = films.film_id" to extract film titles.
@@ -28,12 +36,14 @@ class AnswerWithVoice:
         suffix = """Do not return sql statements. Return only the results.
                     Limit results to 10 rows."""
 
-        agent_executor = create_sql_agent(self._chat_openai, db=self._db, agent_type="openai-tools", verbose=True, prefix=prefix, suffix=suffix)
+        agent_executor = create_sql_agent(
+            self._chat_openai, db=self._db, agent_type="openai-tools", verbose=True, prefix=prefix, suffix=suffix
+        )
 
         sql_output = agent_executor.invoke({"input": question})
         return sql_output.get("output")
 
-    def _style_answer(self, sql_answer:str, user_name:str) -> str:
+    def _style_answer(self, sql_answer: str, user_name: str) -> str:
 
         template_string = """Style the following text to a very short and witty `voice message` from a friendly and funny and Shady Back Alley Ticket Scalper named `Mathias the ZKM guy`.
                             At the end, say something like `hit me up` if you want a ticket or I'll call me or similar to it in a cool way.
@@ -51,11 +61,16 @@ class AnswerWithVoice:
         response = self._chat_openai.invoke(styled_messages)
         return response.content
 
-    def _generate_voice(self, answer:str) -> str:
-        return generate(text=answer, voice="Callum", model="eleven_multilingual_v1", output_format = "mp3_44100_128", api_key=self._eleven_api_key)
+    def _generate_voice(self, answer: str) -> bytes:
+        return generate(
+            text=answer,
+            voice="Callum",
+            model="eleven_multilingual_v1",
+            output_format="mp3_44100_128",
+            api_key=self._eleven_api_key,
+        )
 
-
-    def answer(self, bot, message) -> str:
+    def answer(self, bot: telebot.TeleBot, message: types.Message) -> None:
         # sourcery skip: extract-method
 
         user_name = message.from_user.first_name

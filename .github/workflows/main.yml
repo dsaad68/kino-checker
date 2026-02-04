@@ -1,37 +1,27 @@
-name: 'Python Test and Lint'
+name: 'CI/CD Pipeline'
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
   push:
-    branches:
-      - main
+    branches: [master]
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11']
+        python-version: ['3.11', '3.12', '3.13']
 
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       postgres:
-        # Docker Hub image
-        image: postgres:alpine3.18
-        # Provide the password for postgres
+        image: postgres:16-alpine
         env:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: another!!22TEST
         ports:
-          # Maps tcp port 5432 on service container to the host
           - 5432:5432
-        # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -40,21 +30,57 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        version: "latest"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest docker python-dotenv
-        pip install --no-cache-dir ./code/my_logger
-        pip install --no-cache-dir ./code/common
-        pip install --no-cache-dir ./code/bot
-        pip install --no-cache-dir ./code/miner
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Run tests with pytest
-      run: |
-        pytest -s .
-    - name: Run ruff
-      uses: chartboost/ruff-action@v1
+      run: uv sync --all-packages --dev
+
+    - name: Run ruff check
+      run: uv run ruff check .
+
+    - name: Run ruff format check
+      run: uv run ruff format --check .
+
+    - name: Run mypy
+      run: uv run mypy code/
+      continue-on-error: true
+
+    - name: Run tests with coverage
+      run: uv run pytest --cov --cov-report=xml
+      env:
+        DATABASE_URL: postgresql://postgres:another!!22TEST@localhost:5432/postgres
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      if: matrix.python-version == '3.11'
+      with:
+        file: ./coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
+      continue-on-error: true
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v4
+
+    - name: Run Trivy scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: 'trivy-results.sarif'
+      continue-on-error: true

@@ -1,5 +1,30 @@
-# Assume Python 3.11
 target-version = "py311"
+line-length = 120
 
-# Maximum line length
-line-length = 250
+[lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade (modernize Python code)
+    "ASYNC",  # flake8-async
+    "S",      # bandit security checks
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "T20",    # flake8-print (no print statements)
+    "SIM",    # flake8-simplify
+    "RUF",    # Ruff-specific rules
+]
+ignore = [
+    "S101",   # Allow asserts (for pytest)
+    "E501",   # Line too long (handled by formatter)
+]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = ["S101", "T20"]
+
+[lint.isort]
+known-first-party = ["bot", "miner", "cleaner", "common", "my_logger"]

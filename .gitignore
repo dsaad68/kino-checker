@@ -1,16 +1,52 @@
+# Build artifacts
 build
-.old
-__pycache__
-test*.*
-*.log
-*-bckp.*
-*_bckp.*
-.ruff_cache
 *.egg-info
-.vscode
-.pytest_cache
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
 .venv
 venv
+env
+ENV
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+coverage.xml
+.tox
+.mypy_cache
+
+# Linting and formatting
+.ruff_cache
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+*.log
+
+# Backup files
+.old
+*-bckp.*
+*_bckp.*
+
+# Project specific
 diagram.png
 step.save
 .handler-saves
+
+# OS files
+.DS_Store
+Thumbs.db

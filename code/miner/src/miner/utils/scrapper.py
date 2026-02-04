@@ -1,10 +1,9 @@
-import re
 import logging
-import requests
+import re
+from datetime import date, datetime
 
+import requests
 from bs4 import BeautifulSoup
-from typing import List, Tuple
-from datetime import datetime, date
 from requests import RequestException
 
 
@@ -26,7 +25,7 @@ class Scraper:
         MAX_ITERATIONS = 100  # Set a reasonable limit to prevent infinite loops
 
         i = 1
-        results: List[dict] = []
+        results: list[dict] = []
 
         while i <= MAX_ITERATIONS:
             url = f"{self.base_url}{i}/"
@@ -49,7 +48,7 @@ class Scraper:
 
         return results
 
-    def _get_website(self, url) -> Tuple[BeautifulSoup | None, int]:
+    def _get_website(self, url) -> tuple[BeautifulSoup | None, int]:
         """Retrieves a website and returns its BeautifulSoup object and status code."""
 
         try:
@@ -63,10 +62,10 @@ class Scraper:
             return None, 999
 
     # IDEA: if it works with upcoming film object instead of dict
-    def _extractor(self, soup) -> List[dict] | None:
+    def _extractor(self, soup) -> list[dict] | None:
         """Extracts data from a BeautifulSoup object."""
 
-        results: List[dict] = []
+        results: list[dict] = []
 
         title_selector = "div.elementor-container div.elementor-column-gap-default h2"
         release_date_selector = "div.elementor-container div.elementor-column-gap-default ul > li:nth-of-type(2) span"
@@ -78,11 +77,13 @@ class Scraper:
                 title = element.select_one(title_selector)
                 release_date = element.select_one(release_date_selector)
                 if title is not None:
-                    results.append({
-                                    "title": title.get_text(),
-                                    "release_date": self._get_date(release_date.get_text()),
-                                    "last_updated": datetime.now()
-                                    })
+                    results.append(
+                        {
+                            "title": title.get_text(),
+                            "release_date": self._get_date(release_date.get_text()),
+                            "last_updated": datetime.now(),
+                        }
+                    )
             return results
         except Exception as e:
             logging.error(f"An error occurred: {e}")

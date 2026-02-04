@@ -1,12 +1,11 @@
-#%%
+# %%
 
 import logging
+from datetime import date, datetime, time
+
 import requests
 
-from typing import List
-from datetime import date, time, datetime
-
-#%%
+# %%
 
 CENTER_OID = "6F000000014BHGWDVI"
 HEADERS = {
@@ -24,7 +23,8 @@ HEADERS = {
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
 }
 
-#%%
+
+# %%
 class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
         self.center_oid = center_oid
@@ -44,7 +44,7 @@ class FilmFetcher:
             logging.error(f"An error occurred: {e}")
             return None
 
-    def get_film_list(self, date_from: str, date_to: str) -> List | None:
+    def get_film_list(self, date_from: str, date_to: str) -> list | None:
         url = "https://cineorder.filmpalast.net/api/films"
 
         payload = {"cinemadate.from": date_from, "cinemadate.to": date_to}
@@ -61,6 +61,7 @@ class FilmFetcher:
 
 class FilmInfoExtractor:
     """This class extracts the films and performances from the film_fetcher_response."""
+
     def __init__(self, film_fetcher_response: list | None):
         if film_fetcher_response is not None:
             self.film_fetcher_response = film_fetcher_response
@@ -68,7 +69,7 @@ class FilmInfoExtractor:
             logging.warning("API Response is empty!")
             self.film_fetcher_response = None
 
-    def get_films_info_list(self) -> List[dict] | None:
+    def get_films_info_list(self) -> list[dict] | None:
         """Extracts the films from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:
@@ -81,14 +82,14 @@ class FilmInfoExtractor:
                     "length_in_minutes": film.get("lengthInMinutes"),
                     "nationwide_start": film.get("nationwideStart"),
                     "image_url": film.get("imageUrl"),
-                    "last_updated": datetime.now()
+                    "last_updated": datetime.now(),
                 }
                 for film in film_list  # type: ignore
             ]
         logging.warn("Film Fetcher Response is empty!")
         return None
 
-    def get_performances_list(self) -> List[dict] | None:
+    def get_performances_list(self) -> list[dict] | None:
         """Extracts the performances from the film_fetcher_response and returns a list of dictionaries."""
         film_list = self.film_fetcher_response
         if film_list is not None:

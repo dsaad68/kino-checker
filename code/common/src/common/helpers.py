@@ -1,9 +1,11 @@
-#%%
+# %%
+from __future__ import annotations
+
 import os
+from typing import Any
 
-from typing import Any, Optional
+# %%
 
-#%%
 
 def get_or_raise(env_name: str) -> str:
     """get an environment variable or raise an error
@@ -29,8 +31,9 @@ def get_or_raise(env_name: str) -> str:
     else:
         raise ValueError(f"Missing environment variable {env_name}")
 
-#%%
-def reverse_dict_search(input_dict: dict, value: Any) -> Optional[Any]:
+
+# %%
+def reverse_dict_search(input_dict: dict, value: Any) -> Any | None:
     """Reverse dictionary search
     Search for the first key in the dictionary based on the given value.
 

@@ -1,19 +1,28 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "common"
 version = "0.1.0"
-description = ""
+description = "Shared database models, utilities, and common code"
 authors = [{name = "Daniel Saad", email = "me@dsaad.com"}]
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
 dependencies = [
-    "SQLAlchemy==2.0.12",
-    "psycopg2-binary==2.9.6",
+    "SQLAlchemy>=2.0.40,<3.0",
+    "psycopg2-binary>=2.9.6",
+    "pydantic>=2.10.0,<3.0",
+    "pydantic-settings>=2.7.0,<3.0",
 ]
 
 [project.optional-dependencies]
-testing = [
-    "pytest==7.4.0",
-    "debugpy",
-    ]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",
+    "debugpy>=1.8.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/common"]

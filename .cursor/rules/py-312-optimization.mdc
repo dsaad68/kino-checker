@@ -1,0 +1,24 @@
+---
+globs: *.py
+alwaysApply: false
+---
+
+# PERFORMANCE & OPTIMIZATION FOR PYTHON 3.12
+
+## Performance Optimization
+
+- Cache pure functions with `functools.cache` (unbounded) or `lru_cache` where hit rates are high.
+- Minimize allocations in hot paths; reuse buffers and precompile regexes with `re.compile()` when needed.
+- Move tight numeric loops to vectorized libraries when available, or to C extensions only when justified.
+- Avoid premature micro-optimizations; measure with realistic inputs using cProfile or perf_counter() before and after changes.
+- Use `__slots__` in classes that will have many instances to reduce memory overhead and improve attribute access speed.
+- Use `str.join()` instead of concatenating strings with `+` in loops for better performance.
+- Prefer list comprehensions over `map()`/`filter()` for simple transformations as they're more readable and often faster.
+- Use `set` operations (intersection, union, difference) instead of loops for set-like operations on collections.
+
+## Memory & Resources
+
+- Use `weakref` for caching or observer patterns to prevent memory leaks from circular references.
+- Leverage `__del__` sparingly and prefer context managers for resource cleanup.
+- Use `sys.getsizeof()` and memory profilers to identify memory-heavy objects in performance-critical code.
+- Prefer generators and iterators over materializing large sequences into memory.

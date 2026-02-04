@@ -1,27 +1,28 @@
 # %%
+from __future__ import annotations
+
 import logging
 
-from typing import List, Dict, Tuple
-from sqlalchemy.sql import select, func
 from psycopg2.errors import CardinalityViolation
-from sqlalchemy import Update, update, and_, tuple_
-from sqlalchemy.dialects.postgresql import insert, Insert
+from sqlalchemy import Update, and_, tuple_, update
+from sqlalchemy.dialects.postgresql import Insert, insert
+from sqlalchemy.sql import func, select
 
-from common.db.manager import DBManager
 from common.call_parser import CallParser
+from common.db.db_model import Films, PerformanceInfo, Performances, UpcomingFilms, Users, UsersFilmInfo
+from common.db.manager import DBManager
 from common.helpers import deduplicate_list_dict
-from common.db.db_model import Films, UpcomingFilms, Performances, Users, UsersFilmInfo, PerformanceInfo
-
 
 # %%
+
 
 class FilmDatabaseManager(DBManager):
     """This class manages the films and performances tables in the database"""
 
-    def __init__(self, connection_uri: str):
+    def __init__(self, connection_uri: str) -> None:
         super().__init__(connection_uri)
 
-    def update_films_table(self, films_list: List[dict] | None) -> None:
+    def update_films_table(self, films_list: list[dict] | None) -> None:
         """Updates the films table."""
         if films_list is not None:
             logging.info("[ ] Updating Films table!")
@@ -33,7 +34,7 @@ class FilmDatabaseManager(DBManager):
         else:
             logging.warning("Films list is None")
 
-    def update_performances_table(self, performances_list: List[dict] | None) -> None:
+    def update_performances_table(self, performances_list: list[dict] | None) -> None:
         """Updates the performances table."""
         if performances_list is not None:
             logging.info("[ ] Updating Performances table!")
@@ -45,7 +46,7 @@ class FilmDatabaseManager(DBManager):
         else:
             logging.warning("Performances list is None")
 
-    def update_upcoming_films_table(self, upcoming_films_list: List[dict] | None) -> None:
+    def update_upcoming_films_table(self, upcoming_films_list: list[dict] | None) -> None:
         # sourcery skip: extract-duplicate-method, extract-method
         """Updates the upcoming films table.
 
@@ -58,27 +59,29 @@ class FilmDatabaseManager(DBManager):
         """
 
         if upcoming_films_list is not None:
-
             try:
                 logging.info("[ ] Updating Upcoming Films table!")
 
                 # Upsert statement
-                exclude_cols = ['title', 'is_released', 'is_trackable', 'upcoming_film_id', 'film_id']
-                upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", upcoming_films_list, exclude_cols= exclude_cols)
+                exclude_cols = ["title", "is_released", "is_trackable", "upcoming_film_id", "film_id"]
+                upsert_stmt = self._create_upsert_stmt(
+                    UpcomingFilms, "title", upcoming_films_list, exclude_cols=exclude_cols
+                )
 
                 # Execute the upsert statement
                 self.execute_insert_stmt(upsert_stmt)
                 logging.info("[*] Updated Upcoming Films table!")
 
             except CardinalityViolation as e:
-
                 logging.error(f"[!] Duplicate films found in Upcoming Films table. Error: {e}")
                 logging.warning("[!] Duplicate films found in Upcoming Films table. Deduplicating upcoming films!")
 
                 deduplicated_upcoming_films_list = deduplicate_list_dict(upcoming_films_list, key="title")
 
                 # Upsert statement
-                upsert_stmt = self._create_upsert_stmt(UpcomingFilms, "title", deduplicated_upcoming_films_list, exclude_cols= exclude_cols)
+                upsert_stmt = self._create_upsert_stmt(
+                    UpcomingFilms, "title", deduplicated_upcoming_films_list, exclude_cols=exclude_cols
+                )
 
                 # Execute the upsert statement
                 self.execute_insert_stmt(upsert_stmt)
@@ -111,7 +114,7 @@ class FilmDatabaseManager(DBManager):
         # Execute the update statement
         self.execute_insert_stmt(update_stmt)
 
-    def update_notified_users_table(self, users_list: List[UsersFilmInfo]) -> None:
+    def update_notified_users_table(self, users_list: list[UsersFilmInfo]) -> None:
 
         logging.info("[ ] Updating notified users' status Users table!")
         # Update statement
@@ -122,18 +125,22 @@ class FilmDatabaseManager(DBManager):
         self.execute_insert_stmt(update_stmt)
 
     @staticmethod
-    def _extract_film_data(film_dict, keys: List[str]) -> Dict[str, str | int]:
+    def _extract_film_data(film_dict, keys: list[str]) -> dict[str, str | int]:
         """Extracts film data from a dictionary."""
         return {key: film_dict.get(key) for key in keys}
 
-    def _create_upsert_stmt(self, table, id_col_name: str, update_list: List[dict], exclude_cols: List[str] | None = None) -> Insert:
+    def _create_upsert_stmt(
+        self, table, id_col_name: str, update_list: list[dict], exclude_cols: list[str] | None = None
+    ) -> Insert:
         """Creates an upsert statement for a table"""
 
         # Insert statement
         insert_stmt = insert(table).values(update_list)
 
         # Build a dictionary for updating all columns except the primary key
-        update_dict = {col.name: insert_stmt.excluded[col.name] for col in table.__table__.columns if not col.primary_key}
+        update_dict = {
+            col.name: insert_stmt.excluded[col.name] for col in table.__table__.columns if not col.primary_key
+        }
 
         # Remove keys from the dictionary
         if exclude_cols is not None:
@@ -163,13 +170,18 @@ class FilmDatabaseManager(DBManager):
         # sourcery skip: inline-immediately-returned-variable
 
         # Define the subquery with case-insensitive comparison
-        film_id_subquery = select(Films.film_id).where(func.lower(UpcomingFilms.title) == func.lower(Films.title)).correlate(UpcomingFilms).scalar_subquery()
+        film_id_subquery = (
+            select(Films.film_id)
+            .where(func.lower(UpcomingFilms.title) == func.lower(Films.title))
+            .correlate(UpcomingFilms)
+            .scalar_subquery()
+        )
 
         # Update statement with case-insensitive comparison
         update_stmt = (
             update(UpcomingFilms)
             .values(film_id=film_id_subquery, is_released=True)
-            .where(and_(UpcomingFilms.is_trackable == True, func.lower(UpcomingFilms.title) == func.lower(Films.title)))   # noqa: E712
+            .where(and_(UpcomingFilms.is_trackable == True, func.lower(UpcomingFilms.title) == func.lower(Films.title)))  # noqa: E712
         )
         return update_stmt
 
@@ -205,15 +217,14 @@ class FilmDatabaseManager(DBManager):
         )
 
     @staticmethod
-    def _create_notfied_users_update_stmt(user_film_pairs: List[Tuple[int, str]]) -> Update:
-        """ Creates an update statement for notifying users.
+    def _create_notfied_users_update_stmt(user_film_pairs: list[tuple[int, str]]) -> Update:
+        """Creates an update statement for notifying users.
         Sets notified = True for pair of user_id and film_id.
         """
 
-        return update(Users).where(
-            tuple_(Users.user_id, Users.film_id).in_(user_film_pairs)).values(notified=True)
+        return update(Users).where(tuple_(Users.user_id, Users.film_id).in_(user_film_pairs)).values(notified=True)
 
-    def _get_film_by_title(self, title: str) -> Films |None:
+    def _get_film_by_title(self, title: str) -> Films | None:
         """Get an existing row in the films table given its title."""
         return self.execute_fetch_one(Films, lambda film: func.lower(film.title) == title.lower())
 
@@ -231,7 +242,9 @@ class FilmDatabaseManager(DBManager):
 
     def _get_upcoming_film_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing row in the upcoming films table given its title."""
-        return self.execute_fetch_one(UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower())
+        return self.execute_fetch_one(
+            UpcomingFilms, lambda upcoming_film: func.lower(upcoming_film.title) == title.lower()
+        )
 
     def _get_upcoming_user_by_title(self, title: str) -> UpcomingFilms | None:
         """Get an existing rows in the users table given its title."""
@@ -242,31 +255,35 @@ class FilmDatabaseManager(DBManager):
         return self.execute_fetch_one(Users, lambda user: user.user_id == user_id)
 
     # TODO: Needs testing
-    def _get_performance_info_by_film_id(self, film_id:str, versions: Dict[str, bool]) -> List[PerformanceInfo]:
+    def _get_performance_info_by_film_id(self, film_id: str, versions: dict[str, bool]) -> list[PerformanceInfo]:
         """Gets the perfomance of a film is based on the versions"""
 
-        version_filter= [ getattr(Performances, key) == value for key, value in versions.items() ] # noqa: E712
+        version_filter = [getattr(Performances, key) == value for key, value in versions.items()]
         stmt = select(
-                    Performances.film_id,
-                    Performances.performance_id,
-                    Performances.performance_date,
-                    Performances.performance_time,
-                    Performances.is_3d,
-                    Performances.is_ov,
-                    Performances.is_imax
-                    ).where( and_(Performances.film_id == film_id, *version_filter))
+            Performances.film_id,
+            Performances.performance_id,
+            Performances.performance_date,
+            Performances.performance_time,
+            Performances.is_3d,
+            Performances.is_ov,
+            Performances.is_imax,
+        ).where(and_(Performances.film_id == film_id, *version_filter))
         performances_list = self.execute_query_mapping_all(stmt)
-        return [PerformanceInfo(film_id= performance.get('film_id'),
-                                performance_id= performance.get('performance_id'),
-                                date= performance.get('performance_date'),
-                                time= performance.get('performance_time'),
-                                is_3d= performance.get('is_3d'),
-                                is_ov= performance.get('is_ov'),
-                                is_imax= performance.get('is_imax'))
-                for performance in performances_list]
+        return [
+            PerformanceInfo(
+                film_id=performance.get("film_id"),
+                performance_id=performance.get("performance_id"),
+                date=performance.get("performance_date"),
+                time=performance.get("performance_time"),
+                is_3d=performance.get("is_3d"),
+                is_ov=performance.get("is_ov"),
+                is_imax=performance.get("is_imax"),
+            )
+            for performance in performances_list
+        ]
 
     # TODO: update test
-    def get_users_to_notify(self) -> List[UsersFilmInfo]:
+    def get_users_to_notify(self) -> list[UsersFilmInfo]:
         """Get list of users to notify with information about first available performance based on user preferences.
 
         SQL Query:
@@ -297,37 +314,52 @@ class FilmDatabaseManager(DBManager):
         users_list = []
 
         # Join Users with Performances to fetch in a single query
-        query = ( select(Users.film_id, Users.title, Users.flags,
-                        Users.user_id, Users.chat_id, Users.message_id, Users.notified,
-                        Films.name,
-                        Performances.performance_id,
-                        Performances.is_3d, Performances.is_ov, Performances.is_imax, Performances.last_updated)
-                .join(Performances, Users.film_id == Performances.film_id)
-                .join(Films, Users.film_id == Films.film_id)
-                .where(and_(Users.notified == False, Users.film_id.isnot(None)))  # noqa: E712
+        query = (
+            select(
+                Users.film_id,
+                Users.title,
+                Users.flags,
+                Users.user_id,
+                Users.chat_id,
+                Users.message_id,
+                Users.notified,
+                Films.name,
+                Performances.performance_id,
+                Performances.is_3d,
+                Performances.is_ov,
+                Performances.is_imax,
+                Performances.last_updated,
             )
+            .join(Performances, Users.film_id == Performances.film_id)
+            .join(Films, Users.film_id == Films.film_id)
+            .where(and_(Users.notified == False, Users.film_id.isnot(None)))  # noqa: E712
+        )
 
         unnotified_users = self.execute_query_mapping_all(query)
 
         if unnotified_users is not None:
-
             # Use a set to avoid duplicate users
             seen = set()
 
             # TODO: Add better comments to the code and explain the logic
             # Filter users based on user's preferences
-            unnotified_users = [user
-                                for user in unnotified_users
-                                if all(getattr(user, key) == value for key, value in CallParser.parse(user.flags).items() if value != 2)]
+            unnotified_users = [
+                user
+                for user in unnotified_users
+                if all(getattr(user, key) == value for key, value in CallParser.parse(user.flags).items() if value != 2)
+            ]
 
-            unnotified_users = [user
-                                for user in unnotified_users
-                                if (user.user_id, user.film_id) not in seen and not seen.add((user.user_id, user.film_id))]
+            unnotified_users = [
+                user
+                for user in unnotified_users
+                if (user.user_id, user.film_id) not in seen and not seen.add((user.user_id, user.film_id))
+            ]
 
             for user in unnotified_users:
-
                 # STEP 1: Get a list of performance for the user
-                performances_list = self._get_performance_info_by_film_id(user.get('film_id'), CallParser.parse(user.get('flags')))
+                performances_list = self._get_performance_info_by_film_id(
+                    user.get("film_id"), CallParser.parse(user.get("flags"))
+                )
 
                 # STEP 2: Create a UsersFilmInfo object with the user's data and performance data
                 user = UsersFilmInfo(
@@ -340,7 +372,8 @@ class FilmDatabaseManager(DBManager):
                     last_updated=user.last_updated,
                     flags=user.flags,
                     name=user.name,
-                    performances=performances_list)
+                    performances=performances_list,
+                )
 
                 users_list.append(user)
 

@@ -1,18 +1,15 @@
 # %%
 
-import time
-import logging
 import asyncio
-
-from my_logger import Logger
+import logging
+import time
 
 from common.helpers import get_or_raise
-
-from miner.utils.scrapper import Scraper
 from miner.utils.film_db_manager import FilmDatabaseManager
+from miner.utils.film_fetcher import CENTER_OID, HEADERS, FilmFetcher, FilmInfoExtractor
 from miner.utils.film_notifier import FilmReleaseNotification
-from miner.utils.film_fetcher import FilmFetcher, FilmInfoExtractor, HEADERS, CENTER_OID
-
+from miner.utils.scrapper import Scraper
+from my_logger import Logger
 
 # %%
 # sourcery skip: use-named-expression
@@ -77,7 +74,6 @@ if __name__ == "__main__":
         users_list = film_db_manager.get_users_to_notify()
 
         if users_list:
-
             logging.info(f"Number of users to notify: {len(users_list)}")
             logging.info(f"Users to notify: {users_list}")
 
@@ -100,5 +96,5 @@ if __name__ == "__main__":
         logging.info(f"----- Updating session ended in {elapsed_time:.4f} seconds! -----")
 
         # Sleep for 10 Min
-        logging.info(f"==+== Sleeping for {TIME_INTERVAL/60} Min! ==+==")
+        logging.info(f"==+== Sleeping for {TIME_INTERVAL / 60} Min! ==+==")
         time.sleep(TIME_INTERVAL)

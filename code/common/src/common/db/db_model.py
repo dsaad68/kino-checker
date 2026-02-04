@@ -1,17 +1,17 @@
-#%%
-from typing import List
-from sqlalchemy import MetaData
+# %%
 from dataclasses import dataclass
-from datetime import datetime, date, time
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, Time, ForeignKey, Sequence
+from datetime import date, datetime, time
 
-#%%
+from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, MetaData, Sequence, String, Time
+from sqlalchemy.orm import declarative_base
+
+# %%
 # Define the schema for the tracker database
 metadata_obj = MetaData(schema="tracker")
 
 # Define a base class for declarative models
 Base = declarative_base(metadata=metadata_obj)
+
 
 # Define a model for the tracker.films table
 class Films(Base):
@@ -49,10 +49,14 @@ class UpcomingFilms(Base):
     __tablename__ = "upcoming_films"
 
     # Define the sequence for upcoming_film_id
-    upcoming_film_id_seq = Sequence('upcoming_film_id_seq', metadata=Base.metadata, increment=1, start=1, cycle=False, schema='tracker')
+    upcoming_film_id_seq = Sequence(
+        "upcoming_film_id_seq", metadata=Base.metadata, increment=1, start=1, cycle=False, schema="tracker"
+    )
 
     # Define the columns
-    upcoming_film_id = Column(Integer, upcoming_film_id_seq, server_default=upcoming_film_id_seq.next_value(), primary_key=True)
+    upcoming_film_id = Column(
+        Integer, upcoming_film_id_seq, server_default=upcoming_film_id_seq.next_value(), primary_key=True
+    )
     title = Column(String(255), nullable=False, unique=True)
     release_date = Column(Date)
     film_id = Column(String(255), ForeignKey("tracker.films.film_id"))
@@ -76,6 +80,7 @@ class Users(Base):
 @dataclass
 class PerformanceInfo:
     """Dataclass for performance info"""
+
     film_id: str
     performance_id: str
     date: date
@@ -85,15 +90,16 @@ class PerformanceInfo:
     is_3d: bool
 
     def get_date(self) -> str:
-        return self.time.strftime('%Y-%m-%d')
+        return self.time.strftime("%Y-%m-%d")
 
     def get_time(self) -> str:
-        return self.time.strftime('%H:%M:%S')
+        return self.time.strftime("%H:%M:%S")
 
 
 @dataclass
 class UsersFilmInfo:
     """Dataclass for users film info"""
+
     user_id: int
     chat_id: str
     message_id: str
@@ -102,8 +108,8 @@ class UsersFilmInfo:
     title: str
     last_updated: datetime
     flags: str
-    name:str
-    performances: List[PerformanceInfo]
+    name: str
+    performances: list[PerformanceInfo]
 
     def get_last_updated(self) -> str:
-        return self.last_updated.strftime('%Y-%m-%d %H:%M:%S')
+        return self.last_updated.strftime("%Y-%m-%d %H:%M:%S")

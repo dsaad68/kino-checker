@@ -1,72 +1,71 @@
 services:
-
   db:
-    image: postgres:alpine3.18
+    image: postgres:16-alpine
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       retries: 5
       start_period: 30s
       timeout: 10s
-    restart: always
-    env_file:
-      - ./.env
+    restart: unless-stopped
+    env_file: [./.env]
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - '5432:5432'
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports: ['5432:5432']
     volumes:
       - db:/var/lib/postgresql/data
-      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/create_tables.sql:ro
       # NOTE: uncomment for linux
       # - ./code/init-db/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    networks: [app-network]
 
   miner:
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
     build:
       context: .
       dockerfile: ./code/miner/Dockerfile
-    env_file:
-      - ./.env
-    environment:
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
-    restart: always
+    env_file: [./.env]
+    restart: unless-stopped
+    networks: [app-network]
+    deploy:
+      resources:
+        limits: {cpus: '1', memory: 512M}
+        reservations: {cpus: '0.5', memory: 256M}
 
   bot:
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
     build:
       context: .
       dockerfile: ./code/bot/Dockerfile
-    env_file:
-      - ./.env
-    environment:
-      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
-      - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
-      - DB_DILECT_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
-      - ELEVEN_API_KEY=${ELEVEN_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    restart: always
+    env_file: [./.env]
+    restart: unless-stopped
+    networks: [app-network]
+    deploy:
+      resources:
+        limits: {cpus: '1', memory: 512M}
+        reservations: {cpus: '0.5', memory: 256M}
 
   cleaner:
     depends_on:
-      db:
-        condition: service_healthy
+      db: {condition: service_healthy}
     build:
       context: .
       dockerfile: ./code/cleaner/Dockerfile
-    env_file:
-      - ./.env
-    environment:
-      - POSTGRES_DB_CONNECTION_URI=${POSTGRES_DB_CONNECTION_URI}
-    restart: always
+    env_file: [./.env]
+    restart: unless-stopped
+    networks: [app-network]
+    deploy:
+      resources:
+        limits: {cpus: '0.5', memory: 256M}
+        reservations: {cpus: '0.25', memory: 128M}
 
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   db:

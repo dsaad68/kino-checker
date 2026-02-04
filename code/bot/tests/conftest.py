@@ -1,21 +1,15 @@
-#%%
-import os
-import pytest
+"""Bot-specific test fixtures.
 
-from datetime import datetime, timedelta
+Shared fixtures are automatically imported from parent conftest.py:
+- postgres_container: PostgreSQL test container
+- db_engine: SQLAlchemy engine
+- db_connection_uri: Connection URI with schema
+- db_connection_uri_with_sample_data: Connection URI with sample data
+- schemas: List of database schemas
+- init_scripts: List of init scripts
+- date_ten_days_in_future_date: Future date helper
+"""
 
-#%%
+from __future__ import annotations
 
-@pytest.fixture
-def schemas():
-    return ["tracker"]
-
-@pytest.fixture
-def init_scripts():
-    return [os.path.abspath("./code/init-db/init-db.sql"),
-            os.path.abspath("./code/init-db/sample-data.sql")]
-
-@pytest.fixture
-def date_ten_days_in_future_date():
-    """ It returns a date 10 days in the future """
-    return datetime.now().date() + timedelta(days=10)
+# All shared fixtures are automatically available from parent conftest.py

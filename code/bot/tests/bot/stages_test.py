@@ -1,5 +1,6 @@
 from bot.utils.states import State
 
+
 def test_states():
     assert State.BUY.go_back() == State.TIME
     assert State.TIME.go_back() == State.DATE

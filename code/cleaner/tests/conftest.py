@@ -1,13 +1,14 @@
-#%%
-import os
-import pytest
+"""Cleaner-specific test fixtures.
 
-#%%
-@pytest.fixture
-def schemas():
-    return ["tracker"]
+Shared fixtures are automatically imported from parent conftest.py:
+- postgres_container: PostgreSQL test container
+- db_engine: SQLAlchemy engine
+- db_connection_uri: Connection URI with schema
+- db_connection_uri_with_sample_data: Connection URI with sample data (uses sample-data-cleaner.sql)
+- schemas: List of database schemas
+- init_scripts: List of init scripts
+"""
 
-@pytest.fixture
-def init_scripts():
-    return [os.path.abspath("./code/init-db/init-db.sql"),
-            os.path.abspath("./code/init-db/sample-data-cleaner.sql")]
+from __future__ import annotations
+
+# All shared fixtures are automatically available from parent conftest.py

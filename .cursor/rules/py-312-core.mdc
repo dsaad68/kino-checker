@@ -1,0 +1,178 @@
+---
+globs: *.py
+alwaysApply: false
+---
+
+# CORE LANGUAGE FEATURES
+
+## Tooling & Development Environment
+
+- Use `uv` for fast, reliable Python package management and virtual environment creation.
+- Use `ruff` for linting and code formatting to enforce consistent style and catch common errors.
+
+## Baseline Principles
+
+- Prefer readability first, then performance;
+- Write type-annotated, side-effect-minimal functions with clear docstrings and single responsibilities.
+- Prefer small, composable functions and keep public APIs stable and well-typed.
+
+## Type Hints & Generics
+
+- Use the new 3.12 generic syntax `class MyClass[T]:` and `def func[T](x: T)` for type parameters on classes and functions.
+- Leverage `typing.Self` for fluent interfaces and methods that return instances of the same class.
+- Use `typing.override` decorator when overriding base-class methods to catch signature drift and mismatches.
+- Use `typing.Final` for constants and `typing.Literal`/`LiteralString` to tighten APIs where practical.
+- Prefer `TypedDict`/`Protocol` for structural typing instead of loose dict/Any in public surfaces.
+- Use the `type` statement (PEP 695) for creating type aliases instead of TypeAlias for cleaner syntax.
+- Use `type[X]` instead of `Type[X]` from typing module for class object type hints.
+- Always annotate function signatures with parameter and return types for better IDE support and documentation.
+- Use union types with `|` operator instead of `Union[]` for more readable type hints.
+
+## Pattern Matching
+
+- Use `match`/`case` to replace long if-elif chains on tagged data or enums for clarity and exhaustiveness checking.
+- Keep patterns shallow and explicit; prefer guards (`if ...`) over deeply nested alternatives.
+- Define `__match_args__` on simple domain classes when positional matching improves clarity.
+- Avoid side effects inside case bodies that make control flow hard to follow.
+
+## Function Design
+
+- Use `*` in function signatures to enforce keyword-only arguments for parameters that affect behavior significantly.
+- Leverage positional-only parameters (before `/`) when parameter names don't add clarity or may change.
+- Use `functools.partial` to create specialized functions from general ones instead of wrapper functions.
+- Prefer `functools.singledispatch` for function overloading based on first argument type instead of if-elif type checks.
+
+## Comprehensions & Expressions
+
+- Use dictionary comprehensions with conditional logic instead of filter/map chains for better readability.
+- Leverage walrus operator (`:=`) in comprehensions to avoid recomputing the same expression.
+- Prefer comprehensions over `map()`/`filter()` for simple operations but use functions for complex logic.
+- Use set comprehensions when you need unique values from a transformation.
+- Use itertools instead of manual loops for complex iterators and generators and there is performance benefits.
+
+## String & F-Strings
+
+- Prefer f-strings for string formatting instead of `%` formatting or `.format()` for better readability and speed.
+- Keep formatting logic in one place and use format specifiers rather than manual padding or slicing.
+- Leverage f-string debugging syntax `f"{variable=}"` to quickly print variable names and values.
+- Use f-string format specifiers for number formatting (e.g., `f"{value:.2f}"`) instead of round() when displaying.
+- Prefer raw f-strings (`fr"..."`) when combining f-string interpolation with regular expressions.
+- Avoid `+` concatenation in loops; use `str.join()` for better performance.
+
+## Collections ABCs & Protocols
+
+- Import collection ABCs from `collections.abc` and check against interfaces, not concrete types.
+- Prefer protocols to duck-type capabilities explicitly instead of using `hasattr()` checks.
+- Use `isinstance()` checks with ABCs (Sequence, Mapping, Iterable) for generic type validation.
+
+## Dataclasses & Slots
+
+- Use `@dataclass(slots=True)` to automatically generate `__slots__` and cut memory usage while disallowing ad-hoc attributes.
+- Mark objects immutable with `frozen=True` when possible to aid reasoning and safe sharing.
+- Use `field(default_factory=...)` for mutable default values instead of default arguments.
+- Prefer keyword-only fields with `kw_only=True` for clarity on construction and future-proofing.
+- Avoid custom `__init__` unless necessary; keep logic in factory functions or `__post_init__`.
+- Set `match_args=True` (default in 3.10+) to enable positional pattern matching with dataclasses.
+
+## Pydantic v2 Models
+
+- Use `pydantic.BaseModel` for data validation, serialization, and settings management with automatic type coercion.
+- Leverage `Field()` for validation constraints, defaults, and metadata instead of plain type hints.
+- Use `model_validate()` for validating dictionaries and `model_validate_json()` for JSON strings instead of deprecated parse methods.
+- Enable `ConfigDict(strict=True)` when you want to disallow type coercion and enforce exact type matches.
+- Use `@field_validator` decorator for custom field validation logic and `@model_validator` for cross-field validation.
+- Prefer `model_dump()` and `model_dump_json()` over deprecated `dict()` and `json()` methods for serialization.
+- Use `ConfigDict(frozen=True)` to create immutable models that can be hashed and used as dictionary keys.
+- Leverage `computed_field` decorator with `@property` for derived fields that are included in serialization.
+- Use `model_config = ConfigDict(...)` class attribute instead of nested `Config` class for configuration.
+- Define custom types with `Annotated[Type, Field(...)]` for reusable validation patterns across models.
+- Use `BeforeValidator`, `AfterValidator`, and `WrapValidator` from `pydantic.functional_validators` for complex validation logic.
+- Prefer Pydantic's built-in types (`EmailStr`, `HttpUrl`, `UUID`, `Json`) over manual validation when available.
+- Use `model_rebuild()` when you need to update forward references after all models are defined.
+- Enable `ConfigDict(validate_assignment=True)` to validate field values on assignment after initialization.
+- Use `ConfigDict(extra='forbid')` to reject unknown fields during validation for strict API contracts.
+
+## Error Handling
+
+- Use precise exception types and fail fast with actionable messages.
+- Prefer guard-style validation over try/except for control flow to keep exception handling for truly exceptional cases.
+- When handling parallel tasks, use exception groups (`except*`) to collect failures coherently from concurrent operations.
+- Attach context with `Exception.add_note()` for easier debugging without losing the original traceback.
+- Use `else` clause in try-except blocks for code that should run only when no exception occurred.
+- Leverage `contextlib.suppress()` for ignoring expected exceptions instead of empty except blocks.
+
+## Context Managers
+
+- Always use context managers (`with` statements) for resource management like files, locks, and connections.
+- Create custom context managers using `@contextlib.contextmanager` decorator for reusable resource patterns.
+- Use `contextlib.suppress()` to ignore specific exceptions in clean, readable code.
+- Leverage `contextlib.ExitStack` when managing a variable number of context managers dynamically.
+
+## Code Organization
+
+- Use `from __future__ import annotations` to enable postponed evaluation of type hints and avoid circular imports.
+- Group imports in order: standard library, third-party packages, local modules with blank lines between groups.
+- Keep import sections tidy and explicit; avoid wildcard imports.
+- Use absolute imports for cross-package references and relative imports only within a package.
+- Define `__all__` for public modules to make the export surface intentional.
+
+## Files, I/O & Resources
+
+- Use `pathlib.Path` for paths and `with` statements for files, locks, and network resources.
+- Buffer I/O where beneficial and avoid reading entire files into memory when streaming suffices.
+- Use `tomllib` for TOML configuration parsing in the standard library (read-only in 3.12).
+- Prefer binary mode for non-text files and specify encoding explicitly when reading text files.
+
+## Command-Line & Configuration
+
+- Use `click` for building command-line interfaces with automatic help generation and type conversion.
+- Validate configuration at startup and fail fast with clear diagnostics when misconfigured.
+- Avoid hardcoding configuration values; externalize them to environment variables or TOML files for different environments.
+- Leverage click decorators (`@click.command()`, `@click.option()`, `@click.argument()`) for declarative CLI definition.
+
+## Security & Robustness
+
+- Treat external input as untrusted; validate and sanitize before use in application logic.
+- Avoid `eval()`/`exec()` and restrict deserialization to safe formats; never unpickle untrusted data.
+- Use secrets module for cryptographically secure random values, not the random module.
+
+## Data Structures
+
+- Choose the right container: `deque` for FIFO/LIFO queues, `heapq` for priority queues, `bisect` for sorted lists.
+- Use `collections.Counter` for frequency counting instead of manual dictionary operations.
+- Use `collections.defaultdict` for grouped accumulation to eliminate KeyError handling.
+- Prefer `array`, `memoryview`, or `bytearray` for large numeric/byte workloads to reduce overhead.
+- Use `set`/`frozenset` for membership tests and deduplication; avoid list for repeated containment checks.
+- Keep dictionaries flat and small; prefer tuples or dataclasses for fixed records.
+
+## Iterators & Generators
+
+- Iterate lazily: favor generator expressions and itertools to avoid temporary lists.
+- Use `enumerate()` and `zip()` instead of manual index bookkeeping.
+- Stream transforms as pipelines (itertools/generators) and materialize only at the boundary.
+- Avoid converting to `list()` unless you truly need random access or length.
+- Use `yield from` when delegating to another generator or iterator.
+
+## Async Programming
+
+- Use `async`/`await` for I/O-bound operations; never block the event loop with CPU work or synchronous I/O.
+- Use `asyncio.TaskGroup` for structured concurrency and proper exception handling of concurrent tasks.
+- Use `asyncio.timeout()` for bounded waits instead of manual timeout tracking with asyncio.wait_for().
+- Convert unavoidable blocking calls with `asyncio.to_thread()` or move them to worker processes when CPU-bound.
+- Prefer async context managers and async iterators, ensuring graceful cancellation and cleanup.
+- Avoid mixing multiple event loops per process unless you know why; keep one loop per process in typical apps.
+- Use `asyncio.gather()` when you need to run multiple coroutines concurrently and collect all results.
+- Use `asyncio.create_task()` to run coroutines concurrently without awaiting immediately.
+
+## Concurrency
+
+- Use `threading` for I/O-bound CPU-light tasks with proper lock management.
+- Leverage `multiprocessing` or `concurrent.futures.ProcessPoolExecutor` for CPU-bound parallel tasks.
+- Use `concurrent.futures.ThreadPoolExecutor` for managing thread pools instead of manual thread management.
+- Prefer `asyncio` over threading for high-concurrency I/O-bound workloads.
+
+## Logging & Observability
+
+- Use `loguru` for logging with structured, leveled logs—avoid `print()` statements in library or application code.
+- Pass correlation IDs or task context using extra fields with `logger.bind()` to trace async flows and tasks.
+- Prefer structured logging with key-value pairs (`logger.info("Message", user_id=uid, action=action)`) for easier filtering and analysis.

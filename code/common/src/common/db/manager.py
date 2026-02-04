@@ -1,25 +1,30 @@
 # %%
+from __future__ import annotations
+
 import logging
+from collections.abc import Callable
+from typing import TypeVar
 
-from typing import Type, Callable
-
-from sqlalchemy.sql import select
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine, Update
 from psycopg2.errors import CardinalityViolation
+from sqlalchemy import Update, create_engine
 from sqlalchemy.dialects.postgresql import Insert
-from sqlalchemy.exc import SQLAlchemyError, ProgrammingError
+from sqlalchemy.exc import ProgrammingError, SQLAlchemyError
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.sql import select
 
-#%%
+T = TypeVar("T")
+
+# %%
+
 
 class DBManager:
     """This class is used to manage the database connection and session."""
 
-    def __init__(self, connection_uri: str):
-        self.connection_uri = connection_uri
-        self.session_maker = self._session_maker()
+    def __init__(self, connection_uri: str) -> None:
+        self.connection_uri: str = connection_uri
+        self.session_maker: sessionmaker[Session] = self._session_maker()
 
-    def _session_maker(self) -> sessionmaker:
+    def _session_maker(self) -> sessionmaker[Session]:
         """Creates a session factory for connecting to the database."""
 
         # Define the database connection
@@ -52,7 +57,7 @@ class DBManager:
             session.rollback()  # type: ignore
 
     # INFO: old name: execute_query
-    def execute_fetch_one(self, model: Type, filter_condition: Callable) -> Type | None:
+    def execute_fetch_one(self, model: type[T], filter_condition: Callable[[type[T]], bool]) -> T | None:
         """Execute a query with a given a statement."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
@@ -61,41 +66,41 @@ class DBManager:
                 return session.execute(select(model).where(filter_condition(model))).scalars().first()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
         except Exception as error:
             logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
 
-    def execute_query_mapping_all(self, stmt) -> list[dict] | None:
+    def execute_query_mapping_all(self, stmt: select) -> list[dict] | None:
         """Execute a query with a given a statement."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
-            with self.session_maker() as session: # type: ignore
+            with self.session_maker() as session:
                 return session.execute(stmt).mappings().all()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
         except Exception as error:
             logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
 
-    def execute_query_all(self, stmt) -> list[Type] | None:
+    def execute_query_all(self, stmt: select[tuple[T]]) -> list[T] | None:
         """Execute a query with a given a statement."""
 
         # sourcery skip: class-extract-method, extract-duplicate-method
         try:
-            with self.session_maker() as session: # type: ignore
+            with self.session_maker() as session:
                 return session.execute(stmt).scalars().all()
         except SQLAlchemyError as error:
             logging.error(f"Database Error: {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
         except Exception as error:
             logging.error(f"ERROR : {error}", exc_info=True)
-            session.rollback()  # type: ignore
+            session.rollback()
             return None
