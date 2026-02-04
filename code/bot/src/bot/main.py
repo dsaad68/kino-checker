@@ -58,6 +58,7 @@ def setup_handlers(ctx: BotContext) -> None:
             db_dialect_connection_uri=ctx.db_dialect_connection_uri,
             open_ai_api_key=ctx.openai_api_key,
             eleven_api_key=ctx.eleven_api_key,
+            eleven_voice_id=ctx.eleven_voice_id,
         )
         agent.answer(bot, message)
         bot.delete_state(message.from_user.id, message.chat.id)
@@ -198,6 +199,7 @@ def main() -> None:
         db_dialect_connection_uri=config.database.connection_uri,
         openai_api_key=config.openai.api_key,
         eleven_api_key=config.elevenlabs.api_key,
+        eleven_voice_id=config.elevenlabs.voice_id,
     )
 
     # Setup all handlers with context

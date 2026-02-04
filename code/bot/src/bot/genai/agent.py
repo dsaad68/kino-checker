@@ -24,8 +24,19 @@ def _last_ai_content(messages: list) -> str:
     return "I couldn't find an answer."
 
 
+# Default ElevenLabs voice ID (Rachel) when ELEVEN_VOICE_ID is not set. API requires UUID, not name.
+_DEFAULT_ELEVEN_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"
+
+
 class AnswerWithVoice:
-    def __init__(self, db_dialect_connection_uri: str, open_ai_api_key: str, eleven_api_key: str) -> None:
+    def __init__(
+        self,
+        db_dialect_connection_uri: str,
+        open_ai_api_key: str,
+        eleven_api_key: str,
+        eleven_voice_id: str | None = None,
+    ) -> None:
+        self._voice_id = eleven_voice_id or _DEFAULT_ELEVEN_VOICE_ID
         self._chat_openai = ChatOpenAI(
             model="gpt-4o-mini",
             temperature=0,
@@ -63,7 +74,7 @@ class AnswerWithVoice:
     def _generate_voice(self, answer: str) -> bytes:
         client = ElevenLabs(api_key=self._eleven_api_key)
         chunks = client.text_to_speech.convert(
-            voice_id="Callum",
+            voice_id=self._voice_id,
             text=answer,
             model_id="eleven_multilingual_v1",
             output_format="mp3_44100_128",

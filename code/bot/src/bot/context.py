@@ -19,6 +19,7 @@ class BotContext:
     db_info_finder: FilmInfoFinder
     openai_api_key: str
     eleven_api_key: str
+    eleven_voice_id: str | None
     db_dialect_connection_uri: str
 
     # Rate limiters
@@ -39,6 +40,7 @@ class BotContext:
         db_dialect_connection_uri: str,
         openai_api_key: str,
         eleven_api_key: str,
+        eleven_voice_id: str | None = None,
     ) -> BotContext:
         """Factory method to create a BotContext with initialized dependencies."""
         state_storage = StateMemoryStorage()
@@ -50,6 +52,7 @@ class BotContext:
             db_info_finder=db_info_finder,
             openai_api_key=openai_api_key,
             eleven_api_key=eleven_api_key,
+            eleven_voice_id=eleven_voice_id,
             db_dialect_connection_uri=db_dialect_connection_uri,
         )
 
