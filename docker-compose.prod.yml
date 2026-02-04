@@ -1,18 +1,29 @@
-# Production overrides: build with production target, resource limits
-# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Production compose: can be used standalone or with base compose.
+# No .env file required: set POSTGRES_*, TELEGRAM_BOT_TOKEN, OPENAI_API_KEY,
+# ELEVEN_API_KEY, POSTGRES_DB_CONNECTION_URI in the deployment environment.
+# Standalone: docker compose -f docker-compose.prod.yml up -d --build
+# With base:  docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 
 services:
   db:
+    image: postgres:16-alpine
     container_name: kino-db-prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports: ["5432:5432"]
     volumes:
       - db-prod:/var/lib/postgresql/data
       - ./code/init-db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
+    networks: [app-network]
     deploy:
       resources:
         limits: { cpus: "2", memory: 2G }
@@ -29,6 +40,7 @@ services:
     volumes:
       - ./logs:/app/logs
     restart: always
+    networks: [app-network]
     deploy:
       resources:
         limits: { cpus: "1", memory: 512M }
@@ -45,6 +57,7 @@ services:
     volumes:
       - ./logs:/app/logs
     restart: always
+    networks: [app-network]
     deploy:
       resources:
         limits: { cpus: "1", memory: 512M }
@@ -61,10 +74,15 @@ services:
     volumes:
       - ./logs:/app/logs
     restart: always
+    networks: [app-network]
     deploy:
       resources:
         limits: { cpus: "0.5", memory: 256M }
         reservations: { cpus: "0.25", memory: 128M }
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   db-prod:
