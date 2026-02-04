@@ -19,6 +19,7 @@ class DatabaseConfig(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="POSTGRES_",
         populate_by_name=True,
+        env_file=None,  # use only os.environ (e.g. Docker/K8s); no .env file
     )
 
     # Explicit env name so deployment can set POSTGRES_DB_CONNECTION_URI (prefix can override alias)
@@ -55,7 +56,7 @@ class DatabaseConfig(BaseSettings):
 class TelegramConfig(BaseSettings):
     """Telegram bot configuration settings."""
 
-    model_config = SettingsConfigDict(env_prefix="TELEGRAM_")
+    model_config = SettingsConfigDict(env_prefix="TELEGRAM_", env_file=None)
 
     bot_token: str = Field(alias="TELEGRAM_BOT_TOKEN")
 
@@ -63,7 +64,7 @@ class TelegramConfig(BaseSettings):
 class OpenAIConfig(BaseSettings):
     """OpenAI API configuration settings."""
 
-    model_config = SettingsConfigDict(env_prefix="OPENAI_")
+    model_config = SettingsConfigDict(env_prefix="OPENAI_", env_file=None)
 
     api_key: str = Field(alias="OPENAI_API_KEY")
     model: str = "gpt-4-0125-preview"
@@ -72,7 +73,7 @@ class OpenAIConfig(BaseSettings):
 class ElevenLabsConfig(BaseSettings):
     """ElevenLabs API configuration settings."""
 
-    model_config = SettingsConfigDict(env_prefix="ELEVEN_")
+    model_config = SettingsConfigDict(env_prefix="ELEVEN_", env_file=None)
 
     api_key: str = Field(alias="ELEVEN_API_KEY")
 
