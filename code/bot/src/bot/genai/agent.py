@@ -25,7 +25,7 @@ def _last_ai_content(messages: list) -> str:
 
 
 # Default ElevenLabs voice ID (Rachel) when ELEVEN_VOICE_ID is not set. API requires UUID, not name.
-_DEFAULT_ELEVEN_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"
+_DEFAULT_ELEVEN_VOICE_ID = "ruirxsoakN0GWmGNIo04"
 
 
 class AnswerWithVoice:
