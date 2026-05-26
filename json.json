@@ -1,0 +1,518 @@
+{
+    "shoppingCartId": "30a524a165464150bc47711e4ea9d447",
+    "expires": "2026-02-04T20:47:07.5819481Z",
+    "customer": {
+        "id": 6100710,
+        "title": "Herr",
+        "firstName": "Daniel",
+        "lastName": "Saad",
+        "email": "dsaad68@gmail.com",
+        "address": {
+            "street": "Berckmüllerstraße",
+            "streetNumber": "10",
+            "postalCode": "76131",
+            "city": "Kalrsruhe",
+            "countryCode": "DEU"
+        },
+        "birthday": "1989-07-09"
+    },
+    "pricing": {
+        "sumOfLoyaltyPoints": 0
+    },
+    "promotions": [
+        {
+            "promotionItemId": "1bb0c74ab12549ce9eb3bca27679eb39",
+            "promotionType": "customer-card",
+            "promotionContext": {
+                "customerCardPricesRequireCardPayment": true,
+                "promotionAccounts": [
+                    {
+                        "number": 0,
+                        "unit": "EUR",
+                        "type": "stored-value",
+                        "remainingBalance": {
+                            "amount": 17.71,
+                            "unit": "EUR"
+                        },
+                        "redeemAutomatically": false,
+                        "redeemableAmount": {
+                            "amount": 17.71,
+                            "unit": "EUR"
+                        },
+                        "validFor": {
+                            "priceCategories": [],
+                            "products": [],
+                            "vouchers": []
+                        }
+                    },
+                    {
+                        "number": 10,
+                        "name": "10% Erm. Ticket",
+                        "unit": "Ermäßigung",
+                        "type": "discount-percent",
+                        "remainingBalance": {
+                            "amount": 2,
+                            "unit": "Ermäßigung"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 20,
+                        "name": "10% Erm. Concession",
+                        "unit": "Ermäßigung",
+                        "type": "discount-percent",
+                        "remainingBalance": {
+                            "amount": 50,
+                            "unit": "Ermäßigung"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 100,
+                        "name": "Freikarte",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 300,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 310,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 320,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 330,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 340,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 350,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 360,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    },
+                    {
+                        "number": 370,
+                        "name": "5 Sterne Tickets",
+                        "unit": "Ticket",
+                        "type": "free-ticket",
+                        "remainingBalance": {
+                            "amount": 0,
+                            "unit": "Ticket"
+                        },
+                        "redeemAutomatically": false
+                    }
+                ],
+                "loyaltySchemeNumber": 10006,
+                "cardNumber": "550011778"
+            },
+            "isApplied": false
+        }
+    ],
+    "promotionCustomerCards": [
+        {
+            "cardNumber": "550011778",
+            "customerCardPricesRequireCardPayment": true,
+            "customerAccounts": [
+                {
+                    "number": 0,
+                    "unit": "EUR",
+                    "type": "stored-value",
+                    "remainingBalance": {
+                        "amount": 17.71,
+                        "unit": "EUR"
+                    },
+                    "redeemAutomatically": false,
+                    "redeemableAmount": {
+                        "amount": 17.71,
+                        "unit": "EUR"
+                    },
+                    "validFor": {
+                        "priceCategories": [],
+                        "products": [],
+                        "vouchers": []
+                    }
+                },
+                {
+                    "number": 10,
+                    "name": "10% Erm. Ticket",
+                    "unit": "Ermäßigung",
+                    "type": "discount-percent",
+                    "remainingBalance": {
+                        "amount": 2,
+                        "unit": "Ermäßigung"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 20,
+                    "name": "10% Erm. Concession",
+                    "unit": "Ermäßigung",
+                    "type": "discount-percent",
+                    "remainingBalance": {
+                        "amount": 50,
+                        "unit": "Ermäßigung"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 100,
+                    "name": "Freikarte",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 300,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 310,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 320,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 330,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 340,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 350,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 360,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                },
+                {
+                    "number": 370,
+                    "name": "5 Sterne Tickets",
+                    "unit": "Ticket",
+                    "type": "free-ticket",
+                    "remainingBalance": {
+                        "amount": 0,
+                        "unit": "Ticket"
+                    },
+                    "redeemAutomatically": false
+                }
+            ]
+        }
+    ],
+    "availablePaymentMethods": [
+        {
+            "identifier": "payPal",
+            "friendlyName": "PayPal",
+            "supportMultiple": false,
+            "paymentCategory": "external",
+            "supportStoredPayment": true,
+            "isPromotionalPaymentMethod": false
+        },
+        {
+            "identifier": "evoPayments",
+            "friendlyName": "Kreditkarte",
+            "supportMultiple": false,
+            "paymentCategory": "external",
+            "supportStoredPayment": false,
+            "isPromotionalPaymentMethod": false
+        },
+        {
+            "identifier": "vouchercard",
+            "friendlyName": "Gutscheinkarte",
+            "supportMultiple": true,
+            "paymentCategory": "voucher-card",
+            "supportStoredPayment": false,
+            "isPromotionalPaymentMethod": false
+        },
+        {
+            "identifier": "voucher",
+            "friendlyName": "Gutschein",
+            "supportMultiple": true,
+            "paymentCategory": "voucher",
+            "supportStoredPayment": false,
+            "isPromotionalPaymentMethod": false
+        },
+        {
+            "identifier": "storedValue",
+            "friendlyName": "Stored value",
+            "supportMultiple": true,
+            "paymentCategory": "stored-value",
+            "supportStoredPayment": false,
+            "isPromotionalPaymentMethod": false
+        }
+    ],
+    "shippingAddressRequired": false,
+    "availableStoredPayments": [],
+    "seatSelection": {
+        "selection": [
+            {
+                "sno": 116,
+                "row": "B",
+                "col": "8",
+                "seat": "8",
+                "status": 1284,
+                "seatTypeName": "love-chair"
+            },
+            {
+                "sno": 117,
+                "row": "B",
+                "col": "9",
+                "seat": "9",
+                "status": 1284,
+                "seatTypeName": "love-chair"
+            }
+        ],
+        "expires": "2026-02-04T20:47:07.5819481Z",
+        "numberOfSeats": 2,
+        "seatingAreaId": 1,
+        "seatingAreaName": "Sitzplatz",
+        "seatingArea": {
+            "id": 1,
+            "name": "Sitzplatz",
+            "useAssignedSeating": true,
+            "acceptanceMethod": "none"
+        },
+        "performance": {
+            "id": "9E4C5000023UHQLKCP",
+            "name": "Avatar: Fire and Ash HFR",
+            "title": "Avatar: Fire and Ash HFR",
+            "ticketTitle": "Avatar: Fire and Ash HFR",
+            "displayTitle": "Avatar: Fire and Ash HFR",
+            "performanceDateTime": "2026-02-05T16:00:00+01:00",
+            "auditoriumId": "40000000015UHQLKCP",
+            "auditoriumNumber": 4,
+            "auditoriumName": "Kino 4",
+            "auditorium": {
+                "id": "40000000015UHQLKCP",
+                "name": "Kino 4",
+                "number": 4,
+                "type": "auditorium"
+            },
+            "filmReleaseType": {
+                "id": 322,
+                "identifier": "HFR",
+                "number": 216,
+                "name": "HFR",
+                "shortName": "Hfr",
+                "badgeText": "",
+                "sortOrder": 38,
+                "acceptanceMethod": "none",
+                "icons": []
+            },
+            "filmId": "A14BC200012UHQLKCP",
+            "filmTitle": "Avatar: Fire and Ash",
+            "imageUrl": "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy9sRTlLcFZ3Z2VXSE13Z3drTmFlSDVuRUZoMjAuanBnX2RlfA",
+            "posterUrls": [
+                "https://contentservice.cineorder.shop/contents/img?q=683jXKQuPC9SmgAAUHQLETQ",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy9jUGc1NnE0aGFpbHNWN3gwaDFPbWhjN2tDeE4uanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy9uQjhnalFkSTZSUGN6R2NKNW16Q2dBZGpkSDguanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy95blFMZE5weWNBRTZ6ZnQ0S2pQdDZtZUdxTzEuanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy9yQTVMek5JQXl4QTE4NngycGxoMmZSUkdPT0guanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy9sRTlLcFZ3Z2VXSE13Z3drTmFlSDVuRUZoMjAuanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy83OUd6NmV4Wng3OXhhUWM0ZlZqV0NaNHdEeGYuanBnX2RlfA",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w3fDgzNTMzXy83T2xPVU9IWVdGcjBpOG9lMEYyajIzdG84YXIuanBnX2RlfA"
+            ],
+            "backdropUrls": [
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9wTjNlYUNsM3Nxd3JlclU4VU5kcDQwRjJtSzAuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9pTjQxQ2N3NERjdEw4bnBmbVlnMWo1VHIxZWIuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy92bTRIMURpdmpRb05JbTBWczZpM0NUekZ4UTAuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9ieFdaQ0NxOG9qUXlndjNwVUxvcGZvUnIxSEIuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9BdXo5VHdLc0dyR2hxS2JSNmRLT0VseUZqOXQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9jcDM1amNKMDlZeVl0MFFEak5zdVBLY3hadzYuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy85UVc4YlEwQks0R2p0cEhQdVp2SDZjZmNCRFMuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy82aExrTXVuTm5GelpUa0t4SERIZGJJN2JQdzQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91Z2dYb3ZLTk9lRVpQM0JtRjJjcVVFZnpzaXguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy93dnNaazVmRnZqWEtpdGFXUTJLbFllQXE0TjMuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qSVRGYjJJM0d3cFE1REdEdmtnMm0xUGMzV0IuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9tSTJzclNUTklZWHBoVWRXTmFybEtTSlJ6OEQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy90aWJzTWpnOTlsQUlDdXFSRUZ2UnhLVldrcWcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qTWowSG1uVlUycFZFcHIzZ0NOd2xkM3ozY0wuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91cXppcUVhZXo3T2xaaXhyUGo4YTg2MUNxckouanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy8yNmdIMnJhSmVMSmQwaFFHZ1NZYllHa0ZTd3kuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9mVWhZcHoyWGRzZ0lOZWJQbjZmS2s3TjlISGguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9xM3FtSmFhVFF0V2ZxQkhWeXRHcmZpc0xkdVEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91NFd4SlNUeDRQMGFRZE9aTk5aR1J0MkRPNzMuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy94M2xEQjJqRUhuV2NpQnowVzF0QVJHM2dKczYuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9mU3ZkMlFCVHZLb1NSZ0hEN1BTejJqZVU0bXcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qWkRoMTNDTkhYd0NheVJyaUg0NUJXSGdPNnIuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy95SzA0VUxIS3pTdjViVWVzdnRSY3Y3SFF3YUEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9kWVpsb1Q0Z1ZrSDFHZ2hjNDI1TlhXam8xbTQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9kMXVGNnlsMFBHT2RTbkhqcWlJUTl1SXpTRTguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy8yeUVZZnhscjNSYnlMemVzREhtYzZLSmwxb0UuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy82V085OWY4R1FGRHpEZlg4T05IUmFKQmZCeDYuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9kaVhpZzl2R05ERVBEMEpwVjV2azRJVHpZd2EuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qeVQyNjkwOExaenFUeGxoRHkzakFXM1NPdnguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9zc0RrQ09xZzZ1U0pINW82VGljTmRXSG5HM2YuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qOVJWdW8zYVBoZGx3MDFFTlR4MVFiM0hWc0YuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy96OXZIc2tnd3cxMjExTzNUbzlWUWVFelV2eDcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9jOENaeHJMYUI1NFp0RTJzcVVja05aQW9yUFUuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91ZG1Vd0ZDbTRtYm5kSEd2N0R6QUN0aThkenUuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy82aktwSk5YczUwQ2NzS1lHYXdKOUdBWlRBNkEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy8xcURmdmVXV3NJZjE2QmFsQ1NrNktpOWZXVUEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9tdmhyUVhOVUVuWHNWWGJIaWlHNE1yMkw2MUIuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9zcDBJMnZYejlOZU9nNzJjVExZcWdlUWNrTEwuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9sUHEza1ZKMHdCNDN3Um5teFRudWJJVUZKYXguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9Bdm5rd1hlTXhQd1NnUk1sUnVJRTZrN3VPSjkuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy84OE50dlg5WEdIRlROMXJXd3RqY0c5Q3JkZEUuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy8xZnR6SFJuVlpVUldiZThGNGJDa2F6N2hSeEUuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qeFd4SWFKY3VrbTN6UW81dmFVeTd5NzhtSGcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9xZTZHRGpZeE1nd1hhRzJBVllnZ1VYZGxWWFguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy93THVLVjkyN3JvbTNQdjc3NGoxWnJTcG1TamouanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9qY1JybW9IZFllOHljZGFuQ2dFVUlqc1pQRjQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy80cHl3RE1ZeThUZ1ZZSzFtdTBGNm1ZRjlWNjkuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9kNXNNajlsZW1QM3lUdE00M2VxUVA1VWRWbWQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9hTEJrSXlDbFlWVVU1NFQwNURrdkpZRWZQYjguanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy93bE4yWE9zMlo1M0dPWkNUcjNuUEJ3ZXRGMVQuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy85aWVrTDZOckk0MzdTZm14VlFrNUlGb0xIbU0uanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy80TkZjQ0xVVmlmeFNYV0R2RkZscFNwUTMzRm0uanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9tempPTnl5MmZ0Q29JZDhsQXFmNDZKbmFGM1QuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9kVVBhZU9JQ0l0ZWxOektVdXZqWkhBdFY5SnYuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9wN29BczJVWWpuckhoY05vaHRIQUpBOW5FRUcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy90MWFncUliTEZZcVI1cUY2WnEzUVMzMFZ0MTYuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9sNEZLek9zcExORzllR3F5bEI3ME9vZW1XeHAuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy83ZW92eFJSRFpHRnBIRjBGdmNMWGFJVU5VV0MuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9lWHdrTlRiVU84Qm1sNldnWG9CdzJmWlBOMmwuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9tcEJEOTl2OEt4dDVrT29jV0E4dks2SG9XSzAuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy81dnRXTUJiT2RDWEo1elh4bWJTeE5uY282a2EuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy83ZjV0VTVBN0cwSHIzODF5Q3lEUmdNOXJwZ0kuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy8xZlk4TkJUMEkzSWg5cDVORkFOQVpMcXJZYW0uanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9wVFFoMlJWSmFGY0NjREdkVTFPNTZSNndWZjAuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91OERVNWZrTG9NNXRUUnVrelBDMzFvR1B4YVEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9zZFpTanRHVVRTTjhCM2FsNW8wZjJXb1FmUVEuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy91NDVBcTJTRG1VUGJwZzZFSmZNblV3djNWZ2kuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9mcUlnV2gwWGpnaVhiR1h5NjFIOUJXbGtMWjcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9tOU5ocFBxeGVIcGE1WFhWV0xBUWhLaUhRY2IuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9scXpDUllpekVFYnZYa3BKVVpjd25xYjNvWHcuanBnX3w",
+                "https://contentservice.cineorder.shop/contents/img?q=fDJ8M3w4fDgzNTMzXy9mSEEzbjAxMzJwVXFpNnJPY1BmRlN6ZEtDclUuanBnX3w"
+            ],
+            "performanceCustomFields": [],
+            "weekfilmCustomFields": [],
+            "filmReleaseCustomFields": [],
+            "filmCustomFields": []
+        },
+        "useAssignedSeating": true,
+        "refundDisabled": false
+    }
+}
