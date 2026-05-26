@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from datetime import date, datetime, time
 
-import requests
+from curl_cffi import requests
 from loguru import logger
 
 # Max characters of response body to log on error (avoid huge logs)
@@ -71,7 +71,7 @@ def _safe_json_response(response: requests.Response, context: str = "") -> dict 
 
     try:
         return response.json()
-    except requests.exceptions.JSONDecodeError as e:
+    except ValueError as e:
         snippet = (text[:_RESPONSE_BODY_LOG_LIMIT] + "...") if len(text) > _RESPONSE_BODY_LOG_LIMIT else text
         logger.error(
             "API response invalid JSON: status={} content_type={} context={} error={} body={}",
@@ -88,15 +88,26 @@ class FilmFetcher:
     def __init__(self, center_oid: str = CENTER_OID, headers: dict = HEADERS):
         self.center_oid = center_oid
         self.headers = headers
+        # curl_cffi browser impersonation gets us past Cloudflare's TLS fingerprint check
+        self.session = requests.Session(impersonate="chrome120")
+        self._warm_up()
         self.session_id = self._get_session_id()
+
+    def _warm_up(self) -> None:
+        """Hit the landing pages first so the session picks up Cloudflare cookies before any API call."""
+        try:
+            self.session.get(CINEORDER_BASE_URL, timeout=30)
+            self.session.get(f"{CINEORDER_BASE_URL}/zkm", timeout=30)
+        except Exception as e:
+            logger.warning("Warm-up request failed: {}", e)
 
     def _get_session_id(self) -> str | None:
         url = f"{CINEORDER_BASE_URL}/api/session"
         headers = self.headers | {"center-oid": self.center_oid} | _auth_headers()
 
         try:
-            response = requests.request("GET", url, headers=headers, timeout=30)
-        except requests.RequestException as e:
+            response = self.session.get(url, headers=headers, timeout=30)
+        except Exception as e:
             logger.error("Session API request failed: %s", e)
             return None
 
@@ -111,8 +122,8 @@ class FilmFetcher:
         headers = self.headers | {"center-oid": self.center_oid, "session-id": self.session_id or ""} | _auth_headers()
 
         try:
-            response = requests.request("GET", url, headers=headers, params=params, timeout=30)
-        except requests.RequestException as e:
+            response = self.session.get(url, headers=headers, params=params, timeout=30)
+        except Exception as e:
             logger.error("Films API request failed: %s", e)
             return None
 

@@ -7,6 +7,9 @@ MINER_POLL_INTERVAL = 1200  # 20 minutes
 CLEANER_POLL_INTERVAL = 43200  # 12 hours
 CLEANER_TRACKABLE_DAYS = 120  # days to keep released films trackable
 
+# Miner fetch window: API rejects date_from more than 2 days in the past (error C-OL-18)
+MINER_FETCH_WINDOW_DAYS = 90
+
 # Rate limiting
 RATE_LIMIT_COMMANDS = 10  # requests per minute
 RATE_LIMIT_QUERIES = 5

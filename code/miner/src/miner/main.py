@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import time
+from datetime import date, timedelta
 from pathlib import Path
 
 from loguru import logger
 
 from common.config import DatabaseConfig, TelegramConfig
-from common.constants import MINER_POLL_INTERVAL
+from common.constants import MINER_FETCH_WINDOW_DAYS, MINER_POLL_INTERVAL
 from common.logging_config import setup_logger
 from miner.utils.film_db_manager import FilmDatabaseManager
 from miner.utils.film_fetcher import CENTER_OID, HEADERS, FilmFetcher, FilmInfoExtractor
@@ -39,7 +40,10 @@ def main() -> None:
 
         logger.info("Call the API to getting the films' list!")
         film_fetcher = FilmFetcher(center_oid=CENTER_OID, headers=HEADERS)
-        response = film_fetcher.get_film_list("2022-01-01", "2022-01-31")
+        today = date.today()
+        date_from = today.isoformat()
+        date_to = (today + timedelta(days=MINER_FETCH_WINDOW_DAYS)).isoformat()
+        response = film_fetcher.get_film_list(date_from, date_to)
 
         logger.info("Extracting the films info and performance data from the API response!")
         film_info_extractor = FilmInfoExtractor(response)
